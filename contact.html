@@ -41,36 +41,47 @@
   <h2>Liên hệ</h2>
   <div class="grid">
     <div class="form" style="grid-column:span 7">
-      <form>
+      <!-- SỬA: Thêm ID cho form -->
+      <form id="contact-form">
         <div class="grid" style="gap:10px">
           <div style="grid-column:span 6">
             <label>Họ và tên
-              <input class="input" type="text" placeholder="Nguyễn Văn A" required>
+              <!-- SỬA: Thêm ID -->
+              <input id="contact-name" class="input" type="text" placeholder="Nguyễn Văn A" required>
             </label>
           </div>
           <div style="grid-column:span 6">
             <label>Email
-              <input class="input" type="email" placeholder="you@example.com" required>
+              <!-- SỬA: Thêm ID -->
+              <input id="contact-email" class="input" type="email" placeholder="you@example.com" required>
             </label>
           </div>
           <div style="grid-column:span 12">
             <label>Tiêu đề
-              <input class="input" type="text" placeholder="Tôi cần hỗ trợ đơn hàng #1234" required>
+              <!-- SỬA: Thêm ID -->
+              <input id="contact-title" class="input" type="text" placeholder="Tôi cần hỗ trợ đơn hàng #1234" required>
             </label>
           </div>
           <div style="grid-column:span 12">
             <label>Nội dung
-              <textarea class="input" placeholder="Mô tả chi tiết vấn đề..."></textarea>
+              <!-- SỬA: Thêm ID -->
+              <textarea id="contact-message" class="input" placeholder="Mô tả chi tiết vấn đề..."></textarea>
             </label>
           </div>
+          
+          <!-- MỚI: Thêm 1 div để JS báo thành công -->
+          <div id="contact-success-msg" style="grid-column:span 12; color: var(--brand-2); font-weight: 700;"></div>
+          
           <div style="grid-column:span 12">
-            <a href="index.html">
-              <button class="btn primary" type="button" aria-disabled="true" title="Cần Backend để gửi">Gửi liên hệ</button>
-            </a>
+            <!-- SỬA: Bỏ thẻ <a>, đổi button thành type="submit" -->
+            <button class="btn primary" type="submit">Gửi liên hệ</button>
           </div>
         </div>
       </form>
-      <p class="muted" style="margin-top:8px">* Mẫu giao diện. Để gửi form cần xử lý bằng Backend.</p>
+      <!-- SỬA: Cập nhật lại dòng text -->
+      <p class="muted" style="margin-top:8px">
+        * Phản hồi sẽ được gửi đến trang quản trị của Admin.
+      </p>
     </div>
     <aside style="grid-column:span 5">
       <div class="card">

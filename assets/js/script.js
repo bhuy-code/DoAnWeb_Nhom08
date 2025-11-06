@@ -1,98 +1,66 @@
 // ==========================================================
 // HÀM TOÀN CỤC: Cập nhật chỉ báo số lượng giỏ hàng (Badge)
-// (Đặt bên ngoài DOMContentLoaded để các file khác có thể gọi)
 // ==========================================================
 function updateCartCounter() {
   const cart = JSON.parse(localStorage.getItem("cart")) || [];
-  // Tính tổng số lượng SẢN PHẨM (ví dụ: 2 áo + 1 quần = 3)
   const totalQuantity = cart.reduce((total, item) => total + (item.quantity || 0), 0);
   
-  // Tìm bộ đếm
   const counterElement = document.getElementById('cart-counter');
   if (counterElement) {
     if (totalQuantity > 0) {
       counterElement.textContent = totalQuantity;
-      counterElement.style.display = 'inline-block'; // Hiển thị
+      counterElement.style.display = 'inline-block'; 
     } else {
-      counterElement.style.display = 'none'; // Ẩn nếu bằng 0
+      counterElement.style.display = 'none'; 
     }
   }
 };
+
+// ==========================================================
+// (MỚI) HÀM KHỞI TẠO CƠ SỞ DỮ LIỆU TỒN KHO
+// ==========================================================
+function initializeInventory() {
+  // Kiểm tra xem kho hàng đã tồn tại trong localStorage chưa
+  if (!localStorage.getItem('masterInventory')) {
+    
+    console.log('Đang khởi tạo cơ sở dữ liệu tồn kho lần đầu...');
+    
+    // Dữ liệu tồn kho ban đầu
+    const initialInventory = [
+      { id: 'SP001', name: 'Áo thun basic Form Nữ', stock: 120 },
+      { id: 'SP002', name: 'Áo thun Basic Nam mẫu Typo', stock: 80 },
+      { id: 'SP003', name: 'Áo Sweaeter nỉ', stock: 50 },
+      { id: 'SP004', name: 'Áo len nữ', stock: 75 },
+      { id: 'SP005', name: 'Áo sơ mi Nam vải Broadcloth', stock: 90 },
+      { id: 'SP006', name: 'Jeans Baggy', stock: 65 },
+      { id: 'SP007', name: 'Áo Sơ Mi Cổ Thường Tay Ngắn', stock: 40 },
+      { id: 'SP008', name: 'Jeans Baggy Short', stock: 110 },
+      { id: 'SP009', name: 'Áo khoác Bomber', stock: 30 },
+      { id: 'SP010', name: 'Áo khoác chần bông lai', stock: 45 },
+      { id: 'SP011', name: 'Quần thể thao nữ', stock: 85 },
+      { id: 'SP012', name: 'Quần thể thao nam dài', stock: 60 }
+    ];
+    
+    // Lưu vào localStorage
+    localStorage.setItem('masterInventory', JSON.stringify(initialInventory));
+  }
+}
 
 // Chờ cho toàn bộ nội dung trang web được tải xong
 document.addEventListener('DOMContentLoaded', () => {
 
   console.log('Clothify JS (script.js) đã sẵn sàng!');
   
+  // ==========================================================
+  // TÍNH NĂNG 0 (MỚI): KHỞI TẠO KHO
+  // ==========================================================
+  initializeInventory(); // Chạy hàm khởi tạo kho
+  
   // Gọi hàm này ngay khi tải trang để lấy số lượng mới nhất
   updateCartCounter();
 
   // ==========================================================
-  // TÍNH NĂNG 1 (SỬA LỖI): Thêm vào giỏ hàng TRỰC TIẾP (cho index.html)
-  // FIX: Đổi tên class "add-to-cart-btn-direct" để tránh xung đột
-  // với "add-to-cart-btn" (có modal) bên file products.js
-  // ==========================================================
-  
-  document.querySelectorAll(".add-to-cart-btn-direct").forEach(button => {
-    button.addEventListener("click", () => {
-      const card = button.closest(".card");
-      const name = card.querySelector(".product-name").innerText;
-      const price = parseInt(card.querySelector(".product-price").dataset.priceValue);
-      const image = card.querySelector(".product-image").src;
-      const id = button.dataset.productId;
-      // Vì đây là thêm trực tiếp, ta tự gán 1 size mặc định (hoặc lấy từ data-attribute)
-      const size = button.dataset.availableSizes.split(',')[0] || 'M'; 
-
-      // Tạo đối tượng sản phẩm
-      const product = {
-        id: id,
-        name: name,
-        price: price,
-        image: image,
-        size: size,
-        quantity: 1,
-        uniqueId: id + "-" + size // Tạo ID duy nhất dựa trên size
-      };
-
-      // Lấy giỏ hàng hiện tại
-      let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-      // Kiểm tra nếu sản phẩm (với size đó) đã có
-      const existing = cart.find(item => item.uniqueId === product.uniqueId);
-      if (existing) {
-        existing.quantity += 1;
-      } else {
-        cart.push(product);
-      }
-
-      // Lưu lại vào localStorage
-      localStorage.setItem("cart", JSON.stringify(cart));
-
-      // Cập nhật bộ đếm trên header
-      updateCartCounter();
-
-      // === Hiệu ứng nút ===
-      const originalText = "Thêm vào giỏ";
-      
-      if (!button.classList.contains('added')) {
-        button.textContent = 'Đã thêm!';
-        button.classList.add('added');
-        button.style.backgroundColor = '#22a06b'; // Màu xanh
-        button.style.borderColor = '#22a06b';
-
-        setTimeout(() => {
-          button.textContent = originalText;
-          button.classList.remove('added');
-          button.style.backgroundColor = ''; // Xoá style
-          button.style.borderColor = '';
-        }, 1500);
-      }
-    });
-  });
-
-  // ==========================================================
   // TÍNH NĂNG 2: Lọc sản phẩm (trang "products.html")
-  // (Giữ nguyên, nhưng chỉ chạy nếu thấy .filterbar)
   // ==========================================================
   const filterBar = document.querySelector('.filterbar');
   if (filterBar) {
@@ -101,52 +69,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     filterButtons.forEach(button => {
       button.addEventListener('click', () => {
-        // 1. Cập nhật giao diện nút (thêm/xoá class 'active')
+        // 1. Cập nhật giao diện nút
         filterButtons.forEach(btn => btn.classList.remove('active'));
         button.classList.add('active');
 
-        // 2. Lấy giá trị lọc (từ data-filler="...")
-        const filterValue = button.dataset.filler.toLowerCase();
+        // 2. Lấy giá trị lọc (ví dụ: "tatca", "nam", "nu")
+        const filterValue = button.dataset.filler;
         
         // 3. Lọc sản phẩm
-        // LƯU Ý: logic lọc này yêu cầu card sản phẩm phải có data-category
-        // Ví dụ: <article class="card" data-category="nam">
-        // Code HTML gốc không có, nên hàm lọc này sẽ không hoạt động
-        // chính xác 100% trừ khi bạn thêm data-category vào HTML.
-        // Tuy nhiên, logic cơ bản là đúng.
-        
         productCards.forEach(card => {
-          // Lấy category từ tên sản phẩm (cách chữa cháy)
-          const title = card.querySelector('.product-name').innerText.toLowerCase();
-          
-          if (filterValue === 'tất cả') {
-            card.style.display = 'block';
-          } else if (filterValue === 'nam' && title.includes('nam')) {
-            card.style.display = 'block';
-          } else if (filterValue === 'nữ' && title.includes('nữ')) {
-            card.style.display = 'block';
-          } else if (filterValue === 'phụ kiện' && (title.includes('mũ') || title.includes('túi'))) {
-            // ví dụ
-            card.style.display = 'block';
-          } else if (filterValue !== 'nam' && filterValue !== 'nữ' && filterValue !== 'phụ kiện') {
-            // Fallback nếu category không rõ ràng (ví dụ: Áo len)
-             if (!title.includes('nam') && !title.includes('nữ')) {
-                card.style.display = 'block';
-             } else {
-                card.style.display = 'none';
-             }
-          }
-          else {
-            card.style.display = 'none';
-          }
+          // Lấy category của card (ví dụ: "nam", "nu")
+          const cardCategory = card.dataset.category;
 
-          // Cách lọc chuẩn nếu HTML có data-category
-          // const cardCategory = card.dataset.category || 'none';
-          // if (filterValue === 'tất cả' || filterValue === cardCategory) {
-          //   card.style.display = 'block';
-          // } else {
-          //   card.style.display = 'none';
-          // }
+          if (filterValue === 'tatca' || filterValue === cardCategory) {
+            card.style.display = 'block'; // Hiện
+          } else {
+            card.style.display = 'none'; // Ẩn
+          }
         });
       });
     });
@@ -154,16 +93,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ==========================================================
   // TÍNH NĂNG 3: Tìm kiếm (cho products.html và index.html)
-  // (Lấy từ file products.js cũ)
   // ==========================================================
   const searchInput = document.getElementById("search-input");
   const searchBtn = document.getElementById("search-btn");
-
   if (searchInput && searchBtn) {
     function filterProductsOnPage() {
       const keyword = searchInput.value.trim().toLowerCase();
       
-      // Lấy danh sách card sản phẩm tùy theo trang
       let productCards = document.querySelectorAll('#product-list .card'); // Trang Products
       if (productCards.length === 0) {
          productCards = document.querySelectorAll('#featured .card'); // Trang Index
@@ -174,40 +110,239 @@ document.addEventListener('DOMContentLoaded', () => {
         const title = product.querySelector(".product-name")?.innerText.toLowerCase() || "";
         const desc = product.querySelector(".muted")?.innerText.toLowerCase() || "";
 
-        if (keyword === "") {
-          product.style.display = "block";
-          foundCount++;
-          return;
-        }
+        const isHiddenByFilter = (product.style.display === 'none');
 
-        if (title.includes(keyword) || desc.includes(keyword)) {
-          product.style.display = "block";
-          foundCount++;
-        } else {
-          product.style.display = "none";
+        if (!isHiddenByFilter || keyword === "") {
+            if (keyword === "") {
+              product.style.display = "block"; // Reset
+              foundCount++;
+              return;
+            }
+
+            if (title.includes(keyword) || desc.includes(keyword)) {
+              product.style.display = "block";
+              foundCount++;
+            } else {
+              product.style.display = "none";
+            }
         }
       });
-      
-      // (Tùy chọn) Hiển thị thông báo nếu không tìm thấy
-      // Bạn có thể thêm 1 thẻ <p id="search-result-msg"></p> vào HTML
-      const msgEl = document.getElementById('search-result-msg');
-      if (msgEl) {
-          if(foundCount === 0) {
-            msgEl.innerText = "Không tìm thấy sản phẩm nào phù hợp.";
-          } else {
-            msgEl.innerText = "";
-          }
-      }
     }
 
     searchBtn.addEventListener("click", filterProductsOnPage);
     searchInput.addEventListener("keypress", (e) => {
       if (e.key === "Enter") {
-        e.preventDefault(); // Ngăn form submit (nếu có)
+        e.preventDefault(); 
         filterProductsOnPage();
+      }
+    });
+    
+    searchInput.addEventListener("keyup", (e) => {
+        if (e.target.value === "") {
+            filterProductsOnPage();
+            const activeFilter = document.querySelector('.filterbar .badge.active');
+            if (activeFilter) {
+                activeFilter.click(); 
+            }
+        }
+    });
+  }
+
+  // ==========================================================
+  // TÍNH NĂNG 4: Chuyển đổi Form Đăng nhập / Đăng ký
+  // ==========================================================
+  const showRegisterBtn = document.getElementById('show-register-btn');
+  const showLoginBtn = document.getElementById('show-login-btn');
+  const loginView = document.getElementById('login-view');
+  const registerView = document.getElementById('register-view');
+
+  if (showRegisterBtn && showLoginBtn && loginView && registerView) {
+    
+    showRegisterBtn.addEventListener('click', (e) => {
+      e.preventDefault(); 
+      loginView.style.display = 'none';
+      registerView.style.display = 'block';
+    });
+
+    showLoginBtn.addEventListener('click', (e) => {
+      e.preventDefault(); 
+      loginView.style.display = 'block';
+      registerView.style.display = 'none';
+    });
+  }
+  
+  // ==========================================================
+  // TÍNH NĂNG 5: Logic ĐĂNG KÝ
+  // ==========================================================
+  const registerForm = document.getElementById('register-form');
+  if(registerForm) {
+    registerForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const name = document.getElementById('reg-name').value;
+      const email = document.getElementById('reg-email').value;
+      const pass = document.getElementById('reg-password').value;
+      const confirmPass = document.getElementById('reg-confirm-password').value;
+      const errorEl = document.getElementById('register-error');
+      
+      if (!name || !email || !pass || !confirmPass) {
+        errorEl.textContent = 'Vui lòng điền đầy đủ thông tin.';
+        return;
+      }
+      if (pass !== confirmPass) {
+        errorEl.textContent = 'Mật khẩu xác nhận không khớp.';
+        return;
+      }
+      if (pass.length < 6) {
+        errorEl.textContent = 'Mật khẩu phải có ít nhất 6 ký tự.';
+        return;
+      }
+
+      let users = JSON.parse(localStorage.getItem('users')) || [];
+      const emailExists = users.find(user => user.email === email);
+      
+      if (emailExists) {
+        errorEl.textContent = 'Email này đã được sử dụng.';
+        return;
+      }
+
+      const newUser = { name: name, email: email, password: pass };
+      users.push(newUser);
+      localStorage.setItem('users', JSON.stringify(users));
+      
+      alert('Đăng ký thành công! Vui lòng đăng nhập.');
+      errorEl.textContent = '';
+      
+      registerForm.reset();
+      loginView.style.display = 'block';
+      registerView.style.display = 'none';
+    });
+  }
+  
+  // ==========================================================
+  // TÍNH NĂNG 6: Logic ĐĂNG NHẬP
+  // ==========================================================
+  const loginForm = document.getElementById('login-form');
+  if(loginForm) {
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById('email-login').value;
+      const pass = document.getElementById('password-login').value;
+      const errorEl = document.getElementById('login-error');
+
+      // ===== ADMIN LOGIN CHECK (Ưu tiên) =====
+      if (email === 'admin@clothify.com' && pass === 'admin123') {
+        const adminUser = { name: 'Admin', email: 'admin@clothify.com' };
+        localStorage.setItem('currentUser', JSON.stringify(adminUser));
+        alert('Đăng nhập Admin thành công! Đang chuyển đến trang Quản trị.');
+        window.location.href = 'admin.html'; // Chuyển đến trang admin
+        return; 
+      }
+      
+      let users = JSON.parse(localStorage.getItem('users')) || [];
+      const foundUser = users.find(user => user.email === email && user.password === pass);
+      
+      if(foundUser) {
+        errorEl.textContent = "";
+        localStorage.setItem('currentUser', JSON.stringify(foundUser));
+        alert('Đăng nhập thành công! Chuyển về trang chủ.');
+        window.location.href = 'index.html'; // Chuyển về trang chủ
+      } else {
+        errorEl.textContent = 'Email hoặc mật khẩu không chính xác.';
       }
     });
   }
 
+  // ==========================================================
+  // TÍNH NĂNG 7: Hiển thị/Ẩn thông tin Đăng nhập (Cho mọi trang)
+  // (ĐÃ SỬA: Ẩn "Xin chào" nếu là Admin)
+  // ==========================================================
+  const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+  const ctaContainer = document.querySelector('.header .cta');
+
+  if (currentUser && ctaContainer) {
+    
+    // 1. Tạo HTML cơ bản (chỉ có nút Đăng xuất)
+    let ctaHTML = `
+      <a href="#" class="btn ghost" id="logout-btn">Đăng xuất</a>
+    `;
+
+    // 2. KIỂM TRA: Nếu không phải Admin (là khách hàng)
+    // thì mới thêm "Xin chào, [Tên]"
+    if (currentUser.email !== 'admin@clothify.com') {
+      ctaHTML = `
+        <span style="font-weight: 600; margin-right: 10px;">Xin chào, ${currentUser.name}!</span>
+        ${ctaHTML}
+      `;
+    }
+    
+    // 3. Cập nhật HTML
+    ctaContainer.innerHTML = ctaHTML;
+
+    // 4. Gán sự kiện click
+    ctaContainer.addEventListener('click', (e) => {
+      if (e.target.id === 'logout-btn') {
+        e.preventDefault();
+        
+        const userOnLogout = JSON.parse(localStorage.getItem('currentUser'));
+        const isAdmin = (userOnLogout && userOnLogout.email === 'admin@clothify.com');
+        
+        localStorage.removeItem('currentUser'); // Xóa phiên đăng nhập
+        
+        if (isAdmin) {
+          alert('Đã đăng xuất khỏi tài khoản Admin.');
+          window.location.href = 'login.html'; // Về trang đăng nhập
+        } else {
+          alert('Đã đăng xuất.');
+          window.location.reload(); // Tải lại trang
+        }
+      }
+    });
+    
+  } else if (ctaContainer) {
+    // (Chưa đăng nhập, giữ nguyên HTML gốc)
+  }
+
+  // ==========================================================
+  // TÍNH NĂNG 8: Xử lý Form Liên hệ (contact.html)
+  // ==========================================================
+  const contactForm = document.getElementById('contact-form');
+  if (contactForm) {
+    contactForm.addEventListener('submit', (e) => {
+      e.preventDefault(); 
+
+      const name = document.getElementById('contact-name').value;
+      const email = document.getElementById('contact-email').value;
+      const title = document.getElementById('contact-title').value;
+      const message = document.getElementById('contact-message').value;
+      const successMsg = document.getElementById('contact-success-msg');
+
+      if (!name || !email || !title || !message) {
+        if(successMsg) successMsg.textContent = 'Vui lòng điền đầy đủ thông tin.';
+        return;
+      }
+
+      let feedback = JSON.parse(localStorage.getItem('feedback')) || [];
+
+      const newFeedback = {
+        name: name,
+        email: email,
+        title: title,
+        message: message,
+        date: new Date().toLocaleString('vi-VN') 
+      };
+      feedback.push(newFeedback);
+
+      localStorage.setItem('feedback', JSON.stringify(feedback));
+
+      if(successMsg) successMsg.textContent = 'Cảm ơn bạn! Phản hồi đã được gửi thành công.';
+      contactForm.reset(); 
+
+      setTimeout(() => {
+        if(successMsg) successMsg.textContent = '';
+      }, 5000);
+    });
+  }
 
 }); // <-- Đóng DOMContentLoaded

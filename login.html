@@ -3,10 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- FIX: Sửa lại Title cho đúng -->
-  <title>Đăng nhập · Clothify</title>
+  <title>Đăng nhập & Đăng ký · Clothify</title>
   <meta name="description" content="Clothify – cửa hàng thời trang thuần HTML & CSS">
   <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    /* Thêm CSS cho thông báo lỗi */
+    .form-error {
+      color: #e53e3e; /* Màu đỏ */
+      font-size: 0.9rem;
+      margin-top: 8px;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
 
@@ -20,15 +28,17 @@
       <div>
         <a href="index.html">Trang chủ</a>
         <a href="products.html">Sản phẩm</a>
-        
         <a href="cart.html" style="position: relative;">
           Giỏ hàng
           <span id="cart-counter" class="cart-badge"></span>
         </a>
-
         <a href="about.html">Giới thiệu</a>
         <a href="contact.html">Liên hệ</a>
       </div>
+      <!-- 
+        Phần .cta này sẽ được script.js tự động cập nhật
+        nếu người dùng đã đăng nhập 
+      -->
       <div class="cta">
         <a class="btn ghost" href="login.html" aria-label="Đăng nhập">Đăng nhập</a>
         <a class="btn primary" href="products.html" aria-label="Mua ngay">Mua ngay</a>
@@ -39,28 +49,74 @@
 
 <main>
   <div class="container">
-    <!-- FIX: Thay thế toàn bộ nội dung giỏ hàng bằng form đăng nhập -->
     <section class="section">
-      <div class="login-container">
+      
+      <!-- KHỐI 1: FORM ĐĂNG NHẬP (Hiển thị mặc định) -->
+      <div class="login-container" id="login-view">
         <div class="login-form">
           <h2>Đăng nhập</h2>
           <p class="muted">Chào mừng trở lại! Vui lòng nhập thông tin của bạn.</p>
-          <form style="margin-top: 20px;">
+          
+          <!-- SỬA: Thêm ID "login-form" -->
+          <form style="margin-top: 20px;" id="login-form">
             <div class="form-group">
               <label for="email">Email</label>
-              <input type="email" id="email" class="input" placeholder="you@example.com" required>
+              <!-- SỬA: Thêm ID "email-login" -->
+              <input type="email" id="email-login" class="input" placeholder="you@example.com" required>
             </div>
             <div class="form-group">
               <label for="password">Mật khẩu</label>
-              <input type="password" id="password" class="input" placeholder="••••••••" required>
+              <!-- SỬA: Thêm ID "password-login" -->
+              <input type="password" id="password-login" class="input" placeholder="••••••••" required>
             </div>
+            <!-- Thêm nơi hiển thị lỗi -->
+            <div id="login-error" class="form-error"></div>
+            
             <button type="submit" class="btn primary" style="width: 100%; margin-top: 10px;">Đăng nhập</button>
             <p class="small" style="text-align: center; margin-top: 15px;">
-              Chưa có tài khoản? <a href="#">Đăng ký ngay</a>
+              Chưa có tài khoản? 
+              <a href="#" id="show-register-btn" style="font-weight: 700; color: var(--brand);">Đăng ký ngay</a>
             </p>
           </form>
         </div>
       </div>
+
+      <!-- KHỐI 2: FORM ĐĂNG KÝ (Ẩn mặc định) -->
+      <div class="login-container" id="register-view" style="display: none;">
+        <div class="login-form">
+          <h2>Đăng ký tài khoản</h2>
+          <p class="muted">Chỉ mất vài giây để tham gia cùng chúng tôi.</p>
+          
+          <!-- SỬA: Thêm ID "register-form" -->
+          <form style="margin-top: 20px;" id="register-form">
+            <div class="form-group">
+              <label for="reg-name">Họ và tên</label>
+              <input type="text" id="reg-name" class="input" placeholder="Nguyễn Văn A" required>
+            </div>
+            <div class="form-group">
+              <label for="reg-email">Email</label>
+              <input type="email" id="reg-email" class="input" placeholder="you@example.com" required>
+            </div>
+            <div class="form-group">
+              <label for="reg-password">Mật khẩu</label>
+              <input type="password" id="reg-password" class="input" placeholder="••••••••" required>
+            </div>
+             <div class="form-group">
+              <label for="reg-confirm-password">Xác nhận mật khẩu</label>
+              <input type="password" id="reg-confirm-password" class="input" placeholder="••••••••" required>
+            </div>
+            <!-- Thêm nơi hiển thị lỗi -->
+            <div id="register-error" class="form-error"></div>
+            
+            <button type="submit" class="btn primary" style="width: 100%; margin-top: 10px;">Tạo tài khoản</button>
+            <p class="small" style="text-align: center; margin-top: 15px;">
+              Đã có tài khoản? 
+              <a href="#" id="show-login-btn" style="font-weight: 700; color: var(--brand);">Quay lại đăng nhập</a>
+            </p>
+          </form>
+        </div>
+      </div>
+
     </section>
   </div>
 </main>
@@ -79,7 +135,6 @@
   </div>
 </footer>
 
-<!-- Không cần script đặc biệt cho trang login tĩnh -->
 <script src="assets/js/script.js"></script>
 
 </body>

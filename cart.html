@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-t-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Giỏ hàng · Clothify</title>
   <meta name="description" content="Clothify – cửa hàng thời trang thuần HTML & CSS">
@@ -19,15 +19,17 @@
       <div>
         <a href="index.html">Trang chủ</a>
         <a href="products.html">Sản phẩm</a>
-        <a href="about.html">Giới thiệu</a>
-        <!-- FIX: Thêm link contact.html đã mất -->
-        <a href="contact.html">Liên hệ</a>
+        
         <a href="cart.html" style="position: relative;">
           Giỏ hàng
           <span id="cart-counter" class="cart-badge"></span>
         </a>
-      </div> <!-- FIX: Đóng thẻ div bị thiếu -->
+
+        <a href="about.html">Giới thiệu</a>
+        <a href="contact.html">Liên hệ</a>
+      </div>
       <div class="cta">
+        <!-- Khu vực này sẽ được script.js tự động cập nhật -->
         <a class="btn ghost" href="login.html" aria-label="Đăng nhập">Đăng nhập</a>
         <a class="btn primary" href="products.html" aria-label="Mua ngay">Mua ngay</a>
       </div>
@@ -39,19 +41,30 @@
   <div class="container">
     <section class="section">
       <h2>Giỏ hàng</h2>
+      <!-- SỬA: Thêm cột Size và Xóa -->
       <table class="table" role="table">
-        <!-- FIX: Sửa 'card-items' thành 'cart-items' cho nhất quán -->
-        <thead><tr><th>Sản phẩm</th><th>Giá</th><th>Size</th><th>Số lượng</th><th>Tạm tính</th><th>Xóa</th></tr></thead>
-        <tbody id="cart-items"></tbody>
+        <thead>
+          <tr>
+            <th>Sản phẩm</th>
+            <th>Giá</th>
+            <th>Size</th>
+            <th>Số lượng</th>
+            <th>Tạm tính</th>
+            <th>Xóa</th>
+          </tr>
+        </thead>
+        <tbody id="cart-items">
+          <!-- JS sẽ render giỏ hàng vào đây -->
+        </tbody>
       </table>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
         <a class="btn" href="products.html">Tiếp tục mua sắm</a>
         <div>
         <strong>Tổng cộng: <span id="cart-total">0</span>₫</strong>
+        <!-- SỬA: Thêm ID cho nút thanh toán -->
         <a class="btn success" href="#" id="checkout-btn" title="Thanh toán giỏ hàng">Thanh toán</a>
         </div>
       </div>
-      <p class="muted"></p>
     </section>
   </div>
 </main>
@@ -71,8 +84,12 @@
 </footer>
 
 <!-- 
-  FIX: Thay thế toàn bộ script cũ bằng script logic tốt hơn
-  (Logic này xử lý việc xóa sản phẩm khi số lượng <= 0)
+  (CẬP NHẬT) TOÀN BỘ SCRIPT CỦA cart.html
+  Bao gồm logic:
+  - Hiển thị giỏ hàng
+  - Xóa sản phẩm
+  - Cập nhật số lượng
+  - Trừ kho khi thanh toán
 -->
 <script>
   function loadCart() {
@@ -80,7 +97,6 @@
     const tbody = document.getElementById("cart-items");
     const totalEl = document.getElementById("cart-total");
 
-    // Luôn xóa nội dung cũ (tránh trùng lặp)
     tbody.innerHTML = ""; 
     let total = 0;
 
@@ -88,18 +104,16 @@
       tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Giỏ hàng trống</td></tr>`;
     } else {
       cart.forEach(item => {
-        // Đảm bảo dữ liệu là SỐ
         const price = parseFloat(item.price) || 0;
         const quantity = parseInt(item.quantity) || 0;
-        const size = item.size || 'N/A'; // Lấy size, nếu không có thì ghi N/A
-        const uniqueId = item.uniqueId || (item.id + '-' + size); // Dùng uniqueId để xóa
+        const size = item.size || 'N/A';
+        const uniqueId = item.uniqueId;
         
         const subtotal = price * quantity;
         total += subtotal;
 
         const row = document.createElement("tr");
         row.classList.add("cart-item");
-        // Cập nhật data-id (dùng uniqueId) cho input/nút xóa
         row.innerHTML = `
           <td>
             <img src="${item.image}" alt="${item.name}" style="width:50px;height:50px;margin-right:8px;vertical-align:middle;">
@@ -119,13 +133,11 @@
       });
     }
 
-    // Cập nhật tổng tiền
     if(totalEl) {
-      totalEl.innerText = total.toLocaleString(); // Bỏ '₫' vì đã có sẵn trong HTML
+      totalEl.innerText = total.toLocaleString(); 
     }
 
-    // Cập nhật bộ đếm (badge) trên header
-    // Hàm này được định nghĩa trong file script.js
+    // Luôn gọi hàm updateCartCounter (từ script.js)
     if (typeof updateCartCounter === 'function') {
       updateCartCounter();
     }
@@ -134,7 +146,7 @@
   // 1. Gọi hàm loadCart() ngay khi tải trang
   document.addEventListener("DOMContentLoaded", loadCart);
 
-  // 2. Thêm sự kiện lắng nghe việc thay đổi số lượng HOẶC bấm nút xóa
+  // 2. Sự kiện lắng nghe việc thay đổi số lượng HOẶC bấm nút xóa
   const cartBody = document.getElementById("cart-items");
   if (cartBody) {
     cartBody.addEventListener("click", (e) => {
@@ -155,35 +167,62 @@
     });
   }
 
-  // Hàm helper để cập nhật giỏ hàng
+  // Hàm helper để cập nhật giỏ hàng (thay đổi số lượng/xóa)
   function updateCartItem(uniqueId, quantity) {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const itemIndex = cart.findIndex(p => (p.uniqueId || (p.id + '-' + p.size)) === uniqueId);
+    const itemIndex = cart.findIndex(p => p.uniqueId === uniqueId);
     
     if (itemIndex > -1) {
       if (quantity <= 0) {
-        // Nếu số lượng là 0, xóa sản phẩm
-        cart.splice(itemIndex, 1);
+        cart.splice(itemIndex, 1); // Xóa sản phẩm
       } else {
-        // Ngược lại, cập nhật số lượng
-        cart[itemIndex].quantity = quantity;
+        cart[itemIndex].quantity = quantity; // Cập nhật số lượng
       }
-      
       localStorage.setItem("cart", JSON.stringify(cart));
-      loadCart(); // Tải lại giỏ hàng để cập nhật bảng và tổng tiền
+      loadCart(); // Tải lại bảng giỏ hàng
     }
   }
 
-  // 3. Sự kiện thanh toán
+  // 3. (CẬP NHẬT) Sự kiện thanh toán
   const paymentButton = document.getElementById("checkout-btn");
   if (paymentButton) {
     paymentButton.addEventListener("click", (e) => {
-      e.preventDefault(); // Ngăn thẻ <a> chuyển trang
+      e.preventDefault(); 
       let cart = JSON.parse(localStorage.getItem("cart")) || [];
+      
       if (cart.length > 0) {
+        
+        // --- BẮT ĐẦU LOGIC TRỪ KHO ---
+        
+        // 1. Lấy kho hàng
+        let inventory = JSON.parse(localStorage.getItem('masterInventory')) || [];
+        
+        // 2. Lặp qua từng món hàng trong giỏ
+        cart.forEach(cartItem => {
+          // 3. Tìm món hàng đó trong kho (dựa trên ID gốc, vd: SP001)
+          const inventoryItem = inventory.find(invItem => invItem.id === cartItem.id);
+          
+          if (inventoryItem) {
+            // 4. Trừ số lượng
+            // (Thêm kiểm tra để kho không bị âm, nếu cần)
+            if (inventoryItem.stock >= cartItem.quantity) {
+              inventoryItem.stock -= cartItem.quantity;
+            } else {
+              // Xử lý trường hợp mua lố (hiện tại chỉ đặt về 0)
+              inventoryItem.stock = 0; 
+            }
+          }
+        });
+        
+        // 5. Lưu lại kho hàng đã bị trừ
+        localStorage.setItem('masterInventory', JSON.stringify(inventory));
+        
+        // --- KẾT THÚC LOGIC TRỪ KHO ---
+
         alert("Thanh toán thành công! Cảm ơn bạn ❤️");
-        localStorage.removeItem("cart");
-        loadCart(); // Tải lại giỏ hàng (lúc này sẽ trống)
+        localStorage.removeItem("cart"); // Xóa giỏ hàng
+        loadCart(); // Tải lại (giỏ hàng sẽ trống)
+        
       } else {
         alert("Giỏ hàng của bạn đang trống!");
       }
@@ -191,6 +230,7 @@
   }
 </script>
 
+<!-- Tải file script.js (chứa hàm updateCartCounter và initializeInventory) -->
 <script src="assets/js/script.js"></script>
 
 </body>

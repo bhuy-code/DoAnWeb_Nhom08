@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trang Quản trị · Clothify</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="admin-dashboard">
+
+<header class="header">
+  <div class="container">
+    <nav class="nav">
+      <a href="admin.html" class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <span>Clothify (Admin)</span>
+      </a>
+      <div class="cta">
+        <span style="font-weight: 600; margin-right: 10px;" id="admin-name">Xin chào, Admin!</span>
+        <a href="#" class="btn ghost" id="logout-btn-admin">Đăng xuất</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    
+    <!-- Bảng Tồn Kho -->
+    <section class="section admin-section">
+      <h2>Quản lý Tồn kho (Giả lập)</h2>
+      <p class="muted">
+        Lưu ý: Dữ liệu tồn kho này được giả lập trong file `admin.js` 
+        vì dự án không có cơ sở dữ liệu.
+      </p>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID Sản phẩm</th>
+            <th>Tên Sản phẩm</th>
+            <th>Số lượng Tồn kho</th>
+          </tr>
+        </thead>
+        <tbody id="inventory-list">
+          <!-- Dữ liệu sẽ được JS chèn vào đây -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Danh sách Phản hồi -->
+    <section class="section admin-section">
+      <h2>Phản hồi của Khách hàng</h2>
+      <p class="muted">
+        Dữ liệu này được lấy từ `localStorage` khi khách hàng gửi form
+        trên trang `contact.html`.
+      </p>
+      <div id="feedback-list">
+        <!-- Phản hồi sẽ được JS chèn vào đây -->
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="grid">
+      <div style="grid-column:span 12; text-align: center;">
+        <div class="small">© 2025 Clothify Admin Panel.</div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Tải file logic của Admin -->
+<script src="assets/js/admin.js"></script>
+
+</body>
+</html>
