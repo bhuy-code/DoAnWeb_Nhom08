@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Liên hệ · Clothify</title>
+  <meta name="description" content="Clothify – cửa hàng thời trang thuần HTML & CSS">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="header">
+  <div class="container">
+    <nav class="nav" aria-label="Primary">
+      <a href="index.html" class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <span>Clothify</span>
+      </a>
+      <div>
+        <a href="index.html">Trang chủ</a>
+        <a href="products.html">Sản phẩm</a>
+        <a href="cart.html" style="position: relative;">
+          Giỏ hàng
+          <span id="cart-counter" class="cart-badge"></span>
+        </a>
+        <a href="about.html">Giới thiệu</a>
+        <a href="contact.html">Liên hệ</a>
+      </div>
+      <div class="cta">
+        <a class="btn ghost" href="login.html" aria-label="Đăng nhập">Đăng nhập</a>
+        <a class="btn primary" href="products.html" aria-label="Mua ngay">Mua ngay</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    
+<section class="section">
+  <h2>Liên hệ</h2>
+  <div class="grid">
+    <div class="form" style="grid-column:span 7">
+      <form>
+        <div class="grid" style="gap:10px">
+          <div style="grid-column:span 6">
+            <label>Họ và tên
+              <input class="input" type="text" placeholder="Nguyễn Văn A" required>
+            </label>
+          </div>
+          <div style="grid-column:span 6">
+            <label>Email
+              <input class="input" type="email" placeholder="you@example.com" required>
+            </label>
+          </div>
+          <div style="grid-column:span 12">
+            <label>Tiêu đề
+              <input class="input" type="text" placeholder="Tôi cần hỗ trợ đơn hàng #1234" required>
+            </label>
+          </div>
+          <div style="grid-column:span 12">
+            <label>Nội dung
+              <textarea class="input" placeholder="Mô tả chi tiết vấn đề..."></textarea>
+            </label>
+          </div>
+          <div style="grid-column:span 12">
+            <a href="index.html">
+              <button class="btn primary" type="button" aria-disabled="true" title="Cần Backend để gửi">Gửi liên hệ</button>
+            </a>
+          </div>
+        </div>
+      </form>
+      <p class="muted" style="margin-top:8px">* Mẫu giao diện. Để gửi form cần xử lý bằng Backend.</p>
+    </div>
+    <aside style="grid-column:span 5">
+      <div class="card">
+        <img class="thumb" src="https://voguesg.s3.ap-southeast-1.amazonaws.com/wp-content/uploads/2024/09/06170129/SEOUL_SS25_STREETSTYLE_DAY3_YOUNGCHULKIM_28-800x1200.jpg" alt="Showroom">
+        <div class="body">
+          <div class="title">Showroom Clothify</div>
+          <p class="muted">123 Lê Lợi, P. Bến Thành, Q.1, TP.HCM<br>Hotline: 1900 123 456</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="grid">
+      <div style="grid-column:span 6;">
+        <a href="index.html" class="brand"><span class="logo"></span><span>Clothify</span></a>
+        <p class="small">Cửa hàng thời trang hiện đại – phong cách, bền vững và hợp túi tiền.</p>
+      </div>
+      <div style="grid-column:span 6;text-align:right;">
+        <div class="small">© 2025 Clothify. All rights reserved.</div>
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="assets/js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Giỏ hàng · Clothify</title>
+  <meta name="description" content="Clothify – cửa hàng thời trang thuần HTML & CSS">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="header">
+  <div class="container">
+    <nav class="nav" aria-label="Primary">
+      <a href="index.html" class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <span>Clothify</span>
+      </a>
+      <div>
+        <a href="index.html">Trang chủ</a>
+        <a href="products.html">Sản phẩm</a>
+        <a href="about.html">Giới thiệu</a>
+        <!-- FIX: Thêm link contact.html đã mất -->
+        <a href="contact.html">Liên hệ</a>
+        <a href="cart.html" style="position: relative;">
+          Giỏ hàng
+          <span id="cart-counter" class="cart-badge"></span>
+        </a>
+      </div> <!-- FIX: Đóng thẻ div bị thiếu -->
+      <div class="cta">
+        <a class="btn ghost" href="login.html" aria-label="Đăng nhập">Đăng nhập</a>
+        <a class="btn primary" href="products.html" aria-label="Mua ngay">Mua ngay</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <section class="section">
+      <h2>Giỏ hàng</h2>
+      <table class="table" role="table">
+        <!-- FIX: Sửa 'card-items' thành 'cart-items' cho nhất quán -->
+        <thead><tr><th>Sản phẩm</th><th>Giá</th><th>Size</th><th>Số lượng</th><th>Tạm tính</th><th>Xóa</th></tr></thead>
+        <tbody id="cart-items"></tbody>
+      </table>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+        <a class="btn" href="products.html">Tiếp tục mua sắm</a>
+        <div>
+        <strong>Tổng cộng: <span id="cart-total">0</span>₫</strong>
+        <a class="btn success" href="#" id="checkout-btn" title="Thanh toán giỏ hàng">Thanh toán</a>
+        </div>
+      </div>
+      <p class="muted"></p>
+    </section>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="grid">
+      <div style="grid-column:span 6;">
+        <a href="index.html" class="brand"><span class="logo"></span><span>Clothify</span></a>
+        <p class="small">Cửa hàng thời trang hiện đại – phong cách, bền vững và hợp túi tiền.</p>
+      </div>
+      <div style="grid-column:span 6;text-align:right;">
+        <div class="small">© 2025 Clothify. All rights reserved.</div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- 
+  FIX: Thay thế toàn bộ script cũ bằng script logic tốt hơn
+  (Logic này xử lý việc xóa sản phẩm khi số lượng <= 0)
+-->
+<script>
+  function loadCart() {
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const tbody = document.getElementById("cart-items");
+    const totalEl = document.getElementById("cart-total");
+
+    // Luôn xóa nội dung cũ (tránh trùng lặp)
+    tbody.innerHTML = ""; 
+    let total = 0;
+
+    if (cart.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Giỏ hàng trống</td></tr>`;
+    } else {
+      cart.forEach(item => {
+        // Đảm bảo dữ liệu là SỐ
+        const price = parseFloat(item.price) || 0;
+        const quantity = parseInt(item.quantity) || 0;
+        const size = item.size || 'N/A'; // Lấy size, nếu không có thì ghi N/A
+        const uniqueId = item.uniqueId || (item.id + '-' + size); // Dùng uniqueId để xóa
+        
+        const subtotal = price * quantity;
+        total += subtotal;
+
+        const row = document.createElement("tr");
+        row.classList.add("cart-item");
+        // Cập nhật data-id (dùng uniqueId) cho input/nút xóa
+        row.innerHTML = `
+          <td>
+            <img src="${item.image}" alt="${item.name}" style="width:50px;height:50px;margin-right:8px;vertical-align:middle;">
+            ${item.name}
+          </td>
+          <td>${price.toLocaleString()}₫</td>
+          <td><span class="badge">${size}</span></td>
+          <td>
+            <input type="number" class="qty" min="0" value="${quantity}" data-unique-id="${uniqueId}">
+          </td>
+          <td>${subtotal.toLocaleString()}₫</td>
+          <td>
+            <button class="btn-remove" data-unique-id="${uniqueId}" style="background:none;border:none;color:red;cursor:pointer;font-size:1.2rem;">&times;</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // Cập nhật tổng tiền
+    if(totalEl) {
+      totalEl.innerText = total.toLocaleString(); // Bỏ '₫' vì đã có sẵn trong HTML
+    }
+
+    // Cập nhật bộ đếm (badge) trên header
+    // Hàm này được định nghĩa trong file script.js
+    if (typeof updateCartCounter === 'function') {
+      updateCartCounter();
+    }
+  }
+
+  // 1. Gọi hàm loadCart() ngay khi tải trang
+  document.addEventListener("DOMContentLoaded", loadCart);
+
+  // 2. Thêm sự kiện lắng nghe việc thay đổi số lượng HOẶC bấm nút xóa
+  const cartBody = document.getElementById("cart-items");
+  if (cartBody) {
+    cartBody.addEventListener("click", (e) => {
+      // Bấm nút xóa
+      if (e.target.classList.contains("btn-remove")) {
+        const uniqueId = e.target.dataset.uniqueId;
+        updateCartItem(uniqueId, 0); // Đặt số lượng = 0 để xóa
+      }
+    });
+
+    cartBody.addEventListener("change", (e) => {
+      // Thay đổi ô số lượng
+      if (e.target.classList.contains("qty")) {
+        const uniqueId = e.target.dataset.uniqueId;
+        let quantity = parseInt(e.target.value);
+        updateCartItem(uniqueId, quantity);
+      }
+    });
+  }
+
+  // Hàm helper để cập nhật giỏ hàng
+  function updateCartItem(uniqueId, quantity) {
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const itemIndex = cart.findIndex(p => (p.uniqueId || (p.id + '-' + p.size)) === uniqueId);
+    
+    if (itemIndex > -1) {
+      if (quantity <= 0) {
+        // Nếu số lượng là 0, xóa sản phẩm
+        cart.splice(itemIndex, 1);
+      } else {
+        // Ngược lại, cập nhật số lượng
+        cart[itemIndex].quantity = quantity;
+      }
+      
+      localStorage.setItem("cart", JSON.stringify(cart));
+      loadCart(); // Tải lại giỏ hàng để cập nhật bảng và tổng tiền
+    }
+  }
+
+  // 3. Sự kiện thanh toán
+  const paymentButton = document.getElementById("checkout-btn");
+  if (paymentButton) {
+    paymentButton.addEventListener("click", (e) => {
+      e.preventDefault(); // Ngăn thẻ <a> chuyển trang
+      let cart = JSON.parse(localStorage.getItem("cart")) || [];
+      if (cart.length > 0) {
+        alert("Thanh toán thành công! Cảm ơn bạn ❤️");
+        localStorage.removeItem("cart");
+        loadCart(); // Tải lại giỏ hàng (lúc này sẽ trống)
+      } else {
+        alert("Giỏ hàng của bạn đang trống!");
+      }
+    });
+  }
+</script>
+
+<script src="assets/js/script.js"></script>
+
+</body>
+</html>
