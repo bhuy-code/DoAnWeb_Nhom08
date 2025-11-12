@@ -344,5 +344,15 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 5000);
     });
   }
+  // Lấy tất cả nút có class add-to-cart-btn
+    const addButtons = document.querySelectorAll('#modal-confirm-add-btn');
+
+    // Gắn sự kiện click
+    addButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        alert('✅ Bạn đã thêm sản phẩm vào giỏ hàng thành công!');
+      });
+    });
+  
 
 }); // <-- Đóng DOMContentLoaded

@@ -149,6 +149,8 @@ textarea{min-height:140px}
   display: none;
 }
 
+
+
 /* ===== BẮT ĐẦU CSS CHO MODAL (products.html) ===== */
 .modal-overlay {
   display: none;
@@ -377,4 +379,67 @@ body.admin-dashboard {
   font-weight: 700;
   margin-bottom: 5px;
 }
-/* ===== KẾT THÚC CSS CHO TRANG ADMIN ===== */
+/* ===== KẾT THÚC CSS CHO TRANG ADMIN ===== */ 
+
+/* ==========================================================
+   SỬA LỖI: CĂN GIỮA FORM ĐĂNG NHẬP & ĐĂNG KÝ
+   ========================================================== */
+html, body {
+  height: 100%;
+}
+
+main {
+  min-height: calc(100vh - 160px); /* trừ phần header và footer */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.login-form {
+  background: #fff;
+  border: 1px solid #e6e8ec;
+  border-radius: 14px;
+  padding: 25px 30px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 10px 24px rgba(16, 24, 40, .08);
+  transition: all 0.3s ease;
+}
+
+.login-form h2 {
+  text-align: center;
+  margin-top: 0;
+}
+
+.login-form .muted {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+/* ==========================================================
+   HẾT PHẦN FIX CĂN GIỮA LOGIN/REGISTER FORM
+   ========================================================== */
