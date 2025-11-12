@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Đơn hàng của tôi · Clothify</title>
+  <meta name="description" content="Theo dõi đơn hàng hiện tại tại Clothify">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="page-user" data-orders-view="active">
+
+<header class="header">
+  <div class="container">
+    <nav class="nav" aria-label="Primary">
+      <a href="index.html" class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <span>Clothify</span>
+      </a>
+      <div>
+        <a href="index.html">Trang chủ</a>
+        <a href="products.html">Sản phẩm</a>
+        <a href="cart.html" style="position: relative;">
+          Giỏ hàng
+          <span id="cart-counter" class="cart-badge"></span>
+        </a>
+        <a href="about.html">Giới thiệu</a>
+        <a href="contact.html">Liên hệ</a>
+      </div>
+      <div class="cta">
+        <a class="btn ghost" href="login.html" aria-label="Đăng nhập">Đăng nhập</a>
+        <a class="btn primary" href="products.html" aria-label="Mua ngay">Mua ngay</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="page-content">
+  <div class="container">
+    <section class="section orders-section">
+      <div class="section-header">
+        <h2>Đơn hàng hiện tại</h2>
+        <p class="muted">Theo dõi những đơn hàng đang chờ xác nhận hoặc vận chuyển.</p>
+      </div>
+      <div id="orders-list" class="orders-list" role="list">
+        <!-- JS render -->
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="grid">
+      <div style="grid-column:span 6;">
+        <a href="index.html" class="brand"><span class="logo"></span><span>Clothify</span></a>
+        <p class="small">Cửa hàng thời trang hiện đại – phong cách, bền vững và hợp túi tiền.</p>
+      </div>
+      <div style="grid-column:span 6;text-align:right;">
+        <div class="small">© 2025 Clothify. All rights reserved.</div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/script.js"></script>
+<script src="assets/js/orders.js"></script>
+</body>
+</html>
+

@@ -37,7 +37,7 @@
   </div>
 </header>
 
-<main>
+<main class="page-content">
   <div class="container">
     <section class="section">
       <h2>Giỏ hàng</h2>
@@ -141,6 +141,9 @@
     if (typeof updateCartCounter === 'function') {
       updateCartCounter();
     }
+    if (typeof syncCartToActiveOrder === 'function') {
+      syncCartToActiveOrder(cart);
+    }
   }
 
   // 1. Gọi hàm loadCart() ngay khi tải trang
@@ -191,38 +194,29 @@
       let cart = JSON.parse(localStorage.getItem("cart")) || [];
       
       if (cart.length > 0) {
-        
-        // --- BẮT ĐẦU LOGIC TRỪ KHO ---
-        
-        // 1. Lấy kho hàng
-        let inventory = JSON.parse(localStorage.getItem('masterInventory')) || [];
-        
-        // 2. Lặp qua từng món hàng trong giỏ
-        cart.forEach(cartItem => {
-          // 3. Tìm món hàng đó trong kho (dựa trên ID gốc, vd: SP001)
-          const inventoryItem = inventory.find(invItem => invItem.id === cartItem.id);
-          
-          if (inventoryItem) {
-            // 4. Trừ số lượng
-            // (Thêm kiểm tra để kho không bị âm, nếu cần)
-            if (inventoryItem.stock >= cartItem.quantity) {
-              inventoryItem.stock -= cartItem.quantity;
-            } else {
-              // Xử lý trường hợp mua lố (hiện tại chỉ đặt về 0)
-              inventoryItem.stock = 0; 
-            }
-          }
-        });
-        
-        // 5. Lưu lại kho hàng đã bị trừ
-        localStorage.setItem('masterInventory', JSON.stringify(inventory));
-        
-        // --- KẾT THÚC LOGIC TRỪ KHO ---
+        let currentUser = null;
+        if (typeof getCurrentUser === 'function') {
+          currentUser = getCurrentUser();
+        } else {
+          currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        }
 
-        alert("Thanh toán thành công! Cảm ơn bạn ❤️");
-        localStorage.removeItem("cart"); // Xóa giỏ hàng
-        loadCart(); // Tải lại (giỏ hàng sẽ trống)
-        
+        if (!currentUser) {
+          alert("Bạn cần đăng nhập để thanh toán giỏ hàng.");
+          window.location.href = "login.html";
+          return;
+        }
+
+        let activeOrder = null;
+        if (typeof syncCartToActiveOrder === 'function') {
+          activeOrder = syncCartToActiveOrder(cart);
+        }
+
+        if (activeOrder) {
+          window.location.href = `order-detail.html?orderId=${encodeURIComponent(activeOrder.orderId)}`;
+        } else {
+          alert("Không thể tạo đơn hàng từ giỏ hiện tại. Vui lòng thử lại.");
+        }
       } else {
         alert("Giỏ hàng của bạn đang trống!");
       }
