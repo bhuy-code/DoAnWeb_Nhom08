@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentProductData = {};
   let selectedSize = null;
+  let selectedQuantity = 1;
 
   // ===== HÀM MỞ MODAL (Được gọi khi click vào nút Thêm) =====
   function openSizeModal(button) {
@@ -50,6 +51,9 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("modal-product-price").innerText = priceText;
       document.getElementById("modal-product-image").src = image;
 
+      // Reset số lượng về 1
+      selectedQuantity = 1;
+
       // Tạo các nút chọn Size
       const sizeContainer = document.getElementById("modal-size-options");
       sizeContainer.innerHTML = "";
@@ -80,6 +84,40 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       modalOverlay.classList.add("active");
+      
+      // Xử lý nút tăng/giảm số lượng
+      const quantityInput = document.getElementById("modal-quantity-input");
+      if (quantityInput) quantityInput.value = 1;
+      const quantityDecrease = document.getElementById("modal-quantity-decrease");
+      const quantityIncrease = document.getElementById("modal-quantity-increase");
+      
+      if (quantityInput && quantityDecrease && quantityIncrease) {
+        quantityInput.addEventListener("change", () => {
+          let val = parseInt(quantityInput.value) || 1;
+          if (val < 1) val = 1;
+          if (val > 10) val = 10;
+          quantityInput.value = val;
+          selectedQuantity = val;
+        });
+        
+        quantityDecrease.addEventListener("click", () => {
+          let val = parseInt(quantityInput.value) || 1;
+          if (val > 1) {
+            val--;
+            quantityInput.value = val;
+            selectedQuantity = val;
+          }
+        });
+        
+        quantityIncrease.addEventListener("click", () => {
+          let val = parseInt(quantityInput.value) || 1;
+          if (val < 10) {
+            val++;
+            quantityInput.value = val;
+            selectedQuantity = val;
+          }
+        });
+      }
   }
 
   // ===== SỬA LỖI CHÍNH: LẮNG NGHE CLICK TRÊN DANH SÁCH CHA =====
@@ -105,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ===== NÚT "XÁC NHẬN THÊM" TRONG MODAL =====
+  // ===== NÚT "XÁC NHẬN THÊM" TRONG MODAL (Đơn giản hóa) =====
   modalConfirmBtn.addEventListener("click", () => {
     if (!selectedSize) {
       alert("Vui lòng chọn size sản phẩm!");
@@ -120,28 +158,16 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const productToAdd = {
-      ...currentProductData,
-      size: selectedSize,
-      quantity: 1, // Mặc định là 1
-      uniqueId: currentProductData.id + "-" + selectedSize,
-    };
-
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const existingIndex = cart.findIndex((item) => item.uniqueId === productToAdd.uniqueId);
-
-    if (existingIndex > -1) {
-      cart[existingIndex].quantity += 1;
-    } else {
-      cart.push(productToAdd);
+    // Lấy số lượng
+    const quantityInput = document.getElementById("modal-quantity-input");
+    if (quantityInput) {
+      selectedQuantity = parseInt(quantityInput.value) || 1;
+      if (selectedQuantity < 1) selectedQuantity = 1;
+      if (selectedQuantity > 10) selectedQuantity = 10;
     }
 
-    localStorage.setItem("cart", JSON.stringify(cart));
-    
-    if (typeof updateCartCounter === "function") updateCartCounter();
-    if (typeof syncCartToActiveOrder === "function") syncCartToActiveOrder(cart);
-
-    alert(`✅ Đã thêm "${productToAdd.name}" vào giỏ hàng!`);
+    // Đơn giản hóa: Chỉ hiển thị thông báo thành công, không lưu vào localStorage
+    alert(`✅ Đã thêm "${currentProductData.name}" (Size: ${selectedSize}, Số lượng: ${selectedQuantity}) vào giỏ hàng thành công!`);
     closeModal();
   });
 

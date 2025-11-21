@@ -5,7 +5,12 @@ const products = [
     price: 199000,
     description: "100% làm từ vải cotton, nữ tính và nhẹ nhàng. Phù hợp cho mọi hoạt động hàng ngày, dễ dàng phối đồ.",
     image: "https://product.hstatic.net/1000184601/product/women_nau-nhat__2__47206564af004145addea15a2b71c162_2048x2048.jpg",
-    availableSizes: ["S", "M", "L", "XL"]
+    availableSizes: ["S", "M", "L", "XL"],
+    category: "nu",
+    material: "100% Cotton",
+    color: "Nâu nhạt",
+    care: "Giặt máy ở nhiệt độ thấp, không tẩy",
+    origin: "Việt Nam"
   },
   {
     id: "SP002",
@@ -13,7 +18,12 @@ const products = [
     price: 249000,
     description: "Áo làm từ vải cotton, mang lại cảm giác mềm mại và đầy năng động. Thiết kế typo trẻ trung, hiện đại.",
     image: "https://product.hstatic.net/1000184601/product/men_vang-sundress__5__a2dca065fd0547209ea90ecf86ff9782_2048x2048.jpg",
-    availableSizes: ["M", "L", "XL"]
+    availableSizes: ["M", "L", "XL"],
+    category: "nam",
+    material: "100% Cotton",
+    color: "Vàng",
+    care: "Giặt máy ở nhiệt độ thấp, không tẩy",
+    origin: "Việt Nam"
   },
   {
     id: "SP003",
@@ -21,7 +31,12 @@ const products = [
     price: 299000,
     description: "Chất vải cao cấp với kết cấu mịn hai mặt, mang lại cảm giác êm ái. Mũ trùm đầu được thiết kế để giữ form đẹp.",
     image: "https://im.uniqlo.com/global-cms/spa/res9d7c31ab934101f35172e2a6d1ae6c3dfr.jpg",
-    availableSizes: ["S", "M", "L"]
+    availableSizes: ["S", "M", "L"],
+    category: "nam",
+    material: "Polyester + Cotton",
+    color: "Xám",
+    care: "Giặt máy ở nhiệt độ thấp, phơi khô tự nhiên",
+    origin: "Việt Nam"
   },
   {
     id: "SP004",
@@ -29,7 +44,12 @@ const products = [
     price: 349000,
     description: "Cảm giác trơn mịn được làm hoàn toàn từ chất len Merino siêu mịn. Một chiếc áo len cao cấp, tinh tế.",
     image: "https://image.uniqlo.com/UQ/ST3/vn/imagesgoods/481408/item/vngoods_69_481408_3x4.jpg?width=369",
-    availableSizes: ["S", "M"]
+    availableSizes: ["S", "M"],
+    category: "nu",
+    material: "100% Merino Wool",
+    color: "Be",
+    care: "Giặt tay, phơi khô tự nhiên, không vắt",
+    origin: "Việt Nam"
   },
   {
     id: "SP005",
@@ -37,7 +57,12 @@ const products = [
     price: 399000,
     description: "Được giặt trước để tạo nên bề mặt mềm mại. Bông được nuôi trồng theo phương pháp bền vững.",
     image: "https://api.muji.com.vn/media/catalog/product/cache/4da93324a1c25b12e9566f761e24b9c9/4/5/4547315862849_org.jpg",
-    availableSizes: ["S", "M", "L", "XL"]
+    availableSizes: ["S", "M", "L", "XL"],
+    category: "nam",
+    material: "100% Cotton Broadcloth",
+    color: "Trắng",
+    care: "Giặt máy, ủi ở nhiệt độ trung bình",
+    origin: "Việt Nam"
   },
   {
     id: "SP006",
@@ -45,7 +70,12 @@ const products = [
     price: 449000,
     description: "Chất liệu Raw denim (100% cotton) cùng form baggy loose fit, thoải mái và cá tính.",
     image: "https://content.pancake.vn/1/s2288x2860/88/d3/98/05/f32daa82a82f8cf47c9256f5303cc907852f6f2ad97b0d84cc1e7464-w:2400-h:3000-l:875966-t:image/jpeg.jpeg",
-    availableSizes: ["28", "29", "30", "31", "32"]
+    availableSizes: ["28", "29", "30", "31", "32"],
+    category: "nam",
+    material: "100% Cotton Denim",
+    color: "Xanh đậm",
+    care: "Giặt ngược, không tẩy, phơi khô tự nhiên",
+    origin: "Việt Nam"
   },
   {
     id: "SP007",
@@ -53,7 +83,12 @@ const products = [
     price: 499000,
     description: "Sản phẩm sử dụng chất liệu tạo cảm giác mát mẻ khi chạm vào, thích hợp cho mùa hè.",
     image: "https://api.muji.com.vn/media/catalog/product/cache/4da93324a1c25b12e9566f761e24b9c9/4/5/4547315946945_org_1.jpg",
-    availableSizes: ["M", "L", "XL"]
+    availableSizes: ["M", "L", "XL"],
+    category: "nam",
+    material: "Cool Touch Polyester",
+    color: "Xanh nhạt",
+    care: "Giặt máy ở nhiệt độ thấp, không ủi",
+    origin: "Việt Nam"
   },
   {
     id: "SP008",
@@ -61,7 +96,12 @@ const products = [
     price: 549000,
     description: "Một thiết kế năng động dành cho các khách hàng trẻ trung và đầy cá tính. Dễ dàng phối với áo thun hoặc sơ mi.",
     image: "https://content.pancake.vn/1/s700x875/23/77/e2/f4/5fa6d0958119c7d9a0e7243849ae0c54876ee93d5339d1d6ed0b491d-w:2400-h:3000-l:897588-t:image/jpeg.jpeg",
-    availableSizes: ["28", "29", "30", "31"]
+    availableSizes: ["28", "29", "30", "31"],
+    category: "nam",
+    material: "100% Cotton Denim",
+    color: "Xanh đậm",
+    care: "Giặt ngược, không tẩy, phơi khô tự nhiên",
+    origin: "Việt Nam"
   },
   {
     id: "SP009",
@@ -69,7 +109,12 @@ const products = [
     price: 599000,
     description: "Chất liệu Da Simili giả da cá sấu, mạnh mẽ và trẻ trung. Chống nước nhẹ.",
     image: "https://dosi-in.com/file/detailed/369/dosiin-mlb-mlb-ao-khoac-bomber-waffen-premium-padded-369992369992.jpg?w=320&h=320&fit=fill&fm=webp",
-    availableSizes: ["M", "L"]
+    availableSizes: ["M", "L"],
+    category: "nam",
+    material: "Polyester + PU Leather",
+    color: "Đen",
+    care: "Lau khô bằng vải mềm, không giặt máy",
+    origin: "Việt Nam"
   },
   {
     id: "SP010",
@@ -77,7 +122,12 @@ const products = [
     price: 649000,
     description: "Áo khoác chất bông giúp giữ ấm, chống tia UV, thanh lịch và nam tính.",
     image: "https://assets.adidas.com/images/w_383,h_383,f_auto,q_auto,fl_lossy,c_fill,g_auto/2a2e875733534a7390db0ee2815f4e2f_9366/ao-khoac-chan-bong-lai-cong-nghe-cold.rdy-danh-cho-nam.jpg",
-    availableSizes: ["M", "L", "XL"]
+    availableSizes: ["M", "L", "XL"],
+    category: "nam",
+    material: "Polyester + Cotton (Cold.Dry)",
+    color: "Xanh navy",
+    care: "Giặt máy ở nhiệt độ thấp, phơi khô tự nhiên",
+    origin: "Việt Nam"
   },
   {
     id: "SP011",
@@ -85,7 +135,12 @@ const products = [
     price: 699000,
     description: "Quần short 2 trong 1 thông thoáng và thoải mái, rất thích hợp cho một buổi tập luyện.",
     image: "https://assets.adidas.com/images/w_383,h_383,f_auto,q_auto,fl_lossy,c_fill,g_auto/d798d656cac14a67a1153cd486f26ce1_9366/quan-short-2-trong-1-climacool-own-the-run.jpg",
-    availableSizes: ["S", "M", "L", "XL"]
+    availableSizes: ["S", "M", "L", "XL"],
+    category: "nu",
+    material: "Polyester + Spandex (ClimaCool)",
+    color: "Đen",
+    care: "Giặt máy ở nhiệt độ thấp, không tẩy",
+    origin: "Việt Nam"
   },
   {
     id: "SP012",
@@ -93,6 +148,11 @@ const products = [
     price: 749000,
     description: "Năng động và cá tính, trẻ trung và hợp thời đại. Chất liệu co giãn 4 chiều.",
     image: "https://assets.adidas.com/images/w_383,h_383,f_auto,q_auto,fl_lossy,c_fill,g_auto/2a7478515757479d9f10cfb79b24c367_9366/quan-track-pant-dang-rong-cutline.jpg",
-    availableSizes: ["S", "M", "L"]
+    availableSizes: ["S", "M", "L"],
+    category: "nam",
+    material: "Polyester + Spandex (4-way stretch)",
+    color: "Xám",
+    care: "Giặt máy ở nhiệt độ thấp, không tẩy",
+    origin: "Việt Nam"
   }
 ];

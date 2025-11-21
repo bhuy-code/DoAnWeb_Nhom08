@@ -164,6 +164,7 @@ function renderOrderDetail(order) {
             <p style="margin-bottom:5px;"><strong>Thông tin giao hàng:</strong></p>
             <ul style="list-style:none; padding-left:0; margin:0;">
               <li>👤 <strong>Người nhận:</strong> ${order.customerName || order.userEmail}</li>
+              <li>📧 <strong>Email:</strong> ${shipInfo.email || '---'}</li>
               <li>📞 <strong>SĐT:</strong> ${shipInfo.phone || '---'}</li>
               <li>📍 <strong>Địa chỉ:</strong> ${shipInfo.address || '---'}</li>
               <li>📝 <strong>Ghi chú:</strong> ${shipInfo.note || 'Không có'}</li>
@@ -202,25 +203,26 @@ function setupPaymentHandling(paymentForm, order) {
     const method = formData.get('payment-method');
 
     // 1. Lấy dữ liệu từ ô Input
+    const emailInput = document.getElementById('customer-email');
     const phoneInput = document.getElementById('customer-phone');
     const addressInput = document.getElementById('customer-address');
     const noteInput = document.getElementById('customer-note');
 
-    // [DEBUG - BẪY KIỂM TRA]
-    // Hiện thông báo để xem code có lấy được chữ bạn nhập không
+    // Lấy giá trị từ các input
+    const emailVal = emailInput ? emailInput.value.trim() : '';
     const phoneVal = phoneInput ? phoneInput.value.trim() : '';
     const addrVal = addressInput ? addressInput.value.trim() : '';
     
-    // Nếu không lấy được dữ liệu -> HTML sai ID
-    if (!phoneInput || !addressInput) {
-        alert("LỖI: Không tìm thấy ô nhập SĐT hoặc Địa chỉ trong HTML. Hãy kiểm tra lại file order-detail.html");
+    // Kiểm tra các trường bắt buộc
+    if (!emailInput || !phoneInput || !addressInput) {
+        alert("LỖI: Không tìm thấy các ô nhập thông tin trong HTML. Hãy kiểm tra lại file order-detail.html");
         return;
     }
 
     // Nếu dữ liệu trống -> Chưa nhập
-    if (!phoneVal || !addrVal) {
-        if (paymentErrorEl) paymentErrorEl.textContent = 'Vui lòng nhập Số điện thoại và Địa chỉ nhận hàng.';
-        alert("Vui lòng nhập đầy đủ SĐT và Địa chỉ!");
+    if (!emailVal || !phoneVal || !addrVal) {
+        if (paymentErrorEl) paymentErrorEl.textContent = 'Vui lòng nhập đầy đủ Email, Số điện thoại và Địa chỉ nhận hàng.';
+        alert("Vui lòng nhập đầy đủ Email, SĐT và Địa chỉ!");
         return;
     }
 
@@ -250,6 +252,7 @@ function setupPaymentHandling(paymentForm, order) {
       status: 'Chờ xác nhận',
       // LƯU THÔNG TIN GIAO HÀNG
       shippingInfo: {
+          email: emailVal,
           phone: phoneVal,
           address: addrVal,
           note: noteInput ? noteInput.value.trim() : ''
@@ -291,12 +294,27 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
   }
 
-  const orders = (typeof getOrders === 'function' ? getOrders() : JSON.parse(localStorage.getItem('orders')) || [])
+  let orders = (typeof getOrders === 'function' ? getOrders() : JSON.parse(localStorage.getItem('orders')) || [])
     .filter(order => order.userEmail === currentUser.email)
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   if (view === 'active') {
-      renderOrdersList(orders, document.getElementById('orders-list'), 'Bạn chưa có đơn hàng nào.');
+      // Nếu không có đơn hàng, hiển thị thông báo thân thiện
+      if (orders.length === 0) {
+        const ordersList = document.getElementById('orders-list');
+        if (ordersList) {
+          ordersList.innerHTML = `
+            <div style="text-align: center; padding: 60px 20px; background: #fff; border-radius: 12px; border: 1px solid #e5e7eb;">
+              <div style="font-size: 48px; margin-bottom: 20px;">🛍️</div>
+              <h3 style="margin-bottom: 10px;">Bạn chưa có đơn hàng nào</h3>
+              <p class="muted" style="margin-bottom: 30px;">Hãy khám phá các sản phẩm tuyệt vời của chúng tôi!</p>
+              <a href="products.html" class="btn primary">Xem sản phẩm</a>
+            </div>
+          `;
+        }
+      } else {
+        renderOrdersList(orders, document.getElementById('orders-list'), 'Bạn chưa có đơn hàng nào.');
+      }
   } else if (view === 'detail') {
     const targetId = getQueryParam('id') || getQueryParam('orderId');
     if (!targetId) return;

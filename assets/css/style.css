@@ -330,6 +330,7 @@ textarea{min-height:140px}
   gap: 10px;
   max-width: 400px;
   padding: 0 16px;
+  position: relative;
 }
 
 .search-bar input {
@@ -353,6 +354,63 @@ textarea{min-height:140px}
 
 .search-bar button:hover {
   filter: brightness(.96);
+}
+
+/* Dropdown danh sách sản phẩm */
+.search-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 10px 24px rgba(16,24,40,.08);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;
+}
+
+.search-dropdown.active {
+  display: block;
+}
+
+.search-dropdown-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: background 0.2s;
+}
+
+.search-dropdown-item:hover {
+  background: #f8fafc;
+}
+
+.search-dropdown-item img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.search-dropdown-item-info {
+  flex: 1;
+}
+
+.search-dropdown-item-name {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.search-dropdown-item-price {
+  color: var(--brand);
+  font-weight: 700;
+  font-size: 13px;
 }
 /* ===== KẾT THÚC CSS THANH TÌM KIẾM ===== */
 

@@ -17,6 +17,8 @@ function normalizeCustomers() {
       id: user.id || `CUS${user.email}`,
       name: user.name || 'Khách hàng',
       email: user.email,
+      phone: user.phone || '---',
+      address: user.address || '---',
       createdAt: user.createdAt || null
     }))
     .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
@@ -48,7 +50,7 @@ function renderCustomers(customers) {
   if (!tbody) return;
 
   if (!customers.length) {
-    tbody.innerHTML = '<tr><td colspan="4" class="muted" style="text-align:center;">Chưa có khách hàng.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="muted" style="text-align:center;">Chưa có khách hàng.</td></tr>';
     return;
   }
 
@@ -57,6 +59,8 @@ function renderCustomers(customers) {
       <td>${customer.id}</td>
       <td>${customer.name}</td>
       <td>${customer.email}</td>
+      <td>${customer.phone || '---'}</td>
+      <td>${customer.address || '---'}</td>
       <td>${customer.createdAt ? new Date(customer.createdAt).toLocaleString('vi-VN') : '—'}</td>
     </tr>
   `).join('');
@@ -160,6 +164,7 @@ function viewOrderDetail(orderId) {
 
   const modalId = document.getElementById('modal-order-id');
   const modalName = document.getElementById('modal-customer-name');
+  const modalEmail = document.getElementById('modal-customer-email');
   const modalPhone = document.getElementById('modal-customer-phone');
   const modalAddress = document.getElementById('modal-customer-address');
   const modalNote = document.getElementById('modal-customer-note');
@@ -169,26 +174,59 @@ function viewOrderDetail(orderId) {
   modalName.innerText = order.customerName || order.userEmail || 'Khách';
   
   const shipInfo = order.shippingInfo || {};
+  modalEmail.innerText = shipInfo.email || order.userEmail || '---';
   modalPhone.innerText = shipInfo.phone || '---';
   modalAddress.innerText = shipInfo.address || '---';
   modalNote.innerText = shipInfo.note || 'Không có ghi chú';
+  
+  // Hiển thị trạng thái thanh toán
+  const modalPaymentStatus = document.getElementById('modal-payment-status');
+  if (modalPaymentStatus) {
+    const pStatusPaid = (typeof PAYMENT_STATUS !== 'undefined') ? PAYMENT_STATUS.PAID : 'paid';
+    if (order.paymentStatus === pStatusPaid) {
+      modalPaymentStatus.textContent = 'Đã thanh toán';
+      modalPaymentStatus.className = 'badge badge-success';
+    } else {
+      modalPaymentStatus.textContent = 'Chưa thanh toán';
+      modalPaymentStatus.className = 'badge badge-warning';
+    }
+  }
 
   modalItems.innerHTML = '';
-  (order.items || []).forEach(item => {
-    const itemRow = document.createElement('tr');
-    const sizeHTML = item.size ? `<div class="small muted">Size: <strong>${item.size}</strong></div>` : '';
-    itemRow.innerHTML = `
-      <td style="width: 50px;">
-        <img src="${item.image}" style="width:40px; height:40px; object-fit:cover; border-radius:4px; border:1px solid #eee;">
-      </td>
-      <td>
-        <div style="font-weight:600; font-size:0.9rem;">${item.name}</div>
-        ${sizeHTML}
-      </td>
-      <td style="text-align:right; vertical-align:middle;">x${item.quantity}</td>
+  if (!order.items || order.items.length === 0) {
+    modalItems.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;" class="muted">Không có sản phẩm trong đơn hàng này.</td></tr>';
+  } else {
+    (order.items || []).forEach(item => {
+      const itemRow = document.createElement('tr');
+      const sizeHTML = item.size ? `<div class="small muted">Size: <strong>${item.size}</strong></div>` : '';
+      const price = typeof formatCurrency === 'function' ? formatCurrency(item.price || 0) : (item.price || 0);
+      const subtotal = typeof formatCurrency === 'function' ? formatCurrency((item.price || 0) * (item.quantity || 0)) : ((item.price || 0) * (item.quantity || 0));
+      itemRow.innerHTML = `
+        <td style="width: 50px;">
+          <img src="${item.image || ''}" style="width:40px; height:40px; object-fit:cover; border-radius:4px; border:1px solid #eee;" onerror="this.style.display='none'">
+        </td>
+        <td>
+          <div style="font-weight:600; font-size:0.9rem;">${item.name}</div>
+          ${sizeHTML}
+        </td>
+        <td style="text-align:center; vertical-align:middle;">x${item.quantity || 0}</td>
+        <td style="text-align:right; vertical-align:middle; font-weight:600;">${price}₫</td>
+        <td style="text-align:right; vertical-align:middle; font-weight:700; color:#d32f2f;">${subtotal}₫</td>
+      `;
+      modalItems.appendChild(itemRow);
+    });
+    
+    // Thêm dòng tổng cộng
+    const totalRow = document.createElement('tr');
+    totalRow.style.borderTop = '2px solid #eee';
+    totalRow.style.fontWeight = '700';
+    const total = typeof formatCurrency === 'function' ? formatCurrency(order.total || 0) : (order.total || 0);
+    totalRow.innerHTML = `
+      <td colspan="4" style="text-align:right; padding:12px;">Tổng cộng:</td>
+      <td style="text-align:right; padding:12px; color:#d32f2f; font-size:1.1em;">${total}₫</td>
     `;
-    modalItems.appendChild(itemRow);
-  });
+    modalItems.appendChild(totalRow);
+  }
 
   modal.classList.add('active');
 }

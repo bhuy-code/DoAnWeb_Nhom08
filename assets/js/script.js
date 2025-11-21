@@ -322,6 +322,155 @@ function initializeInventory() {
   }
 }
 
+function initializeSampleData() {
+  // Chỉ khởi tạo một lần
+  if (localStorage.getItem('sampleDataInitialized')) return;
+  
+  const users = JSON.parse(localStorage.getItem('users')) || [];
+  const orders = JSON.parse(localStorage.getItem('orders')) || [];
+  
+  // Tạo 2 khách hàng mẫu
+  const sampleCustomers = [
+    {
+      id: 'CUS002',
+      name: 'Nguyễn Văn An',
+      email: 'nguyenvanan@email.com',
+      password: '123456',
+      phone: '0901234567',
+      address: '123 Đường ABC, Phường 1, Quận 1, TP.HCM',
+      createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+    },
+    {
+      id: 'CUS003',
+      name: 'Trần Thị Bình',
+      email: 'tranthibinh@email.com',
+      password: '123456',
+      phone: '0987654321',
+      address: '456 Đường XYZ, Phường 2, Quận 3, TP.HCM',
+      createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString()
+    }
+  ];
+  
+  // Thêm khách hàng mẫu nếu chưa có
+  sampleCustomers.forEach(sampleCustomer => {
+    if (!users.find(u => u.email === sampleCustomer.email)) {
+      users.push(sampleCustomer);
+    }
+  });
+  localStorage.setItem('users', JSON.stringify(users));
+  
+  // Cập nhật customers
+  let customers = JSON.parse(localStorage.getItem('customers')) || [];
+  sampleCustomers.forEach(sampleCustomer => {
+    if (!customers.find(c => c.email === sampleCustomer.email)) {
+      customers.push({
+        id: sampleCustomer.id,
+        name: sampleCustomer.name,
+        email: sampleCustomer.email,
+        createdAt: sampleCustomer.createdAt
+      });
+    }
+  });
+  localStorage.setItem('customers', JSON.stringify(customers));
+  
+  // Tạo đơn hàng mẫu
+  const pStatusPaid = (typeof PAYMENT_STATUS !== 'undefined') ? PAYMENT_STATUS.PAID : 'paid';
+  const oStatusDelivered = (typeof ORDER_STATUS !== 'undefined') ? ORDER_STATUS.DELIVERED : 'delivered';
+  const oStatusShipping = (typeof ORDER_STATUS !== 'undefined') ? ORDER_STATUS.SHIPPING : 'shipping';
+  
+  const sampleOrders = [
+    {
+      orderId: 'DH1704067200001',
+      userEmail: 'nguyenvanan@email.com',
+      customerName: 'Nguyễn Văn An',
+      items: [
+        {
+          productId: 'SP001',
+          name: 'Áo thun basic Form Nữ màu cổ điển',
+          size: 'M',
+          price: 199000,
+          quantity: 2,
+          image: 'https://product.hstatic.net/1000184601/product/women_nau-nhat__2__47206564af004145addea15a2b71c162_2048x2048.jpg',
+          subtotal: 398000
+        },
+        {
+          productId: 'SP005',
+          name: 'Áo sơ mi Nam vải Broadcloth',
+          size: 'L',
+          price: 399000,
+          quantity: 1,
+          image: 'https://api.muji.com.vn/media/catalog/product/cache/4da93324a1c25b12e9566f761e24b9c9/4/5/4547315862849_org.jpg',
+          subtotal: 399000
+        }
+      ],
+      total: 797000,
+      status: oStatusDelivered,
+      paymentStatus: pStatusPaid,
+      paymentMethod: 'cod',
+      createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
+      paidAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+      shippingInfo: {
+        email: 'nguyenvanan@email.com',
+        phone: '0901234567',
+        address: '123 Đường ABC, Phường 1, Quận 1, TP.HCM',
+        note: 'Giao hàng giờ hành chính'
+      },
+      inventoryDeducted: true
+    },
+    {
+      orderId: 'DH1704153600002',
+      userEmail: 'tranthibinh@email.com',
+      customerName: 'Trần Thị Bình',
+      items: [
+        {
+          productId: 'SP003',
+          name: 'Áo Sweaeter nỉ',
+          size: 'M',
+          price: 299000,
+          quantity: 1,
+          image: 'https://im.uniqlo.com/global-cms/spa/res9d7c31ab934101f35172e2a6d1ae6c3dfr.jpg',
+          subtotal: 299000
+        },
+        {
+          productId: 'SP011',
+          name: 'Quần thể thao nữ',
+          size: 'S',
+          price: 699000,
+          quantity: 1,
+          image: 'https://assets.adidas.com/images/w_383,h_383,f_auto,q_auto,fl_lossy,c_fill,g_auto/d798d656cac14a67a1153cd486f26ce1_9366/quan-short-2-trong-1-climacool-own-the-run.jpg',
+          subtotal: 699000
+        }
+      ],
+      total: 998000,
+      status: oStatusShipping,
+      paymentStatus: pStatusPaid,
+      paymentMethod: 'qr',
+      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+      paidAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+      updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+      shippingInfo: {
+        email: 'tranthibinh@email.com',
+        phone: '0987654321',
+        address: '456 Đường XYZ, Phường 2, Quận 3, TP.HCM',
+        note: ''
+      },
+      inventoryDeducted: true
+    }
+  ];
+  
+  // Thêm đơn hàng mẫu nếu chưa có
+  sampleOrders.forEach(sampleOrder => {
+    if (!orders.find(o => o.orderId === sampleOrder.orderId)) {
+      orders.push(sampleOrder);
+    }
+  });
+  localStorage.setItem('orders', JSON.stringify(orders));
+  
+  // Đánh dấu đã khởi tạo
+  localStorage.setItem('sampleDataInitialized', 'true');
+}
+
 // Chờ cho toàn bộ nội dung trang web được tải xong
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -333,6 +482,11 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeInventory(); // Chạy hàm khởi tạo kho
   initializeProductCatalog();
   ensureUserIds();
+  
+  // ==========================================================
+  // TÍNH NĂNG 0.5: KHỞI TẠO DỮ LIỆU MẪU (Khách hàng & Đơn hàng)
+  // ==========================================================
+  initializeSampleData();
   
   // Gọi hàm này ngay khi tải trang để lấy số lượng mới nhất
   updateCartCounter();
@@ -446,39 +600,100 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================================
-  // TÍNH NĂNG 3: Tìm kiếm (cho products.html và index.html)
+  // TÍNH NĂNG 3: Tìm kiếm với dropdown danh sách sản phẩm
   // ==========================================================
   const searchInput = document.getElementById("search-input");
   const searchBtn = document.getElementById("search-btn");
-  if (searchInput && searchBtn) {
-    function filterProductsOnPage() {
-      const keyword = searchInput.value.trim().toLowerCase();
+  const searchBar = document.querySelector(".search-bar");
+  
+  if (searchInput && searchBtn && searchBar) {
+    // Tạo dropdown
+    let searchDropdown = document.createElement("div");
+    searchDropdown.className = "search-dropdown";
+    searchDropdown.id = "search-dropdown";
+    searchBar.appendChild(searchDropdown);
+    
+    // Lấy danh sách sản phẩm từ database.js
+    function getProductList() {
+      if (typeof products !== 'undefined' && Array.isArray(products)) {
+        return products;
+      }
+      // Fallback: lấy từ DOM
+      const cards = document.querySelectorAll('.card');
+      return Array.from(cards).map(card => {
+        const name = card.querySelector('.product-name')?.innerText || '';
+        const price = card.querySelector('.product-price')?.getAttribute('data-price-value') || '0';
+        const image = card.querySelector('.product-image')?.src || '';
+        return { name, price: parseInt(price), image };
+      });
+    }
+    
+    // Hiển thị dropdown với danh sách sản phẩm
+    function showProductDropdown() {
+      const products = getProductList();
+      searchDropdown.innerHTML = '';
       
-      let productCards = document.querySelectorAll('#product-list .card'); // Trang Products
-      if (productCards.length === 0) {
-         productCards = document.querySelectorAll('#featured .card'); // Trang Index
+      if (products.length === 0) {
+        searchDropdown.innerHTML = '<div style="padding: 12px; text-align: center; color: #999;">Không có sản phẩm</div>';
+        searchDropdown.classList.add('active');
+        return;
       }
       
-      let foundCount = 0;
+      products.forEach(product => {
+        const item = document.createElement("div");
+        item.className = "search-dropdown-item";
+        item.innerHTML = `
+          <img src="${product.image || ''}" alt="${product.name}" onerror="this.style.display='none'">
+          <div class="search-dropdown-item-info">
+            <div class="search-dropdown-item-name">${product.name}</div>
+            <div class="search-dropdown-item-price">${(product.price || 0).toLocaleString()}₫</div>
+          </div>
+        `;
+        item.addEventListener('click', () => {
+          searchInput.value = product.name;
+          searchDropdown.classList.remove('active');
+          filterProductsOnPage();
+        });
+        searchDropdown.appendChild(item);
+      });
+      
+      searchDropdown.classList.add('active');
+    }
+    
+    // Ẩn dropdown khi click ra ngoài
+    document.addEventListener('click', (e) => {
+      if (!searchBar.contains(e.target)) {
+        searchDropdown.classList.remove('active');
+      }
+    });
+    
+    // Hiển thị dropdown khi click vào input
+    searchInput.addEventListener('focus', showProductDropdown);
+    searchInput.addEventListener('click', showProductDropdown);
+    
+    // Tìm kiếm khi nhập
+    function filterProductsOnPage() {
+      const keyword = searchInput.value.trim().toLowerCase();
+      searchDropdown.classList.remove('active');
+      
+      let productCards = document.querySelectorAll('#product-list .card');
+      if (productCards.length === 0) {
+         productCards = document.querySelectorAll('#featured .card');
+      }
+      
       productCards.forEach((product) => {
         const title = product.querySelector(".product-name")?.innerText.toLowerCase() || "";
         const desc = product.querySelector(".muted")?.innerText.toLowerCase() || "";
 
-        const isHiddenByFilter = (product.style.display === 'none');
+        if (keyword === "") {
+          product.style.display = "block";
+          return;
+        }
 
-        if (!isHiddenByFilter || keyword === "") {
-            if (keyword === "") {
-              product.style.display = "block"; // Reset
-              foundCount++;
-              return;
-            }
-
-            if (title.includes(keyword) || desc.includes(keyword)) {
-              product.style.display = "block";
-              foundCount++;
-            } else {
-              product.style.display = "none";
-            }
+        if (title.includes(keyword) || desc.includes(keyword)) {
+          product.style.display = "block";
+        } else {
+          product.style.display = "none";
         }
       });
     }
@@ -503,98 +718,45 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================================
-  // TÍNH NĂNG 4: Chuyển đổi Form Đăng nhập / Đăng ký
-  // ==========================================================
-  const showRegisterBtn = document.getElementById('show-register-btn');
-  const showLoginBtn = document.getElementById('show-login-btn');
-  const loginView = document.getElementById('login-view');
-  const registerView = document.getElementById('register-view');
-
-  if (showRegisterBtn && showLoginBtn && loginView && registerView) {
-    
-    showRegisterBtn.addEventListener('click', (e) => {
-      e.preventDefault(); 
-      loginView.style.display = 'none';
-      registerView.style.display = 'block';
-    });
-
-    showLoginBtn.addEventListener('click', (e) => {
-      e.preventDefault(); 
-      loginView.style.display = 'block';
-      registerView.style.display = 'none';
-    });
-  }
-  
-  // ==========================================================
-  // TÍNH NĂNG 5: Logic ĐĂNG KÝ
-  // ==========================================================
-  const registerForm = document.getElementById('register-form');
-  if(registerForm) {
-    registerForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      
-      const name = document.getElementById('reg-name').value;
-      const email = document.getElementById('reg-email').value;
-      const pass = document.getElementById('reg-password').value;
-      const confirmPass = document.getElementById('reg-confirm-password').value;
-      const errorEl = document.getElementById('register-error');
-      
-      if (!name || !email || !pass || !confirmPass) {
-        errorEl.textContent = 'Vui lòng điền đầy đủ thông tin.';
-        return;
-      }
-      if (pass !== confirmPass) {
-        errorEl.textContent = 'Mật khẩu xác nhận không khớp.';
-        return;
-      }
-      if (pass.length < 6) {
-        errorEl.textContent = 'Mật khẩu phải có ít nhất 6 ký tự.';
-        return;
-      }
-
-      let users = JSON.parse(localStorage.getItem('users')) || [];
-      const emailExists = users.find(user => user.email === email);
-      
-      if (emailExists) {
-        errorEl.textContent = 'Email này đã được sử dụng.';
-        return;
-      }
-
-      const newUser = {
-        id: `CUS${Date.now()}${Math.floor(Math.random() * 1000)}`,
-        name: name,
-        email: email,
-        password: pass,
-        phone: '',
-        address: '',
-        createdAt: new Date().toISOString()
-      };
-      users.push(newUser);
-      localStorage.setItem('users', JSON.stringify(users));
-
-      const customers = JSON.parse(localStorage.getItem('customers')) || [];
-      customers.push({
-        id: newUser.id,
-        name: newUser.name,
-        email: newUser.email,
-        createdAt: newUser.createdAt
-      });
-      localStorage.setItem('customers', JSON.stringify(customers));
-      
-      alert('Đăng ký thành công! Vui lòng đăng nhập.');
-      errorEl.textContent = '';
-      
-      registerForm.reset();
-      loginView.style.display = 'block';
-      registerView.style.display = 'none';
-    });
-  }
-  
-  // ==========================================================
-  // TÍNH NĂNG 6: Logic ĐĂNG NHẬP
+  // TÍNH NĂNG 6: Logic ĐĂNG NHẬP (Tài khoản khách hàng mặc định)
   // ==========================================================
   const loginForm = document.getElementById('login-form');
   if(loginForm) {
+    // Khởi tạo tài khoản khách hàng mặc định nếu chưa có
+    function initializeDefaultCustomer() {
+      let users = JSON.parse(localStorage.getItem('users')) || [];
+      const defaultCustomer = users.find(u => u.email === 'khachhang@clothify.com');
+      
+      if (!defaultCustomer) {
+        const newCustomer = {
+          id: 'CUS001',
+          name: 'Khách hàng',
+          email: 'khachhang@clothify.com',
+          password: '123456',
+          phone: '',
+          address: '',
+          createdAt: new Date().toISOString()
+        };
+        users.push(newCustomer);
+        localStorage.setItem('users', JSON.stringify(users));
+        
+        // Thêm vào danh sách khách hàng
+        let customers = JSON.parse(localStorage.getItem('customers')) || [];
+        if (!customers.find(c => c.email === 'khachhang@clothify.com')) {
+          customers.push({
+            id: newCustomer.id,
+            name: newCustomer.name,
+            email: newCustomer.email,
+            createdAt: newCustomer.createdAt
+          });
+          localStorage.setItem('customers', JSON.stringify(customers));
+        }
+      }
+    }
+    
+    // Khởi tạo khi trang load
+    initializeDefaultCustomer();
+    
     loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
       
@@ -607,10 +769,31 @@ document.addEventListener('DOMContentLoaded', () => {
         const adminUser = { name: 'Admin', email: 'admin@clothify.com' };
         localStorage.setItem('currentUser', JSON.stringify(adminUser));
         alert('Đăng nhập Admin thành công! Đang chuyển đến trang Quản trị.');
-        window.location.href = 'admin.html'; // Chuyển đến trang admin
+        window.location.href = 'admin.html';
         return; 
       }
       
+      // ===== TÀI KHOẢN KHÁCH HÀNG MẶC ĐỊNH =====
+      if (email === 'khachhang@clothify.com' && pass === '123456') {
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        let foundUser = users.find(user => user.email === email);
+        
+        if (!foundUser) {
+          initializeDefaultCustomer();
+          foundUser = users.find(user => user.email === email);
+        }
+        
+        if (foundUser) {
+          errorEl.textContent = "";
+          const { password: removedPassword, ...publicUser } = foundUser;
+          localStorage.setItem('currentUser', JSON.stringify(publicUser));
+          alert('Đăng nhập thành công! Chuyển về trang chủ.');
+          window.location.href = 'index.html';
+          return;
+        }
+      }
+      
+      // ===== TÀI KHOẢN KHÁC (nếu có) =====
       let users = JSON.parse(localStorage.getItem('users')) || [];
       const foundUser = users.find(user => user.email === email && user.password === pass);
       
@@ -619,7 +802,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const { password: removedPassword, ...publicUser } = foundUser;
         localStorage.setItem('currentUser', JSON.stringify(publicUser));
         alert('Đăng nhập thành công! Chuyển về trang chủ.');
-        window.location.href = 'index.html'; // Chuyển về trang chủ
+        window.location.href = 'index.html';
       } else {
         errorEl.textContent = 'Email hoặc mật khẩu không chính xác.';
       }

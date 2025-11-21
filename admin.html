@@ -85,11 +85,13 @@
                 <th>Mã KH</th>
                 <th>Họ tên</th>
                 <th>Email</th>
+                <th>Số điện thoại</th>
+                <th>Địa chỉ</th>
                 <th>Ngày tham gia</th>
               </tr>
             </thead>
             <tbody id="customers-table">
-              <tr><td colspan="4" class="muted" style="text-align:center;">Chưa có khách hàng.</td></tr>
+              <tr><td colspan="6" class="muted" style="text-align:center;">Chưa có khách hàng.</td></tr>
             </tbody>
           </table>
         </div>
@@ -170,45 +172,8 @@
         <span id="modal-customer-name" style="font-weight:bold; font-size:1.1em;">...</span>
       </div>
       <div>
-        <strong style="display:block; color:#666; font-size:0.9em;">Số điện thoại:</strong>
-        <span id="modal-customer-phone" style="color:#d32f2f; font-weight:bold;">...</span>
-      </div>
-      <div style="grid-column: span 2;">
-        <strong style="display:block; color:#666; font-size:0.9em;">Địa chỉ giao hàng:</strong>
-        <span id="modal-customer-address">...</span>
-      </div>
-      <div style="grid-column: span 2;">
-        <strong style="display:block; color:#666; font-size:0.9em;">Ghi chú từ khách:</strong>
-        <p id="modal-customer-note" style="font-style:italic; color:#555; background:#f9f9f9; padding:8px; border-radius:4px; margin-top:4px;">...</p>
-      </div>
-    </div>
-
-    <h4 style="margin-bottom:10px;">Sản phẩm cần giao</h4>
-    <div style="max-height: 200px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px;">
-      <table class="table" style="margin:0;">
-        <tbody id="modal-order-items">
-          </tbody>
-      </table>
-    </div>
-    
-    <div style="text-align:right; margin-top:15px; padding-top:10px; border-top:1px solid #eee;">
-        <button class="btn" id="close-modal-btn">Đóng</button>
-    </div>
-  </div>
-</div>
-<div id="order-detail-modal" class="modal-overlay">
-  <div class="modal-content" style="max-width: 600px; width: 90%;">
-    <button class="modal-close" id="close-order-modal">&times;</button>
-    
-    <div class="modal-header" style="border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:15px;">
-      <h3>Thông tin giao hàng</h3>
-      <span id="modal-order-id" class="muted small">#DH...</span>
-    </div>
-
-    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-      <div>
-        <strong style="display:block; color:#666; font-size:0.9em;">Người nhận:</strong>
-        <span id="modal-customer-name" style="font-weight:bold; font-size:1.1em;">...</span>
+        <strong style="display:block; color:#666; font-size:0.9em;">Email:</strong>
+        <span id="modal-customer-email" style="color:#d32f2f; font-weight:bold;">---</span>
       </div>
       <div>
         <strong style="display:block; color:#666; font-size:0.9em;">Số điện thoại:</strong>
@@ -224,12 +189,28 @@
       </div>
     </div>
 
-    <h4 style="margin-bottom:10px;">Sản phẩm cần giao</h4>
-    <div style="max-height: 200px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px;">
+    <h4 style="margin-bottom:10px;">Sản phẩm trong đơn hàng</h4>
+    <div style="max-height: 300px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px;">
       <table class="table" style="margin:0;">
+        <thead>
+          <tr>
+            <th style="width:50px;">Hình</th>
+            <th>Sản phẩm</th>
+            <th style="text-align:center;">SL</th>
+            <th style="text-align:right;">Đơn giá</th>
+            <th style="text-align:right;">Tạm tính</th>
+          </tr>
+        </thead>
         <tbody id="modal-order-items">
           </tbody>
       </table>
+    </div>
+    
+    <div style="margin-top:15px; padding:12px; background:#f8fafc; border-radius:8px; border:1px solid #e5e7eb;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <strong>Trạng thái thanh toán:</strong>
+        <span id="modal-payment-status" class="badge" style="font-size:0.9em;">---</span>
+      </div>
     </div>
     
     <div style="text-align:right; margin-top:15px; padding-top:10px; border-top:1px solid #eee;">
