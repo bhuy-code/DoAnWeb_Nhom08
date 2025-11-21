@@ -847,6 +847,45 @@ body.auth-layout .section {
   margin-bottom: 6px;
   font-weight: 600;
 }
+/* ===== CSS PHÂN TRANG (PAGINATION) ===== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  
+  /* SỬA 2 DÒNG NÀY */
+  margin-top: 10px;     /* Giảm xuống để nút gần sản phẩm hơn (cũ là 30px) */
+  margin-bottom: 0px;   /* Bỏ khoảng trống bên dưới để sát với footer */
+  
+  padding-bottom: 20px; /* Tạo một chút khoảng đệm bên trong nếu cần */
+}
+
+.page-btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #e6e8ec;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.page-btn:hover {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+
+.page-btn.active {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
 
 /* ==========================================================
    HẾT PHẦN FIX CĂN GIỮA LOGIN/REGISTER FORM

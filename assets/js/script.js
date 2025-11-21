@@ -342,32 +342,107 @@ document.addEventListener('DOMContentLoaded', () => {
   // TÍNH NĂNG 2: Lọc sản phẩm (trang "products.html")
   // ==========================================================
   const filterBar = document.querySelector('.filterbar');
-  if (filterBar) {
-    const filterButtons = filterBar.querySelectorAll('.badge[data-filler]');
-    const productCards = document.querySelectorAll('#product-list .card');
+  // ==========================================================
+  // TÍNH NĂNG 2 (NÂNG CẤP): LỌC SẢN PHẨM + PHÂN TRANG
+  // ==========================================================
+  
+  const allCards = document.querySelectorAll('.grid .card');
+  const paginationContainer = document.getElementById('pagination');
+  const filterButtons = document.querySelectorAll('.filterbar .badge');
 
-    filterButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        // 1. Cập nhật giao diện nút
-        filterButtons.forEach(btn => btn.classList.remove('active'));
-        button.classList.add('active');
+  // Chỉ chạy nếu có sản phẩm và khung phân trang
+  if (allCards.length > 0 && paginationContainer) {
 
-        // 2. Lấy giá trị lọc (ví dụ: "tatca", "nam", "nu")
-        const filterValue = button.dataset.filler;
-        
-        // 3. Lọc sản phẩm
-        productCards.forEach(card => {
-          // Lấy category của card (ví dụ: "nam", "nu")
-          const cardCategory = card.dataset.category;
+    // 1. Cấu hình số lượng: Trang chủ 6, Trang sản phẩm 8
+    let itemsPerPage = 4; 
+    if (window.location.pathname.includes('products.html')) {
+      itemsPerPage = 8;
+    }
 
-          if (filterValue === 'tatca' || filterValue === cardCategory) {
-            card.style.display = 'block'; // Hiện
-          } else {
-            card.style.display = 'none'; // Ẩn
-          }
+    // Biến lưu trạng thái
+    let currentFilter = 'tatca'; 
+    let currentPage = 1;
+
+    // --- HÀM XỬ LÝ CHÍNH ---
+    function updateDisplay() {
+      const visibleItems = []; 
+
+      // B1: Lọc sản phẩm
+      allCards.forEach(card => {
+        const category = card.dataset.category; 
+        // Kiểm tra nút lọc
+        if (currentFilter === 'tatca' || currentFilter === 'all' || category === currentFilter) {
+          visibleItems.push(card);
+        } else {
+          card.style.display = 'none'; // Ẩn ngay nếu không đúng loại
+        }
+      });
+
+      // B2: Tính toán phân trang trên danh sách ĐÃ LỌC
+      const totalPages = Math.ceil(visibleItems.length / itemsPerPage);
+      if (currentPage > totalPages) currentPage = 1;
+      if (totalPages === 0) currentPage = 1;
+
+      const start = (currentPage - 1) * itemsPerPage;
+      const end = start + itemsPerPage;
+
+      // B3: Cắt trang (Chỉ hiện những sp trong khoảng start -> end)
+      visibleItems.forEach((card, index) => {
+        if (index >= start && index < end) {
+          card.style.display = 'flex'; // Hiện
+        } else {
+          card.style.display = 'none'; // Ẩn (do nằm ở trang khác)
+        }
+      });
+
+      // B4: Vẽ nút phân trang
+      renderPaginationButtons(totalPages);
+    }
+
+    // --- HÀM VẼ NÚT 1, 2, 3... ---
+    function renderPaginationButtons(totalPages) {
+      paginationContainer.innerHTML = '';
+
+      if (totalPages <= 1) return; // Ít sp quá thì khỏi hiện nút
+
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.innerText = i;
+        btn.className = 'page-btn'; // Class CSS bạn đã thêm
+        if (i === currentPage) btn.classList.add('active');
+
+        btn.addEventListener('click', () => {
+          currentPage = i;
+          updateDisplay(); // Vẽ lại
+          
+          // Cuộn lên đầu danh sách
+          const grid = document.querySelector('.grid');
+          if(grid) grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+
+        paginationContainer.appendChild(btn);
+      }
+    }
+
+    // --- SỰ KIỆN CLICK NÚT LỌC ---
+    if (filterButtons.length > 0) {
+      filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          // Đổi màu nút active
+          filterButtons.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          // Lấy giá trị lọc và reset về trang 1
+          currentFilter = btn.getAttribute('data-filler');
+          currentPage = 1;
+
+          updateDisplay();
         });
       });
-    });
+    }
+
+    // Chạy lần đầu khi vào trang
+    updateDisplay();
   }
 
   // ==========================================================

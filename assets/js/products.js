@@ -6,37 +6,38 @@ document.addEventListener("DOMContentLoaded", () => {
   const modalOverlay = document.getElementById("size-modal");
   const modalCloseBtn = document.getElementById("modal-close-btn");
   const modalConfirmBtn = document.getElementById("modal-confirm-add-btn");
-  const allAddToCartButtons = document.querySelectorAll(".add-to-cart-btn");
+  
+  // CHÚNG TA SẼ LẮNG NGHE SỰ KIỆN TRÊN TOÀN BỘ DANH SÁCH SẢN PHẨM (Event Delegation)
+  // Thay vì tìm từng nút một.
+  const productListContainer = document.getElementById("product-list") || document.querySelector(".grid");
 
   if (!modalOverlay || !modalCloseBtn || !modalConfirmBtn) return;
 
   let currentProductData = {};
   let selectedSize = null;
 
-  // ===== GẮN SỰ KIỆN CHO NÚT "THÊM VÀO GIỎ" =====
-  allAddToCartButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      event.preventDefault();
-
+  // ===== HÀM MỞ MODAL (Được gọi khi click vào nút Thêm) =====
+  function openSizeModal(button) {
       // 🔒 KIỂM TRA ĐĂNG NHẬP
       const currentUser = JSON.parse(localStorage.getItem("currentUser"));
       if (!currentUser) {
         alert("⚠️ Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng!");
-        window.location.href = "login.html"; // chuyển đến trang đăng nhập
-        return; // Dừng lại, không mở modal
+        window.location.href = "login.html"; 
+        return;
       }
 
-      // --- Nếu đã đăng nhập, tiếp tục hiển thị modal ---
-      const productCard = event.target.closest(".card");
+      // Lấy thông tin sản phẩm từ thẻ cha .card
+      const productCard = button.closest(".card");
+      if (!productCard) return;
+
       const name = productCard.querySelector(".product-name").innerText;
       const priceText = productCard.querySelector(".product-price").innerText;
-      const priceValue = productCard
-        .querySelector(".product-price")
-        .getAttribute("data-price-value");
+      const priceValue = productCard.querySelector(".product-price").getAttribute("data-price-value");
       const image = productCard.querySelector(".product-image").src;
-      const id = event.target.getAttribute("data-product-id");
-      const sizesString = event.target.getAttribute("data-available-sizes");
+      const id = button.getAttribute("data-product-id");
+      const sizesString = button.getAttribute("data-available-sizes");
 
+      // Lưu dữ liệu tạm
       currentProductData = {
         id: id,
         name: name,
@@ -44,17 +45,16 @@ document.addEventListener("DOMContentLoaded", () => {
         image: image,
       };
 
+      // Điền thông tin vào Modal
       document.getElementById("modal-product-name").innerText = name;
       document.getElementById("modal-product-price").innerText = priceText;
       document.getElementById("modal-product-image").src = image;
 
+      // Tạo các nút chọn Size
       const sizeContainer = document.getElementById("modal-size-options");
       sizeContainer.innerHTML = "";
       selectedSize = null;
       modalConfirmBtn.disabled = true;
-
-      const qtyInput = document.getElementById("modal-quantity");
-      if (qtyInput) qtyInput.value = 1;
 
       if (sizesString) {
         const sizesArray = sizesString.split(",");
@@ -65,9 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
           sizeBtn.setAttribute("data-size", size.trim());
 
           sizeBtn.addEventListener("click", () => {
-            sizeContainer
-              .querySelectorAll(".size-option")
-              .forEach((btn) => btn.classList.remove("active"));
+            sizeContainer.querySelectorAll(".size-option").forEach((btn) => btn.classList.remove("active"));
             sizeBtn.classList.add("active");
             selectedSize = size.trim();
             modalConfirmBtn.disabled = false;
@@ -82,8 +80,30 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       modalOverlay.classList.add("active");
+  }
+
+  // ===== SỬA LỖI CHÍNH: LẮNG NGHE CLICK TRÊN DANH SÁCH CHA =====
+  if (productListContainer) {
+    productListContainer.addEventListener("click", (event) => {
+      // Kiểm tra xem cái thứ vừa bấm vào có phải là nút "add-to-cart-btn" không
+      const btn = event.target.closest(".add-to-cart-btn");
+      
+      if (btn) {
+        event.preventDefault();
+        openSizeModal(btn);
+      }
     });
-  });
+  } else {
+    // Dự phòng cho trang chủ (nếu ID khác) hoặc trường hợp không tìm thấy container
+    // Vẫn giữ cách cũ để đảm bảo tương thích
+    const buttons = document.querySelectorAll(".add-to-cart-btn");
+    buttons.forEach(btn => {
+        btn.addEventListener("click", (e) => {
+            e.preventDefault();
+            openSizeModal(e.target);
+        });
+    });
+  }
 
   // ===== NÚT "XÁC NHẬN THÊM" TRONG MODAL =====
   modalConfirmBtn.addEventListener("click", () => {
@@ -92,14 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    const quantityInput = document.getElementById("modal-quantity");
-    const quantityValue = parseInt(quantityInput?.value) || 1;
-    if (quantityValue <= 0) {
-      alert("Số lượng phải lớn hơn 0!");
-      return;
-    }
-
-    // 🔒 KIỂM TRA LẠI ĐĂNG NHẬP (phòng trường hợp mở modal sẵn)
+    // Kiểm tra lại đăng nhập
     const currentUser = JSON.parse(localStorage.getItem("currentUser"));
     if (!currentUser) {
       alert("⚠️ Vui lòng đăng nhập để hoàn tất thao tác!");
@@ -110,31 +123,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const productToAdd = {
       ...currentProductData,
       size: selectedSize,
-      quantity: quantityValue,
+      quantity: 1, // Mặc định là 1
       uniqueId: currentProductData.id + "-" + selectedSize,
     };
 
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const existingIndex = cart.findIndex(
-      (item) => item.uniqueId === productToAdd.uniqueId
-    );
+    const existingIndex = cart.findIndex((item) => item.uniqueId === productToAdd.uniqueId);
 
     if (existingIndex > -1) {
-      cart[existingIndex].quantity += quantityValue;
+      cart[existingIndex].quantity += 1;
     } else {
       cart.push(productToAdd);
     }
 
     localStorage.setItem("cart", JSON.stringify(cart));
     
-    if (typeof updateCartCounter === "function") {
-      updateCartCounter();
-    }
-    if (typeof syncCartToActiveOrder === "function") {
-      syncCartToActiveOrder(cart);
-    }
+    if (typeof updateCartCounter === "function") updateCartCounter();
+    if (typeof syncCartToActiveOrder === "function") syncCartToActiveOrder(cart);
 
-    alert("✅ Đã thêm sản phẩm vào giỏ hàng!");
+    alert(`✅ Đã thêm "${productToAdd.name}" vào giỏ hàng!`);
     closeModal();
   });
 
