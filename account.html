@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tài khoản của tôi · Clothify</title>
+  <meta name="description" content="Thông tin tài khoản khách hàng Clothify">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="page-user">
+
+<header class="header">
+  <div class="container">
+    <nav class="nav" aria-label="Primary">
+      <a href="index.html" class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <span>Clothify</span>
+      </a>
+      <div>
+        <a href="index.html">Trang chủ</a>
+        <a href="products.html">Sản phẩm</a>
+        <a href="cart.html" style="position: relative;">
+          Giỏ hàng
+          <span id="cart-counter" class="cart-badge"></span>
+        </a>
+        <a href="about.html">Giới thiệu</a>
+        <a href="contact.html">Liên hệ</a>
+      </div>
+      <div class="cta">
+        <a class="btn ghost" href="login.html" aria-label="Đăng nhập">Đăng nhập</a>
+        <a class="btn primary" href="products.html" aria-label="Mua ngay">Mua ngay</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="page-content">
+  <div class="container">
+    <section class="section account-section">
+      <h2>Thông tin tài khoản</h2>
+      <div class="account-card">
+        <div class="account-card__header">
+          <div class="account-avatar" id="account-avatar" aria-hidden="true">U</div>
+          <div>
+            <h3 id="account-name">Khách hàng</h3>
+            <p class="muted" id="account-email">email@example.com</p>
+          </div>
+        </div>
+        <div class="account-card__body">
+          <div class="account-info-row">
+            <span>Ngày tham gia</span>
+            <strong id="account-created">--</strong>
+          </div>
+          <div class="account-info-row">
+            <span>Số điện thoại</span>
+            <strong id="account-phone">Chưa cập nhật</strong>
+          </div>
+          <div class="account-info-row">
+            <span>Địa chỉ</span>
+            <strong id="account-address">Chưa cập nhật</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="account-grid">
+        <article class="account-stat">
+          <h4>Đơn hàng đã tạo</h4>
+          <strong id="account-orders-count">0</strong>
+          <p class="muted small">Bao gồm tất cả đơn hàng đang chờ và đã hoàn tất.</p>
+        </article>
+        <article class="account-stat">
+          <h4>Đơn đã thanh toán</h4>
+          <strong id="account-orders-paid">0</strong>
+          <p class="muted small">Các đơn hàng đã xác nhận thanh toán thành công.</p>
+        </article>
+        <article class="account-stat">
+          <h4>Tổng chi tiêu</h4>
+          <strong id="account-total-spent">0₫</strong>
+          <p class="muted small">Tính theo những đơn hàng đã thanh toán.</p>
+        </article>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="grid">
+      <div style="grid-column:span 6;">
+        <a href="index.html" class="brand"><span class="logo"></span><span>Clothify</span></a>
+        <p class="small">Cửa hàng thời trang hiện đại – phong cách, bền vững và hợp túi tiền.</p>
+      </div>
+      <div style="grid-column:span 6;text-align:right;">
+        <div class="small">© 2025 Clothify. All rights reserved.</div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/script.js"></script>
+<script src="assets/js/account.js"></script>
+</body>
+</html>
+

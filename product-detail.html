@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>Chi tiết sản phẩm</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    /* CSS riêng cho trang chi tiết */
+    .detail-container { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 30px; }
+    .detail-img { width: 100%; border-radius: 12px; object-fit: cover; }
+    .detail-info h1 { font-size: 28px; margin-bottom: 10px; }
+    .detail-price { font-size: 24px; color: #d32f2f; font-weight: bold; margin-bottom: 20px; }
+    .detail-desc { color: #555; line-height: 1.6; margin-bottom: 30px; }
+    
+    /* CSS cho các nút size trong Modal */
+    .size-options { display: flex; gap: 10px; margin: 15px 0; }
+    .size-option {
+      padding: 8px 15px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;
+      transition: 0.2s;
+    }
+    .size-option:hover { background: #f0f0f0; }
+    .size-option.active { background: #007bff; color: white; border-color: #007bff; }
+
+    @media(max-width:768px){ .detail-container { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <div class="container">
+    <nav class="nav">
+      <a href="index.html" class="brand">Clothify</a>
+      <div>
+        <a href="index.html">Trang chủ</a>
+        <a href="products.html">Sản phẩm</a>
+        <a href="cart.html" style="position:relative">Giỏ hàng <span id="cart-counter" class="cart-badge"></span></a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <div id="product-detail" class="detail-container">
+    </div>
+</main>
+
+<div id="size-modal" class="modal-overlay">
+  <div class="modal-content">
+    <button class="modal-close" id="modal-close-btn">&times;</button>
+
+    <div class="modal-product-info">
+      <img src="" alt="Sản phẩm" id="modal-product-image">
+      <div>
+        <h3 id="modal-product-name">Tên sản phẩm</h3>
+        <span id="modal-product-price">Giá</span>
+      </div>
+    </div>
+
+    <div class="modal-options">
+      <h4>Chọn size:</h4>
+      <div id="modal-size-options" class="size-options"></div>
+    </div>
+
+    <button class="modal-confirm-btn" id="modal-confirm-add-btn">Xác nhận thêm</button>
+  </div>
+</div>
+<script src="assets/js/database.js"></script>
+<script src="assets/js/script.js"></script> 
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    
+    // 1. Lấy ID sản phẩm từ URL
+    const params = new URLSearchParams(window.location.search);
+    const productId = params.get("id");
+
+    // 2. Tìm sản phẩm trong database.js
+    // Lưu ý: Nếu biến trong database.js tên là "allProducts" thì đổi "products" thành "allProducts"
+    const product = products.find(p => p.id === productId);
+
+    const container = document.getElementById("product-detail");
+
+    if (product) {
+      // 3. Hiển thị thông tin sản phẩm lên trang
+      container.innerHTML = `
+        <div>
+          <img src="${product.image}" alt="${product.name}" class="detail-img">
+        </div>
+        <div class="detail-info">
+          <h1>${product.name}</h1>
+          <div class="detail-price">${product.price.toLocaleString()}₫</div>
+          <p class="detail-desc">${product.desc || product.description}</p>
+          
+          <button class="btn primary" id="open-modal-btn">
+            Thêm vào giỏ
+          </button>
+          <a href="index.html" class="btn ghost">Quay lại</a>
+        </div>
+      `;
+
+      // =========================================================
+      // [MỚI THÊM] LOGIC XỬ LÝ MODAL CHỌN SIZE
+      // =========================================================
+      const modal = document.getElementById('size-modal');
+      const openBtn = document.getElementById('open-modal-btn');
+      const closeBtn = document.getElementById('modal-close-btn');
+      const confirmBtn = document.getElementById('modal-confirm-add-btn');
+      
+      const modalImg = document.getElementById('modal-product-image');
+      const modalName = document.getElementById('modal-product-name');
+      const modalPrice = document.getElementById('modal-product-price');
+      const sizeContainer = document.getElementById('modal-size-options');
+      
+      let selectedSize = null; // Biến lưu size người dùng chọn
+
+      // A. Khi bấm nút "Thêm vào giỏ" (Màu xanh trên trang)
+      openBtn.addEventListener('click', () => {
+        // Điền thông tin vào Modal
+        modalImg.src = product.image;
+        modalName.textContent = product.name;
+        modalPrice.textContent = product.price.toLocaleString() + '₫';
+        
+        // Tạo các nút Size (Reset lại mỗi lần mở)
+        sizeContainer.innerHTML = ''; 
+        selectedSize = null; 
+        
+        // Nếu trong database có availableSizes thì dùng, không thì dùng mặc định
+        const sizes = product.availableSizes || ["S", "M", "L", "XL"];
+        
+        sizes.forEach(size => {
+          const span = document.createElement('span');
+          span.classList.add('size-option'); 
+          span.textContent = size;
+          
+          // Sự kiện khi bấm chọn 1 size
+          span.addEventListener('click', () => {
+            document.querySelectorAll('.size-option').forEach(s => s.classList.remove('active'));
+            span.classList.add('active');
+            selectedSize = size;
+          });
+          
+          sizeContainer.appendChild(span);
+        });
+
+        // Hiện Modal
+        modal.classList.add('active');
+      });
+
+      // B. Khi bấm nút "Xác nhận thêm" (Trong Modal)
+      confirmBtn.addEventListener('click', () => {
+        if (!selectedSize) {
+          alert("Vui lòng chọn size!");
+          return;
+        }
+
+        // Logic thêm vào localStorage
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        
+        const newItem = {
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.image,
+          quantity: 1,
+          size: selectedSize // [QUAN TRỌNG] Lưu thêm Size
+        };
+        
+        // Kiểm tra trùng: Phải trùng cả ID và Size mới tăng số lượng
+        const existing = cart.find(item => item.id === newItem.id && item.size === selectedSize);
+        
+        if (existing) {
+          existing.quantity++;
+        } else {
+          cart.push(newItem);
+        }
+
+        localStorage.setItem("cart", JSON.stringify(cart));
+        
+        // Cập nhật badge (số trên menu)
+        if(typeof updateCartCounter === 'function') updateCartCounter();
+
+        // Đóng modal và thông báo
+        modal.classList.remove('active');
+        alert(`Đã thêm "${product.name}" (Size: ${selectedSize}) vào giỏ!`);
+      });
+
+      // C. Đóng modal khi bấm nút X hoặc bấm ra ngoài
+      closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.remove('active');
+      });
+
+    } else {
+      container.innerHTML = "<h2>Không tìm thấy sản phẩm!</h2>";
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -17,6 +17,282 @@ function updateCartCounter() {
 };
 
 // ==========================================================
+// CẤU HÌNH VÀ HÀM TIỆN ÍCH DỮ LIỆU ĐƠN HÀNG
+// ==========================================================
+const ORDER_STATUS = {
+  PENDING: 'cho-xac-nhan',
+  SHIPPING: 'dang-giao',
+  DELIVERED: 'da-giao'
+};
+
+const PAYMENT_STATUS = {
+  UNPAID: 'unpaid',
+  PAID: 'paid'
+};
+
+const ORDER_STATUS_LABELS = {
+  [ORDER_STATUS.PENDING]: 'Chờ xác nhận',
+  [ORDER_STATUS.SHIPPING]: 'Đang giao',
+  [ORDER_STATUS.DELIVERED]: 'Đã giao'
+};
+
+const PAYMENT_METHOD_LABELS = {
+  cod: 'Thanh toán khi nhận hàng (COD)',
+  qr: 'Chuyển khoản qua QR'
+};
+
+function getCurrentUser() {
+  return JSON.parse(localStorage.getItem('currentUser')) || null;
+}
+
+function getOrders() {
+  return JSON.parse(localStorage.getItem('orders')) || [];
+}
+
+function saveOrders(orders) {
+  localStorage.setItem('orders', JSON.stringify(orders));
+}
+
+function generateOrderId() {
+  const randomSuffix = Math.floor(Math.random() * 9000) + 1000;
+  return `DH${Date.now()}${randomSuffix}`;
+}
+
+function findActiveOrder(orders, userEmail) {
+  return orders.find(order => order.userEmail === userEmail && order.paymentStatus === PAYMENT_STATUS.UNPAID);
+}
+
+function ensureUserIds() {
+  const users = JSON.parse(localStorage.getItem('users')) || [];
+  let updated = false;
+
+  const normalized = users.map(user => {
+    if (!user.id) {
+      updated = true;
+      return {
+        ...user,
+        id: `CUS${Date.now()}${Math.floor(Math.random() * 1000)}`,
+        createdAt: user.createdAt || new Date().toISOString()
+      };
+    }
+    if (!user.createdAt) {
+      updated = true;
+      return {
+        ...user,
+        createdAt: new Date().toISOString()
+      };
+    }
+    return user;
+  });
+
+  if (updated) {
+    localStorage.setItem('users', JSON.stringify(normalized));
+  }
+
+  const customerRecords = normalized
+    .filter(user => user.email !== 'admin@clothify.com')
+    .map(user => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      createdAt: user.createdAt
+    }));
+  localStorage.setItem('customers', JSON.stringify(customerRecords));
+}
+
+function initializeProductCatalog() {
+  if (!localStorage.getItem('productCatalog')) {
+    const catalog = [
+      { id: 'SP001', name: 'Áo thun basic Form Nữ', price: 199000 },
+      { id: 'SP002', name: 'Áo thun Basic Nam mẫu Typo', price: 249000 },
+      { id: 'SP003', name: 'Áo Sweaeter nỉ', price: 299000 },
+      { id: 'SP004', name: 'Áo len nữ', price: 349000 },
+      { id: 'SP005', name: 'Áo sơ mi Nam vải Broadcloth', price: 399000 },
+      { id: 'SP006', name: 'Jeans Baggy', price: 449000 },
+      { id: 'SP007', name: 'Áo Sơ Mi Cổ Thường Tay Ngắn', price: 499000 },
+      { id: 'SP008', name: 'Jeans Baggy Short', price: 549000 },
+      { id: 'SP009', name: 'Áo khoác Bomber', price: 599000 },
+      { id: 'SP010', name: 'Áo khoác chần bông lai', price: 649000 },
+      { id: 'SP011', name: 'Quần thể thao nữ', price: 279000 },
+      { id: 'SP012', name: 'Quần thể thao nam dài', price: 299000 }
+    ];
+    localStorage.setItem('productCatalog', JSON.stringify(catalog));
+  }
+}
+
+function cleanupEmptyOrders(userEmail) {
+  const orders = getOrders();
+  const filtered = orders.filter(order => !(order.userEmail === userEmail && Array.isArray(order.items) && order.items.length === 0));
+  if (filtered.length !== orders.length) {
+    saveOrders(filtered);
+  }
+}
+
+function syncCartToActiveOrder(providedCart) {
+  const currentUser = getCurrentUser();
+  if (!currentUser || currentUser.email === 'admin@clothify.com') {
+    return null;
+  }
+
+  const cart = Array.isArray(providedCart) ? providedCart : (JSON.parse(localStorage.getItem('cart')) || []);
+  let orders = getOrders();
+  let activeOrder = findActiveOrder(orders, currentUser.email);
+  const now = new Date().toISOString();
+
+  if (!cart.length) {
+    if (activeOrder) {
+      activeOrder.items = [];
+      activeOrder.total = 0;
+      activeOrder.updatedAt = now;
+      saveOrders(orders);
+      cleanupEmptyOrders(currentUser.email);
+    }
+    return null;
+  }
+
+  const normalizedItems = cart.map(item => ({
+    productId: item.id,
+    name: item.name,
+    size: item.size,
+    price: item.price,
+    quantity: item.quantity,
+    image: item.image,
+    subtotal: item.price * item.quantity
+  }));
+
+  const total = normalizedItems.reduce((sum, item) => sum + item.subtotal, 0);
+
+  if (!activeOrder) {
+    activeOrder = {
+      orderId: generateOrderId(),
+      userEmail: currentUser.email,
+      customerName: currentUser.name,
+      items: normalizedItems,
+      total,
+      status: ORDER_STATUS.PENDING,
+      paymentStatus: PAYMENT_STATUS.UNPAID,
+      paymentMethod: null,
+      createdAt: now,
+      updatedAt: now,
+      paidAt: null,
+      history: [
+        {
+          status: ORDER_STATUS.PENDING,
+          timestamp: now,
+          note: 'Đơn hàng được tạo từ giỏ hàng'
+        }
+      ],
+      inventoryDeducted: false
+    };
+    orders.push(activeOrder);
+  } else {
+    activeOrder.items = normalizedItems;
+    activeOrder.total = total;
+    activeOrder.updatedAt = now;
+  }
+
+  saveOrders(orders);
+  return activeOrder;
+}
+
+function formatCurrency(value) {
+  return (value || 0).toLocaleString('vi-VN');
+}
+
+function deductInventoryForOrder(order) {
+  if (!order || !Array.isArray(order.items) || order.items.length === 0) return;
+
+  const inventory = JSON.parse(localStorage.getItem('masterInventory')) || [];
+  let changed = false;
+
+  order.items.forEach(item => {
+    const inventoryItem = inventory.find(inv => inv.id === item.productId);
+    if (inventoryItem) {
+      inventoryItem.stock = Math.max(0, (inventoryItem.stock || 0) - (item.quantity || 0));
+      changed = true;
+    }
+  });
+
+  if (changed) {
+    localStorage.setItem('masterInventory', JSON.stringify(inventory));
+  }
+}
+
+function setupAccountDropdown(currentUser) {
+  const ctaContainer = document.querySelector('.header .cta');
+  if (!ctaContainer || !currentUser) return;
+
+  if (currentUser.email === 'admin@clothify.com') {
+    ctaContainer.innerHTML = `
+      <a href="#" class="btn ghost" id="logout-btn">Đăng xuất</a>
+    `;
+    ctaContainer.addEventListener('click', (e) => {
+      if (e.target.id === 'logout-btn') {
+        e.preventDefault();
+        localStorage.removeItem('currentUser');
+        alert('Đã đăng xuất khỏi tài khoản Admin.');
+        window.location.href = 'login.html';
+      }
+    });
+    return;
+  }
+
+  ctaContainer.innerHTML = `
+    <div class="account-menu">
+      <button class="account-toggle" id="account-toggle" aria-haspopup="true" aria-expanded="false">
+        <span class="account-avatar">${currentUser.name?.charAt(0)?.toUpperCase() || 'U'}</span>
+        <span class="account-name">Xin chào, ${currentUser.name}!</span>
+        <span class="account-caret" aria-hidden="true">▾</span>
+      </button>
+      <div class="account-dropdown" id="account-dropdown" role="menu">
+        <a href="account.html" class="dropdown-item" role="menuitem">Thông tin tài khoản</a>
+        <a href="my-orders.html" class="dropdown-item" role="menuitem">Đơn hàng của tôi</a>
+        <a href="order-history.html" class="dropdown-item" role="menuitem">Lịch sử đơn hàng</a>
+      </div>
+    </div>
+    <a href="#" class="btn ghost" id="logout-btn">Đăng xuất</a>
+  `;
+
+  const toggleBtn = ctaContainer.querySelector('#account-toggle');
+  const dropdown = ctaContainer.querySelector('#account-dropdown');
+
+  if (toggleBtn && dropdown) {
+    toggleBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+      dropdown.classList.toggle('open');
+      toggleBtn.setAttribute('aria-expanded', dropdown.classList.contains('open') ? 'true' : 'false');
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!ctaContainer.contains(event.target)) {
+        dropdown.classList.remove('open');
+        toggleBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  const logoutBtn = ctaContainer.querySelector('#logout-btn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      localStorage.removeItem('currentUser');
+      alert('Đã đăng xuất.');
+      window.location.href = 'index.html';
+    });
+  }
+}
+
+function requireAuthentication() {
+  const currentUser = getCurrentUser();
+  if (!currentUser) {
+    alert('Vui lòng đăng nhập để tiếp tục.');
+    window.location.href = 'login.html';
+    return null;
+  }
+  return currentUser;
+}
+
+// ==========================================================
 // (MỚI) HÀM KHỞI TẠO CƠ SỞ DỮ LIỆU TỒN KHO
 // ==========================================================
 function initializeInventory() {
@@ -55,9 +331,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // TÍNH NĂNG 0 (MỚI): KHỞI TẠO KHO
   // ==========================================================
   initializeInventory(); // Chạy hàm khởi tạo kho
+  initializeProductCatalog();
+  ensureUserIds();
   
   // Gọi hàm này ngay khi tải trang để lấy số lượng mới nhất
   updateCartCounter();
+  syncCartToActiveOrder();
 
   // ==========================================================
   // TÍNH NĂNG 2: Lọc sản phẩm (trang "products.html")
@@ -206,9 +485,26 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      const newUser = { name: name, email: email, password: pass };
+      const newUser = {
+        id: `CUS${Date.now()}${Math.floor(Math.random() * 1000)}`,
+        name: name,
+        email: email,
+        password: pass,
+        phone: '',
+        address: '',
+        createdAt: new Date().toISOString()
+      };
       users.push(newUser);
       localStorage.setItem('users', JSON.stringify(users));
+
+      const customers = JSON.parse(localStorage.getItem('customers')) || [];
+      customers.push({
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        createdAt: newUser.createdAt
+      });
+      localStorage.setItem('customers', JSON.stringify(customers));
       
       alert('Đăng ký thành công! Vui lòng đăng nhập.');
       errorEl.textContent = '';
@@ -245,7 +541,8 @@ document.addEventListener('DOMContentLoaded', () => {
       
       if(foundUser) {
         errorEl.textContent = "";
-        localStorage.setItem('currentUser', JSON.stringify(foundUser));
+        const { password: removedPassword, ...publicUser } = foundUser;
+        localStorage.setItem('currentUser', JSON.stringify(publicUser));
         alert('Đăng nhập thành công! Chuyển về trang chủ.');
         window.location.href = 'index.html'; // Chuyển về trang chủ
       } else {
@@ -258,51 +555,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // TÍNH NĂNG 7: Hiển thị/Ẩn thông tin Đăng nhập (Cho mọi trang)
   // (ĐÃ SỬA: Ẩn "Xin chào" nếu là Admin)
   // ==========================================================
-  const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-  const ctaContainer = document.querySelector('.header .cta');
-
-  if (currentUser && ctaContainer) {
-    
-    // 1. Tạo HTML cơ bản (chỉ có nút Đăng xuất)
-    let ctaHTML = `
-      <a href="#" class="btn ghost" id="logout-btn">Đăng xuất</a>
-    `;
-
-    // 2. KIỂM TRA: Nếu không phải Admin (là khách hàng)
-    // thì mới thêm "Xin chào, [Tên]"
-    if (currentUser.email !== 'admin@clothify.com') {
-      ctaHTML = `
-        <span style="font-weight: 600; margin-right: 10px;">Xin chào, ${currentUser.name}!</span>
-        ${ctaHTML}
-      `;
-    }
-    
-    // 3. Cập nhật HTML
-    ctaContainer.innerHTML = ctaHTML;
-
-    // 4. Gán sự kiện click
-    ctaContainer.addEventListener('click', (e) => {
-      if (e.target.id === 'logout-btn') {
-        e.preventDefault();
-        
-        const userOnLogout = JSON.parse(localStorage.getItem('currentUser'));
-        const isAdmin = (userOnLogout && userOnLogout.email === 'admin@clothify.com');
-        
-        localStorage.removeItem('currentUser'); // Xóa phiên đăng nhập
-        
-        if (isAdmin) {
-          alert('Đã đăng xuất khỏi tài khoản Admin.');
-          window.location.href = 'login.html'; // Về trang đăng nhập
-        } else {
-          alert('Đã đăng xuất.');
-          window.location.reload(); // Tải lại trang
-        }
-      }
-    });
-    
-  } else if (ctaContainer) {
-    // (Chưa đăng nhập, giữ nguyên HTML gốc)
-  }
+  const currentUser = getCurrentUser();
+  setupAccountDropdown(currentUser);
 
   // ==========================================================
   // TÍNH NĂNG 8: Xử lý Form Liên hệ (contact.html)
@@ -344,5 +598,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }, 5000);
     });
   }
+  // Lấy tất cả nút xác nhận trong modal thêm giỏ hàng
+  const addButtons = document.querySelectorAll('#modal-confirm-add-btn');
+  addButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      alert('✅ Bạn đã thêm sản phẩm vào giỏ hàng thành công!');
+    });
+  });
 
 }); // <-- Đóng DOMContentLoaded

@@ -65,6 +65,63 @@ body{
 .nav a:hover{color:var(--brand)}
 
 .nav .cta{display:flex;align-items:center;gap:8px}
+.account-menu{
+  position:relative;
+}
+.account-toggle{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border-radius:10px;
+  border:1px solid transparent;
+  background:#fff;
+  cursor:pointer;
+  font-weight:600;
+  color:var(--text);
+}
+.account-toggle:hover{
+  background:#f2f4f8;
+}
+.account-avatar{
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,var(--brand),#7aa7ff);
+  color:#fff;
+  font-weight:700;
+}
+.account-dropdown{
+  position:absolute;
+  top:calc(100% + 8px);
+  right:0;
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  box-shadow:0 14px 32px rgba(15,23,42,0.15);
+  padding:10px;
+  min-width:220px;
+  display:none;
+  flex-direction:column;
+  z-index:1200;
+}
+.account-dropdown.open{
+  display:flex;
+}
+.account-dropdown .dropdown-item{
+  padding:10px 12px;
+  border-radius:8px;
+  color:var(--text);
+  text-decoration:none;
+  font-weight:600;
+}
+.account-dropdown .dropdown-item:hover{
+  background:#f8fafc;
+  color:var(--brand);
+}
 .btn{
   display:inline-block;border-radius:10px;padding:10px 14px;font-weight:700;
   text-decoration:none;border:1px solid #e5e7eb;background:#fff;color:var(--text);
@@ -121,6 +178,26 @@ body{
 .badge{border:1px solid #e6e8ec;padding:6px 10px;border-radius:99px;background:#fff; cursor: pointer; user-select: none;}
 .badge.active{background:#eef4ff;border-color:#d6e2ff;color:#2949c7;font-weight:700}
 .badge:not(.active):hover { background-color: #f9fafb; }
+.badge-success{
+  background:#def7ec;
+  border-color:#c0e6d7;
+  color:#046c4e;
+}
+.badge-warning{
+  background:#fef3c7;
+  border-color:#fde68a;
+  color:#92400e;
+}
+.badge-danger{
+  background:#fee2e2;
+  border-color:#fecaca;
+  color:#b91c1c;
+}
+.badge-info{
+  background:#e0f2fe;
+  border-color:#bae6fd;
+  color:#0b4a6f;
+}
 
 /* Table (Cart) */
 .table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border-radius:12px}
@@ -148,6 +225,8 @@ textarea{min-height:140px}
 .card.hidden{
   display: none;
 }
+
+
 
 /* ===== BẮT ĐẦU CSS CHO MODAL (products.html) ===== */
 .modal-overlay {
@@ -342,39 +421,433 @@ textarea{min-height:140px}
 /* ===== KẾT THÚC CSS CHO TRANG LOGIN ===== */
 
 
+/* ===== BẮT ĐẦU CSS CHUNG CHO TRANG NGƯỜI DÙNG ===== */
+.page-content{
+  padding:40px 0;
+  min-height:calc(100vh - 220px);
+}
+.page-user main{
+  display:block;
+}
+.section-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:16px;
+  margin-bottom:20px;
+}
+.section-header h2{
+  margin-bottom:0;
+}
+.account-section{
+  display:flex;
+  flex-direction:column;
+  gap:24px;
+}
+.account-card{
+  background:#fff;
+  border:1px solid #e6e8ec;
+  border-radius:16px;
+  padding:24px;
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+.account-card__header{
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+.account-card .account-avatar{
+  width:54px;
+  height:54px;
+  font-size:1.2rem;
+}
+.account-info-row{
+  display:flex;
+  justify-content:space-between;
+  padding:12px 0;
+  border-top:1px solid #f1f3f6;
+  font-size:0.98rem;
+}
+.account-info-row:first-child{
+  border-top:none;
+  padding-top:0;
+}
+.account-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:16px;
+}
+.account-stat{
+  background:#fff;
+  border:1px solid #e6e8ec;
+  border-radius:14px;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.account-stat strong{
+  font-size:1.8rem;
+  color:var(--brand);
+}
+.orders-list{
+  display:grid;
+  gap:16px;
+}
+.orders-list .badge{
+  cursor:default;
+}
+.order-card{
+  background:#fff;
+  border:1px solid #e6e8ec;
+  border-radius:14px;
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+.order-card__header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+}
+.order-card__badges{
+  display:flex;
+  gap:8px;
+}
+.order-card__body{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
+  gap:12px;
+}
+.order-card__body strong{
+  font-size:1.1rem;
+}
+.order-card__footer{
+  display:flex;
+  justify-content:flex-end;
+}
+.empty-state{
+  background:#fff;
+  border:1px dashed #cfd7e3;
+  border-radius:14px;
+  text-align:center;
+  padding:40px 24px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  align-items:center;
+  color:var(--muted);
+}
+.empty-state__icon{
+  font-size:2rem;
+}
+.order-detail-card{
+  background:#fff;
+  border:1px solid #e6e8ec;
+  border-radius:16px;
+  padding:24px;
+  display:flex;
+  flex-direction:column;
+  gap:24px;
+}
+.order-detail-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+}
+.order-badges{
+  display:flex;
+  gap:8px;
+}
+.order-summary-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:16px;
+}
+.order-items-wrapper{
+  overflow:auto;
+}
+.order-item{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.order-item__thumb{
+  width:48px;
+  height:48px;
+  object-fit:cover;
+  border-radius:8px;
+  border:1px solid #e5e7eb;
+}
+.order-total-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:1.2rem;
+  border-top:1px solid #f1f3f6;
+  padding-top:12px;
+}
+.payment-section{
+  border-top:1px solid #f1f3f6;
+  padding-top:12px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+.payment-options{
+  display:grid;
+  gap:12px;
+}
+.payment-option{
+  display:flex;
+  gap:12px;
+  padding:12px;
+  border:1px solid #e6e8ec;
+  border-radius:12px;
+  background:#fafbfc;
+  cursor:pointer;
+}
+.payment-option input{
+  margin-top:4px;
+}
+.payment-option strong{
+  display:block;
+}
+.payment-option small{
+  color:var(--muted);
+}
+.qr-preview{
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+.qr-box{
+  width:120px;
+  height:120px;
+  border:1px dashed #cbd5e1;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f8fafc;
+}
+.qr-placeholder{
+  width:70px;
+  height:70px;
+  background-image:linear-gradient(135deg,#0f172a 30%,transparent 30%),linear-gradient(-135deg,#0f172a 30%,transparent 30%),linear-gradient(135deg,transparent 70%,#0f172a 70%),linear-gradient(-135deg,transparent 70%,#0f172a 70%);
+  background-size:20px 20px;
+  background-repeat:repeat;
+}
+.form-error{
+  color:#b91c1c;
+  font-size:0.9rem;
+}
+@media (max-width:640px){
+  .section-header{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .order-card__body{
+    grid-template-columns:1fr;
+  }
+}
+/* ===== KẾT THÚC CSS CHUNG CHO TRANG NGƯỜI DÙNG ===== */
+
+
 /* ===== BẮT ĐẦU CSS CHO TRANG ADMIN ===== */
 body.admin-dashboard {
-  background-color: var(--surface-2); /* Màu nền xám nhạt */
+  background-color: var(--surface-2);
+}
+.admin-main{
+  padding:32px 0 48px;
+}
+.admin-layout{
+  display:grid;
+  grid-template-columns:240px 1fr;
+  gap:24px;
+}
+.admin-sidebar{
+  background:#fff;
+  border:1px solid #e6e8ec;
+  border-radius:16px;
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  position:sticky;
+  top:100px;
+  height:fit-content;
+}
+.admin-tab{
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid transparent;
+  background:#f1f5f9;
+  font-weight:600;
+  text-align:left;
+  cursor:pointer;
+  transition:all .2s ease;
+}
+.admin-tab:hover{
+  background:#e2e8f0;
+}
+.admin-tab.active{
+  background:var(--brand);
+  color:#fff;
+  border-color:var(--brand);
+}
+.admin-content{
+  display:flex;
+  flex-direction:column;
+  gap:24px;
+}
+.admin-panel{
+  display:none;
+  background:#fff;
+  border:1px solid #e6e8ec;
+  border-radius:16px;
+  padding:24px;
+  flex-direction:column;
+  gap:20px;
+}
+.admin-panel.active{
+  display:flex;
+}
+.admin-grid-cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:16px;
+}
+.admin-card{
+  background:#f8fafc;
+  border:1px solid #e2e8f0;
+  border-radius:14px;
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.admin-card strong{
+  font-size:1.6rem;
+  color:var(--brand);
+}
+.admin-panel-body{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+.admin-panel-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.admin-status-select{
+  padding:8px 10px;
+  border-radius:8px;
+  border:1px solid #cbd5e1;
+  background:#fff;
+  font:inherit;
+}
+.feedback-wrapper{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.feedback-item{
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  padding:16px;
+  background:#ffffff;
+}
+.feedback-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:6px;
+}
+.feedback-title{
+  font-weight:700;
+  margin-bottom:6px;
+}
+@media (max-width:960px){
+  .admin-layout{
+    grid-template-columns:1fr;
+  }
+  .admin-sidebar{
+    position:static;
+    flex-direction:row;
+    flex-wrap:wrap;
+  }
+}
+@media (max-width:640px){
+  .admin-panel{
+    padding:18px;
+  }
+}
+/* ===== KẾT THÚC CSS CHO TRANG ADMIN ===== */ 
+
+/* ==========================================================
+   SỬA LỖI: CĂN GIỮA FORM ĐĂNG NHẬP & ĐĂNG KÝ
+   ========================================================== */
+html, body {
+  height: 100%;
 }
 
-.admin-section {
+body.auth-layout main {
+  min-height: calc(100vh - 160px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+body.auth-layout .section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.login-form {
   background: #fff;
   border: 1px solid #e6e8ec;
   border-radius: 14px;
-  padding: 20px 25px;
+  padding: 25px 30px;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 10px 24px rgba(16, 24, 40, .08);
+  transition: all 0.3s ease;
+}
+
+.login-form h2 {
+  text-align: center;
+  margin-top: 0;
+}
+
+.login-form .muted {
+  text-align: center;
   margin-bottom: 20px;
 }
 
-.feedback-item {
-  border: 1px solid #eef0f3;
-  border-radius: 10px;
-  padding: 15px;
-  margin-bottom: 10px;
+.form-group {
+  margin-bottom: 15px;
 }
-.feedback-item:last-child {
-  margin-bottom: 0;
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
 }
-.feedback-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 5px;
-}
-.feedback-header .muted {
-  font-size: 0.9rem;
-}
-.feedback-title {
-  font-weight: 700;
-  margin-bottom: 5px;
-}
-/* ===== KẾT THÚC CSS CHO TRANG ADMIN ===== */
+
+/* ==========================================================
+   HẾT PHẦN FIX CĂN GIỮA LOGIN/REGISTER FORM
+   ========================================================== */

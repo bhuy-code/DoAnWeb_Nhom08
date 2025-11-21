@@ -1,114 +1,388 @@
 // Chờ DOM tải xong
-document.addEventListener('DOMContentLoaded', () => {
-
-  // =============================================
-  // 1. BẢO VỆ TRANG ADMIN
-  // =============================================
-  const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-  
-  if (!currentUser || currentUser.email !== 'admin@clothify.com') {
+function requireAdmin() {
+  const user = JSON.parse(localStorage.getItem('currentUser'));
+  if (!user || user.email !== 'admin@clothify.com') {
     alert('Bạn không có quyền truy cập trang này. Vui lòng đăng nhập với tư cách Admin.');
     window.location.href = 'login.html';
+    return null;
+  }
+  return user;
+}
+
+function normalizeCustomers() {
+  const users = JSON.parse(localStorage.getItem('users')) || [];
+  return users
+    .filter(user => user.email !== 'admin@clothify.com')
+    .map(user => ({
+      id: user.id || `CUS${user.email}`,
+      name: user.name || 'Khách hàng',
+      email: user.email,
+      createdAt: user.createdAt || null
+    }))
+    .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+}
+
+function buildStatusSelect(order) {
+  const select = document.createElement('select');
+  select.className = 'admin-status-select';
+  select.dataset.orderId = order.orderId || order.id;
+
+  const statuses = (typeof ORDER_STATUS !== 'undefined') ? Object.values(ORDER_STATUS) : ['pending', 'shipping', 'delivered', 'cancelled', 'Chờ xác nhận'];
+  const labels = (typeof ORDER_STATUS_LABELS !== 'undefined') ? ORDER_STATUS_LABELS : {
+    'pending': 'Chờ xử lý', 'shipping': 'Đang giao', 'delivered': 'Đã giao', 'cancelled': 'Đã hủy', 'Chờ xác nhận': 'Chờ xác nhận'
+  };
+
+  statuses.forEach(status => {
+    const option = document.createElement('option');
+    option.value = status;
+    option.textContent = labels[status] || status;
+    if (order.status === status) option.selected = true;
+    select.appendChild(option);
+  });
+
+  return select;
+}
+
+function renderCustomers(customers) {
+  const tbody = document.getElementById('customers-table');
+  if (!tbody) return;
+
+  if (!customers.length) {
+    tbody.innerHTML = '<tr><td colspan="4" class="muted" style="text-align:center;">Chưa có khách hàng.</td></tr>';
     return;
   }
 
-  // =============================================
-  // 2. CHỦ ĐỘNG XÂY DỰNG HEADER CHO ADMIN
-  // =============================================
-  const ctaContainer = document.querySelector('.header .cta');
-  if (ctaContainer) {
-    // 1. Xóa sạch mọi thứ mà script.js đã thêm
-    ctaContainer.innerHTML = ''; 
+  tbody.innerHTML = customers.map(customer => `
+    <tr>
+      <td>${customer.id}</td>
+      <td>${customer.name}</td>
+      <td>${customer.email}</td>
+      <td>${customer.createdAt ? new Date(customer.createdAt).toLocaleString('vi-VN') : '—'}</td>
+    </tr>
+  `).join('');
+}
 
-    // 2. Tạo span "Xin chào"
-    const adminWelcome = document.createElement('span');
-    adminWelcome.style.fontWeight = '600';
-    adminWelcome.style.marginRight = '10px';
-    adminWelcome.textContent = `Xin chào, ${currentUser.name}!`;
+function renderProducts(products, inventory, orders) {
+  const tbody = document.getElementById('products-table');
+  if (!tbody) return;
 
-    // 3. Tạo nút "Đăng xuất" MỚI
-    const adminLogoutBtn = document.createElement('a');
-    adminLogoutBtn.href = '#';
-    adminLogoutBtn.className = 'btn ghost';
-    adminLogoutBtn.id = 'logout-btn-admin'; 
-    adminLogoutBtn.textContent = 'Đăng xuất';
-
-    // 4. Thêm vào container
-    ctaContainer.appendChild(adminWelcome);
-    ctaContainer.appendChild(adminLogoutBtn);
+  if (!products.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">Chưa có dữ liệu sản phẩm.</td></tr>';
+    return;
   }
 
-  // =============================================
-  // 3. LOGIC ĐĂNG XUẤT (TÁCH RIÊNG CHO ADMIN)
-  // =============================================
-  const adminLogoutBtnElem = document.getElementById('logout-btn-admin');
-  if (adminLogoutBtnElem) {
-    adminLogoutBtnElem.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation(); 
-      
+  const soldMap = {};
+  const pStatusPaid = (typeof PAYMENT_STATUS !== 'undefined') ? PAYMENT_STATUS.PAID : 'paid';
+
+  orders
+    .filter(order => order.paymentStatus === pStatusPaid)
+    .forEach(order => {
+      (order.items || []).forEach(item => {
+        const pid = item.productId || item.id;
+        soldMap[pid] = (soldMap[pid] || 0) + (item.quantity || 0);
+      });
+    });
+
+  const inventoryMap = {};
+  inventory.forEach(item => {
+    inventoryMap[item.id] = item.stock || 0;
+  });
+
+  tbody.innerHTML = products.map(product => {
+    const sold = soldMap[product.id] || 0;
+    const stock = inventoryMap[product.id] != null ? inventoryMap[product.id] : '—';
+    return `
+      <tr>
+        <td>${product.id}</td>
+        <td>${product.name}</td>
+        <td>${typeof formatCurrency === 'function' ? formatCurrency(product.price) : product.price}₫</td>
+        <td>${stock}</td>
+        <td>${sold}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// === RENDER BẢNG ĐƠN HÀNG (Tab Đơn hàng) ===
+function renderOrdersTable(orders) {
+  const tbody = document.getElementById('orders-table');
+  if (!tbody) return;
+
+  if (!orders.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="muted" style="text-align:center;">Chưa có đơn hàng.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = '';
+  
+  const pStatusPaid = (typeof PAYMENT_STATUS !== 'undefined') ? PAYMENT_STATUS.PAID : 'paid';
+  const oStatusPending = (typeof ORDER_STATUS !== 'undefined') ? ORDER_STATUS.PENDING : 'pending';
+  const oStatusShipping = (typeof ORDER_STATUS !== 'undefined') ? ORDER_STATUS.SHIPPING : 'shipping';
+  const oLabels = (typeof ORDER_STATUS_LABELS !== 'undefined') ? ORDER_STATUS_LABELS : { 'pending': 'Chờ xử lý', 'shipping': 'Đang giao', 'delivered': 'Đã giao', 'cancelled': 'Đã hủy', 'Chờ xác nhận': 'Chờ xác nhận' };
+
+  orders.forEach(order => {
+    const row = document.createElement('tr');
+    const orderId = order.orderId || order.id;
+    
+    row.innerHTML = `
+      <td>${orderId}</td>
+      <td>${order.customerName || order.userEmail || 'Khách'}</td>
+      <td>${typeof formatCurrency === 'function' ? formatCurrency(order.total) : order.total}₫</td>
+      <td>${order.paymentStatus === pStatusPaid ? 'Đã thanh toán' : 'Chưa thanh toán'}</td>
+      <td>
+        <span class="badge ${order.status === oStatusPending ? 'badge-warning' : order.status === oStatusShipping ? 'badge-info' : 'badge-success'}">
+          ${oLabels[order.status] || order.status}
+        </span>
+      </td>
+      <td class="orders-status-cell"></td>
+      <td>
+        <button class="btn ghost small" style="padding:4px 8px; font-size:12px;" onclick="viewOrderDetail('${orderId}')">Xem</button>
+      </td>
+    `;
+
+    const statusCell = row.querySelector('.orders-status-cell');
+    const select = buildStatusSelect(order);
+    statusCell.appendChild(select);
+
+    tbody.appendChild(row);
+  });
+}
+
+// === XEM CHI TIẾT ĐƠN HÀNG (MODAL) ===
+function viewOrderDetail(orderId) {
+  const orders = (typeof getOrders === 'function' ? getOrders() : JSON.parse(localStorage.getItem('orders')) || []);
+  const order = orders.find(o => (o.orderId === orderId || o.id === orderId));
+
+  if (!order) return;
+
+  const modal = document.getElementById('order-detail-modal');
+  if (!modal) return;
+
+  const modalId = document.getElementById('modal-order-id');
+  const modalName = document.getElementById('modal-customer-name');
+  const modalPhone = document.getElementById('modal-customer-phone');
+  const modalAddress = document.getElementById('modal-customer-address');
+  const modalNote = document.getElementById('modal-customer-note');
+  const modalItems = document.getElementById('modal-order-items');
+
+  modalId.innerText = `#${order.orderId || order.id}`;
+  modalName.innerText = order.customerName || order.userEmail || 'Khách';
+  
+  const shipInfo = order.shippingInfo || {};
+  modalPhone.innerText = shipInfo.phone || '---';
+  modalAddress.innerText = shipInfo.address || '---';
+  modalNote.innerText = shipInfo.note || 'Không có ghi chú';
+
+  modalItems.innerHTML = '';
+  (order.items || []).forEach(item => {
+    const itemRow = document.createElement('tr');
+    const sizeHTML = item.size ? `<div class="small muted">Size: <strong>${item.size}</strong></div>` : '';
+    itemRow.innerHTML = `
+      <td style="width: 50px;">
+        <img src="${item.image}" style="width:40px; height:40px; object-fit:cover; border-radius:4px; border:1px solid #eee;">
+      </td>
+      <td>
+        <div style="font-weight:600; font-size:0.9rem;">${item.name}</div>
+        ${sizeHTML}
+      </td>
+      <td style="text-align:right; vertical-align:middle;">x${item.quantity}</td>
+    `;
+    modalItems.appendChild(itemRow);
+  });
+
+  modal.classList.add('active');
+}
+
+// === RENDER DASHBOARD (Trang Tổng quan) ===
+function renderDashboard(orders, customers) {
+  const revenueEl = document.getElementById('dashboard-revenue');
+  const paidCountEl = document.getElementById('dashboard-orders-paid');
+  const pendingCountEl = document.getElementById('dashboard-orders-pending');
+  const customersEl = document.getElementById('dashboard-customers');
+  const ordersTable = document.getElementById('dashboard-orders-table');
+
+  const pStatusPaid = (typeof PAYMENT_STATUS !== 'undefined') ? PAYMENT_STATUS.PAID : 'paid';
+  const oStatusPending = (typeof ORDER_STATUS !== 'undefined') ? ORDER_STATUS.PENDING : 'pending';
+  const pmLabels = (typeof PAYMENT_METHOD_LABELS !== 'undefined') ? PAYMENT_METHOD_LABELS : { 'cod': 'Thanh toán khi nhận hàng (COD)', 'qr': 'Chuyển khoản qua QR' };
+  const oLabels = (typeof ORDER_STATUS_LABELS !== 'undefined') ? ORDER_STATUS_LABELS : { 'pending': 'Chờ xử lý', 'shipping': 'Đang giao', 'delivered': 'Đã giao', 'cancelled': 'Đã hủy', 'Chờ xác nhận': 'Chờ xác nhận' };
+
+  const paidOrders = orders.filter(order => order.paymentStatus === pStatusPaid);
+  const pendingOrders = orders.filter(order => order.status === oStatusPending || order.status === 'Chờ xác nhận');
+  const totalRevenue = paidOrders.reduce((sum, order) => sum + (order.total || 0), 0);
+
+  if (revenueEl) revenueEl.textContent = `${typeof formatCurrency === 'function' ? formatCurrency(totalRevenue) : totalRevenue}₫`;
+  if (paidCountEl) paidCountEl.textContent = paidOrders.length;
+  if (pendingCountEl) pendingCountEl.textContent = pendingOrders.length;
+  if (customersEl) customersEl.textContent = customers.length;
+
+  if (ordersTable) {
+    if (!orders.length) {
+      ordersTable.innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;">Chưa có dữ liệu.</td></tr>';
+    } else {
+      // [ĐÃ SỬA]: Xóa bỏ .slice(0, 5) để hiển thị TOÀN BỘ đơn hàng
+      ordersTable.innerHTML = orders.map(order => `
+        <tr>
+          <td>${order.orderId || order.id}</td>
+          <td>${order.customerName || order.userEmail}</td>
+          <td>${order.paymentStatus === pStatusPaid ? (pmLabels[order.paymentMethod] || order.paymentMethod || 'Đã thanh toán') : 'Chưa thanh toán'}</td>
+          <td>${oLabels[order.status] || order.status}</td>
+          <td>${typeof formatCurrency === 'function' ? formatCurrency(order.total) : order.total}₫</td>
+        </tr>
+      `).join('');
+    }
+  }
+}
+
+function renderFeedback(feedback) {
+  const container = document.getElementById('feedback-list');
+  if (!container) return;
+
+  if (!feedback.length) {
+    container.innerHTML = '<p class="muted">Chưa có phản hồi nào.</p>';
+    return;
+  }
+
+  container.innerHTML = feedback
+    .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+    .map(fb => `
+      <div class="feedback-item">
+        <div class="feedback-header">
+          <strong>${fb.name}</strong>
+          <span class="muted">${fb.date || ''}</span>
+        </div>
+        <div class="feedback-title">${fb.title || ''}</div>
+        <p class="muted"><em>${fb.email || ''}</em></p>
+        <p>${fb.message || ''}</p>
+      </div>
+    `).join('');
+}
+
+function exportRevenueReport(orders) {
+  const pStatusPaid = (typeof PAYMENT_STATUS !== 'undefined') ? PAYMENT_STATUS.PAID : 'paid';
+  const paidOrders = orders.filter(order => order.paymentStatus === pStatusPaid);
+  
+  if (!paidOrders.length) {
+    alert('Chưa có đơn hàng nào được thanh toán.');
+    return;
+  }
+
+  const header = ['Mã đơn', 'Khách hàng', 'Email', 'Phương thức', 'Trạng thái', 'Tổng tiền', 'Thanh toán lúc'];
+  const rows = paidOrders.map(order => [
+    order.orderId || order.id,
+    order.customerName || '',
+    order.userEmail || '',
+    order.paymentMethod || '—',
+    order.status,
+    typeof formatCurrency === 'function' ? formatCurrency(order.total) : order.total,
+    order.paidAt ? new Date(order.paidAt).toLocaleString('vi-VN') : ''
+  ]);
+
+  const csvContent = [header, ...rows]
+    .map(cols => cols.map(value => `"${String(value || '').replace(/"/g, '""')}"`).join(','))
+    .join('\n');
+
+  const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `clothify_revenue_${Date.now()}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+// === EVENT LISTENERS ===
+document.addEventListener('DOMContentLoaded', () => {
+  const adminUser = requireAdmin();
+  if (!adminUser) return;
+
+  const ctaContainer = document.querySelector('.header .cta');
+  if (ctaContainer) {
+    ctaContainer.innerHTML = `
+      <span style="font-weight:600; margin-right:10px;">Xin chào, ${adminUser.name}!</span>
+      <a href="#" class="btn ghost" id="logout-btn-admin">Đăng xuất</a>
+    `;
+  }
+
+  const logoutBtn = document.getElementById('logout-btn-admin');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', (event) => {
+      event.preventDefault();
       localStorage.removeItem('currentUser');
-      alert('Đã đăng xuất khỏi tài khoản Admin.');
-      window.location.href = 'login.html'; 
+      window.location.href = 'login.html';
     });
   }
 
-  // =============================================
-  // 4. HIỂN THỊ DỮ LIỆU TỒN KHO (ĐÃ CẬP NHẬT)
-  // =============================================
-  
-  // (SỬA) Đọc trực tiếp từ "cơ sở dữ liệu" localStorage
-  const inventoryData = JSON.parse(localStorage.getItem('masterInventory')) || [];
-
-  const inventoryBody = document.getElementById('inventory-list');
-  if (inventoryBody) {
-    let html = '';
-    
-    if (inventoryData.length === 0) {
-      html = '<tr><td colspan="4">Không tải được dữ liệu kho. Vui lòng xóa cache và thử lại.</td></tr>';
-    } else {
-      inventoryData.forEach(item => {
-        html += `
-          <tr>
-            <td>${item.id}</td>
-            <td>${item.name}</td>
-            <td>${item.stock}</td>
-            <!-- Thêm logic CSS cho 'Hết hàng' -->
-            <td><span class="badge ${item.stock > 0 ? '' : 'danger'}">${item.stock > 0 ? 'Còn hàng' : 'Hết hàng'}</span></td>
-          </tr>
-        `;
+  const tabs = document.querySelectorAll('.admin-tab');
+  const panels = document.querySelectorAll('.admin-panel');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.target;
+      tabs.forEach(t => t.classList.remove('active'));
+      panels.forEach(panel => {
+        panel.classList.toggle('active', panel.id === target);
       });
-    }
-    inventoryBody.innerHTML = html;
+      tab.classList.add('active');
+    });
+  });
+
+  const orders = (typeof getOrders === 'function' ? getOrders() : JSON.parse(localStorage.getItem('orders')) || [])
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const customers = normalizeCustomers();
+  const products = JSON.parse(localStorage.getItem('productCatalog')) || [];
+  const inventory = JSON.parse(localStorage.getItem('masterInventory')) || [];
+  const feedback = JSON.parse(localStorage.getItem('feedback')) || [];
+
+  renderDashboard(orders, customers);
+  renderCustomers(customers);
+  renderProducts(products, inventory, orders);
+  renderOrdersTable(orders);
+  renderFeedback(feedback);
+
+  // Sự kiện thay đổi trạng thái đơn hàng
+  const ordersTable = document.getElementById('orders-table');
+  if (ordersTable) {
+    ordersTable.addEventListener('change', (event) => {
+      if (event.target.classList.contains('admin-status-select')) {
+        const select = event.target;
+        const orderId = select.dataset.orderId;
+        const newStatus = select.value;
+        const allOrders = typeof getOrders === 'function' ? getOrders() : JSON.parse(localStorage.getItem('orders')) || [];
+        const idx = allOrders.findIndex(order => (order.orderId === orderId || order.id === orderId));
+        
+        if (idx > -1) {
+          const now = new Date().toISOString();
+          allOrders[idx].status = newStatus;
+          allOrders[idx].updatedAt = now;
+          if(typeof saveOrders === 'function') saveOrders(allOrders);
+          else localStorage.setItem('orders', JSON.stringify(allOrders));
+
+          renderOrdersTable(allOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+          renderDashboard(allOrders, customers);
+        }
+      }
+    });
   }
 
-  // =============================================
-  // 5. HIỂN THỊ PHẢN HỒI KHÁCH HÀNG (Giữ nguyên)
-  // =============================================
-  const feedbackList = JSON.parse(localStorage.getItem('feedback')) || [];
-  const feedbackContainer = document.getElementById('feedback-list');
-  
-  if (feedbackContainer) {
-    if (feedbackList.length === 0) {
-      feedbackContainer.innerHTML = '<p class="muted">Chưa có phản hồi nào từ khách hàng.</p>';
-    } else {
-      let html = '';
-      // Sắp xếp feedback mới nhất lên đầu
-      feedbackList.reverse().forEach(fb => {
-        html += `
-          <div class="feedback-item">
-            <div class="feedback-header">
-              <strong>${fb.name}</strong>
-              <span class="muted">${fb.date}</span>
-            </div>
-            <div class="feedback-title">${fb.title}</div>
-            <p class="muted"><em>(${fb.email})</em></p>
-            <p>${fb.message}</p>
-          </div>
-        `;
-      });
-      feedbackContainer.innerHTML = html;
-    }
+  const exportBtn = document.getElementById('export-revenue-btn');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', () => {
+      const currentOrders = typeof getOrders === 'function' ? getOrders() : JSON.parse(localStorage.getItem('orders')) || [];
+      exportRevenueReport(currentOrders);
+    });
   }
 
+  // XỬ LÝ ĐÓNG MODAL
+  const modal = document.getElementById('order-detail-modal');
+  const closeBtns = [
+      document.getElementById('close-order-modal'),
+      document.getElementById('close-modal-btn')
+  ];
+  closeBtns.forEach(btn => {
+      if(btn) btn.addEventListener('click', () => { if(modal) modal.classList.remove('active'); });
+  });
+  window.addEventListener('click', (e) => {
+      if (modal && e.target === modal) modal.classList.remove('active');
+  });
 });

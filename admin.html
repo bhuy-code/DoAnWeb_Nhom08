@@ -13,52 +13,133 @@
     <nav class="nav">
       <a href="admin.html" class="brand">
         <span class="logo" aria-hidden="true"></span>
-        <span>Clothify (Admin)</span>
+        <span>Clothify</span>
       </a>
       <div class="cta">
-        <span style="font-weight: 600; margin-right: 10px;" id="admin-name">Xin chào, Admin!</span>
+        <span id="admin-greeting" style="font-weight:600; margin-right:10px;">Xin chào, Admin!</span>
         <a href="#" class="btn ghost" id="logout-btn-admin">Đăng xuất</a>
       </div>
     </nav>
   </div>
 </header>
 
-<main>
+<main class="admin-main">
   <div class="container">
-    
-    <!-- Bảng Tồn Kho -->
-    <section class="section admin-section">
-      <h2>Quản lý Tồn kho (Giả lập)</h2>
-      <p class="muted">
-        Lưu ý: Dữ liệu tồn kho này được giả lập trong file `admin.js` 
-        vì dự án không có cơ sở dữ liệu.
-      </p>
-      <table class="table">
-        <thead>
-          <tr>
-            <th>ID Sản phẩm</th>
-            <th>Tên Sản phẩm</th>
-            <th>Số lượng Tồn kho</th>
-          </tr>
-        </thead>
-        <tbody id="inventory-list">
-          <!-- Dữ liệu sẽ được JS chèn vào đây -->
-        </tbody>
-      </table>
-    </section>
+    <div class="admin-layout">
+      <aside class="admin-sidebar" role="navigation" aria-label="Quản trị">
+        <button class="admin-tab active" data-target="dashboard-panel">Tổng quan</button>
+        <button class="admin-tab" data-target="customers-panel">Khách hàng</button>
+        <button class="admin-tab" data-target="products-panel">Sản phẩm</button>
+        <button class="admin-tab" data-target="orders-panel">Đơn hàng</button>
+        <button class="admin-tab" data-target="feedback-panel">Phản hồi</button>
+      </aside>
 
-    <!-- Danh sách Phản hồi -->
-    <section class="section admin-section">
-      <h2>Phản hồi của Khách hàng</h2>
-      <p class="muted">
-        Dữ liệu này được lấy từ `localStorage` khi khách hàng gửi form
-        trên trang `contact.html`.
-      </p>
-      <div id="feedback-list">
-        <!-- Phản hồi sẽ được JS chèn vào đây -->
-      </div>
-    </section>
+      <section class="admin-content">
+        <div class="admin-panel active" id="dashboard-panel">
+          <h2>Tổng quan doanh thu</h2>
+          <div class="admin-grid-cards">
+            <article class="admin-card">
+              <span class="muted small">Tổng doanh thu</span>
+              <strong id="dashboard-revenue">0₫</strong>
+            </article>
+            <article class="admin-card">
+              <span class="muted small">Đơn đã thanh toán</span>
+              <strong id="dashboard-orders-paid">0</strong>
+            </article>
+            <article class="admin-card">
+              <span class="muted small">Đơn chờ xử lý</span>
+              <strong id="dashboard-orders-pending">0</strong>
+            </article>
+            <article class="admin-card">
+              <span class="muted small">Khách hàng</span>
+              <strong id="dashboard-customers">0</strong>
+            </article>
+          </div>
+          <div class="admin-panel-body">
+            <div class="admin-panel-header">
+              <h3>Doanh thu theo đơn hàng</h3>
+              <button class="btn success" id="export-revenue-btn">Xuất Excel (CSV)</button>
+            </div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Mã đơn</th>
+                  <th>Khách hàng</th>
+                  <th>Thanh toán</th>
+                  <th>Trạng thái</th>
+                  <th>Doanh thu</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-orders-table">
+                <tr><td colspan="5" class="muted" style="text-align:center;">Chưa có dữ liệu.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
 
+        <div class="admin-panel" id="customers-panel">
+          <h2>Khách hàng</h2>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Mã KH</th>
+                <th>Họ tên</th>
+                <th>Email</th>
+                <th>Ngày tham gia</th>
+              </tr>
+            </thead>
+            <tbody id="customers-table">
+              <tr><td colspan="4" class="muted" style="text-align:center;">Chưa có khách hàng.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="admin-panel" id="products-panel">
+          <h2>Sản phẩm</h2>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Mã SP</th>
+                <th>Tên sản phẩm</th>
+                <th>Giá</th>
+                <th>Tồn kho</th>
+                <th>Đã bán</th>
+              </tr>
+            </thead>
+            <tbody id="products-table">
+              <tr><td colspan="5" class="muted" style="text-align:center;">Chưa có dữ liệu sản phẩm.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="admin-panel" id="orders-panel">
+          <h2>Đơn hàng</h2>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Mã đơn</th>
+                <th>Khách hàng</th>
+                <th>Tổng tiền</th>
+                <th>Thanh toán</th>
+                <th>Trạng thái</th>
+                <th>Cập nhật</th>
+                <th>Chi tiết</th>
+              </tr>
+            </thead>
+            <tbody id="orders-table">
+              <tr><td colspan="6" class="muted" style="text-align:center;">Chưa có đơn hàng.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="admin-panel" id="feedback-panel">
+          <h2>Phản hồi khách hàng</h2>
+          <div id="feedback-list" class="feedback-wrapper">
+            <p class="muted">Chưa có phản hồi nào.</p>
+          </div>
+        </div>
+      </section>
+    </div>
   </div>
 </main>
 
@@ -72,8 +153,89 @@
   </div>
 </footer>
 
-<!-- Tải file logic của Admin -->
+<script src="assets/js/script.js"></script>
 <script src="assets/js/admin.js"></script>
+<div id="order-detail-modal" class="modal-overlay">
+  <div class="modal-content" style="max-width: 600px; width: 90%;">
+    <button class="modal-close" id="close-order-modal">&times;</button>
+    
+    <div class="modal-header" style="border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:15px;">
+      <h3>Thông tin giao hàng</h3>
+      <span id="modal-order-id" class="muted small">#DH...</span>
+    </div>
 
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+      <div>
+        <strong style="display:block; color:#666; font-size:0.9em;">Người nhận:</strong>
+        <span id="modal-customer-name" style="font-weight:bold; font-size:1.1em;">...</span>
+      </div>
+      <div>
+        <strong style="display:block; color:#666; font-size:0.9em;">Số điện thoại:</strong>
+        <span id="modal-customer-phone" style="color:#d32f2f; font-weight:bold;">...</span>
+      </div>
+      <div style="grid-column: span 2;">
+        <strong style="display:block; color:#666; font-size:0.9em;">Địa chỉ giao hàng:</strong>
+        <span id="modal-customer-address">...</span>
+      </div>
+      <div style="grid-column: span 2;">
+        <strong style="display:block; color:#666; font-size:0.9em;">Ghi chú từ khách:</strong>
+        <p id="modal-customer-note" style="font-style:italic; color:#555; background:#f9f9f9; padding:8px; border-radius:4px; margin-top:4px;">...</p>
+      </div>
+    </div>
+
+    <h4 style="margin-bottom:10px;">Sản phẩm cần giao</h4>
+    <div style="max-height: 200px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px;">
+      <table class="table" style="margin:0;">
+        <tbody id="modal-order-items">
+          </tbody>
+      </table>
+    </div>
+    
+    <div style="text-align:right; margin-top:15px; padding-top:10px; border-top:1px solid #eee;">
+        <button class="btn" id="close-modal-btn">Đóng</button>
+    </div>
+  </div>
+</div>
+<div id="order-detail-modal" class="modal-overlay">
+  <div class="modal-content" style="max-width: 600px; width: 90%;">
+    <button class="modal-close" id="close-order-modal">&times;</button>
+    
+    <div class="modal-header" style="border-bottom:1px solid #eee; padding-bottom:10px; margin-bottom:15px;">
+      <h3>Thông tin giao hàng</h3>
+      <span id="modal-order-id" class="muted small">#DH...</span>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+      <div>
+        <strong style="display:block; color:#666; font-size:0.9em;">Người nhận:</strong>
+        <span id="modal-customer-name" style="font-weight:bold; font-size:1.1em;">...</span>
+      </div>
+      <div>
+        <strong style="display:block; color:#666; font-size:0.9em;">Số điện thoại:</strong>
+        <span id="modal-customer-phone" style="color:#d32f2f; font-weight:bold;">---</span>
+      </div>
+      <div style="grid-column: span 2;">
+        <strong style="display:block; color:#666; font-size:0.9em;">Địa chỉ giao hàng:</strong>
+        <span id="modal-customer-address">---</span>
+      </div>
+      <div style="grid-column: span 2;">
+        <strong style="display:block; color:#666; font-size:0.9em;">Ghi chú từ khách:</strong>
+        <p id="modal-customer-note" style="font-style:italic; color:#555; background:#f9f9f9; padding:8px; border-radius:4px; margin-top:4px;">Không có ghi chú</p>
+      </div>
+    </div>
+
+    <h4 style="margin-bottom:10px;">Sản phẩm cần giao</h4>
+    <div style="max-height: 200px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px;">
+      <table class="table" style="margin:0;">
+        <tbody id="modal-order-items">
+          </tbody>
+      </table>
+    </div>
+    
+    <div style="text-align:right; margin-top:15px; padding-top:10px; border-top:1px solid #eee;">
+        <button class="btn" id="close-modal-btn">Đóng</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
