@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-t-8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Giỏ hàng · Clothify</title>
   <meta name="description" content="Clothify – cửa hàng thời trang thuần HTML & CSS">
@@ -19,17 +19,14 @@
       <div>
         <a href="index.html">Trang chủ</a>
         <a href="products.html">Sản phẩm</a>
-        
         <a href="cart.html" style="position: relative;">
           Giỏ hàng
           <span id="cart-counter" class="cart-badge"></span>
         </a>
-
         <a href="about.html">Giới thiệu</a>
         <a href="contact.html">Liên hệ</a>
       </div>
       <div class="cta">
-        <!-- Khu vực này sẽ được script.js tự động cập nhật -->
         <a class="btn ghost" href="login.html" aria-label="Đăng nhập">Đăng nhập</a>
         <a class="btn primary" href="products.html" aria-label="Mua ngay">Mua ngay</a>
       </div>
@@ -39,160 +36,30 @@
 
 <main class="page-content">
   <div class="container">
-    <section class="section cart-section">
+    <section class="section">
       <h2>Giỏ hàng</h2>
-      <p class="muted">Quản lý sản phẩm bạn muốn mua và hoàn tất đơn đặt hàng.</p>
-
-      <div class="cart-grid">
-        <div class="cart-table-wrapper">
-          <table class="table" role="table">
-            <thead>
-              <tr>
-                <th>Sản phẩm</th>
-                <th>Giá</th>
-                <th>Size</th>
-                <th>Số lượng</th>
-                <th>Tạm tính</th>
-                <th>Xóa</th>
-              </tr>
-            </thead>
-            <tbody id="cart-items">
-            </tbody>
-          </table>
-        </div>
-
-        <aside class="cart-summary" id="cart-summary">
-          <h3>Tổng kết</h3>
-          <div class="summary-row">
-            <span>Tạm tính</span>
-            <strong id="cart-subtotal">0₫</strong>
+      <table class="table" role="table">
+        <thead>
+          <tr>
+            <th>Sản phẩm</th>
+            <th>Giá</th>
+            <th>Size</th>
+            <th>Số lượng</th>
+            <th>Tạm tính</th>
+            <th>Xóa</th>
+          </tr>
+        </thead>
+        <tbody id="cart-items">
+          <!-- JS sẽ render giỏ hàng vào đây -->
+        </tbody>
+      </table>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px">
+        <a class="btn" href="products.html">Tiếp tục mua sắm</a>
+        <div style="text-align:right;">
+          <div style="margin-bottom:10px;">
+            <strong>Tổng cộng: <span id="cart-total">0₫</span></strong>
           </div>
-          <div class="summary-row">
-            <span>Phí vận chuyển</span>
-            <strong id="cart-shipping-fee">0₫</strong>
-          </div>
-          <div class="summary-row total">
-            <span>Tổng cộng</span>
-            <strong id="cart-total">0₫</strong>
-          </div>
-          <p class="muted small">Giá đã bao gồm VAT. Phí vận chuyển cố định 20.000₫ cho mọi đơn hàng.</p>
-        </aside>
-      </div>
-
-      <div class="checkout-layout">
-        <div class="checkout-card" id="shipping-info-card">
-          <h3>Thông tin giao hàng</h3>
-          <div class="shipping-options">
-            <label class="radio-option">
-              <input type="radio" name="shipping-source" value="account" checked>
-              <div>
-                <strong>Dùng thông tin tài khoản</strong>
-                <p class="muted small">Áp dụng địa chỉ đã lưu trong hồ sơ cá nhân.</p>
-              </div>
-            </label>
-            <label class="radio-option">
-              <input type="radio" name="shipping-source" value="new">
-              <div>
-                <strong>Nhập địa chỉ mới</strong>
-                <p class="muted small">Giao đến địa chỉ khác (cơ quan, người thân...).</p>
-              </div>
-            </label>
-          </div>
-
-          <div class="account-shipping-preview" id="account-shipping-preview">
-            <p><strong>Tên:</strong> <span id="account-ship-name">—</span></p>
-            <p><strong>SĐT:</strong> <span id="account-ship-phone">—</span></p>
-            <p><strong>Email:</strong> <span id="account-ship-email">—</span></p>
-            <p><strong>Địa chỉ:</strong> <span id="account-ship-address">—</span></p>
-          </div>
-
-          <div id="custom-shipping-fields" class="custom-shipping-fields" hidden>
-            <div class="double-columns">
-              <div class="form-group">
-                <label for="shipping-name">Họ tên người nhận</label>
-                <input type="text" id="shipping-name" class="input" placeholder="Tên người nhận">
-              </div>
-              <div class="form-group">
-                <label for="shipping-phone">Số điện thoại</label>
-                <input type="tel" id="shipping-phone" class="input" placeholder="090xxxxxxx">
-              </div>
-            </div>
-            <div class="double-columns">
-              <div class="form-group">
-                <label for="shipping-email">Email</label>
-                <input type="email" id="shipping-email" class="input" placeholder="example@email.com">
-              </div>
-              <div class="form-group">
-                <label for="shipping-note">Ghi chú</label>
-                <input type="text" id="shipping-note" class="input" placeholder="Hướng dẫn giao hàng (tuỳ chọn)">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="shipping-address">Địa chỉ nhận hàng</label>
-              <textarea id="shipping-address" rows="3" class="input" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành"></textarea>
-            </div>
-          </div>
-        </div>
-
-        <div class="checkout-card">
-          <h3>Phương thức thanh toán</h3>
-          <div class="payment-options">
-            <label class="radio-option">
-              <input type="radio" name="cart-payment-method" value="cod" checked>
-              <div>
-                <strong>Tiền mặt khi nhận hàng (COD)</strong>
-                <p class="muted small">Thanh toán trực tiếp cho nhân viên giao hàng.</p>
-              </div>
-            </label>
-            <label class="radio-option">
-              <input type="radio" name="cart-payment-method" value="qr">
-              <div>
-                <strong>Chuyển khoản / QR Banking</strong>
-                <p class="muted small">Nhận mã QR sau khi đặt hàng để thanh toán.</p>
-              </div>
-            </label>
-            <label class="radio-option">
-              <input type="radio" name="cart-payment-method" value="online">
-              <div>
-                <strong>Thanh toán trực tuyến</strong>
-                <p class="muted small">Thanh toán bằng thẻ nội địa/ quốc tế.</p>
-              </div>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div class="checkout-actions">
-        <a class="btn ghost" href="products.html" id="continue-shopping">Tiếp tục mua sắm</a>
-        <button class="btn success" id="place-order-btn">Đặt hàng</button>
-      </div>
-
-      <div class="order-review-card" id="order-review-card" hidden>
-        <div class="order-review-header">
-          <div>
-            <h3>Đơn hàng vừa tạo</h3>
-            <p class="muted small">Xem lại thông tin trước khi theo dõi trạng thái.</p>
-          </div>
-          <a href="my-orders.html" class="btn ghost small">Xem đơn hàng của tôi</a>
-        </div>
-        <div class="order-review-body">
-          <div class="order-info">
-            <p><strong>Mã đơn:</strong> <span id="review-order-id">—</span></p>
-            <p><strong>Trạng thái:</strong> <span id="review-order-status">—</span></p>
-            <p><strong>Thanh toán:</strong> <span id="review-order-payment">—</span></p>
-            <p><strong>Địa chỉ giao:</strong> <span id="review-order-address">—</span></p>
-          </div>
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Sản phẩm</th>
-                <th>Size</th>
-                <th>SL</th>
-                <th>Thành tiền</th>
-              </tr>
-            </thead>
-            <tbody id="review-order-items"></tbody>
-          </table>
+          <a class="btn success" href="#" id="checkout-btn">Thanh toán</a>
         </div>
       </div>
     </section>

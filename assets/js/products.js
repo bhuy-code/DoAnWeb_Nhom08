@@ -162,9 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     localStorage.setItem('cart', JSON.stringify(cart));
-
     if (typeof updateCartCounter === 'function') updateCartCounter();
-    if (typeof syncCartToActiveOrder === 'function') syncCartToActiveOrder(cart);
   }
 
   // ===== NÚT "XÁC NHẬN THÊM" TRONG MODAL =====
