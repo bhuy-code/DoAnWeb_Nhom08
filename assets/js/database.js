@@ -156,3 +156,100 @@ const products = [
     origin: "Việt Nam"
   }
 ];
+
+const productTypesSeed = [
+  { id: 'PT001', name: 'Áo thun', description: 'Các mẫu áo thun và sweater', profitMargin: 25 },
+  { id: 'PT002', name: 'Quần', description: 'Quần jean, quần thể thao', profitMargin: 22 },
+  { id: 'PT003', name: 'Áo khoác', description: 'Áo khoác, bomber, cardigan', profitMargin: 28 }
+];
+
+const priceRulesSeed = [
+  { id: 'PR001', productId: 'SP001', profitPercent: 20 },
+  { id: 'PR002', productId: 'SP005', profitPercent: 18 },
+  { id: 'PR003', productId: 'SP009', profitPercent: 25 }
+];
+
+const purchaseOrdersSeed = [
+  {
+    id: 'PO202501',
+    date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+    status: 'completed',
+    note: 'Nhập áo thun tháng 11',
+    items: [
+      { productId: 'SP001', quantity: 50, costPrice: 120000 },
+      { productId: 'SP004', quantity: 30, costPrice: 220000 }
+    ],
+    totalCost: 50 * 120000 + 30 * 220000
+  },
+  {
+    id: 'PO202502',
+    date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+    status: 'draft',
+    note: 'Nhập quần jean bổ sung',
+    items: [
+      { productId: 'SP006', quantity: 40, costPrice: 280000 }
+    ],
+    totalCost: 40 * 280000
+  }
+];
+
+const inventoryLedgerSeed = [
+  {
+    id: 'IMV001',
+    type: 'import',
+    productId: 'SP001',
+    quantity: 50,
+    reference: 'PO202501',
+    note: 'Nhập kho áo thun nữ',
+    timestamp: purchaseOrdersSeed[0].date
+  },
+  {
+    id: 'IMV002',
+    type: 'import',
+    productId: 'SP004',
+    quantity: 30,
+    reference: 'PO202501',
+    note: 'Nhập kho áo len nữ',
+    timestamp: purchaseOrdersSeed[0].date
+  },
+  {
+    id: 'IMV003',
+    type: 'export',
+    productId: 'SP001',
+    quantity: 3,
+    reference: 'DH1704067200001',
+    note: 'Giao đơn #DH1704067200001',
+    timestamp: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString()
+  }
+];
+
+function initializeProductTypesData() {
+  if (!localStorage.getItem('productTypes')) {
+    localStorage.setItem('productTypes', JSON.stringify(productTypesSeed));
+  }
+}
+
+function initializePriceRulesData() {
+  if (!localStorage.getItem('priceRules')) {
+    localStorage.setItem('priceRules', JSON.stringify(priceRulesSeed));
+  }
+}
+
+function initializePurchaseOrdersData() {
+  if (!localStorage.getItem('purchaseOrders')) {
+    localStorage.setItem('purchaseOrders', JSON.stringify(purchaseOrdersSeed));
+  }
+}
+
+function initializeInventoryLedgerData() {
+  if (!localStorage.getItem('inventoryLedger')) {
+    localStorage.setItem('inventoryLedger', JSON.stringify(inventoryLedgerSeed));
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initializeProductTypesData();
+  initializePriceRulesData();
+  initializePurchaseOrdersData();
+  initializeInventoryLedgerData();
+});

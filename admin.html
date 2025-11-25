@@ -29,8 +29,12 @@
       <aside class="admin-sidebar" role="navigation" aria-label="Quản trị">
         <button class="admin-tab active" data-target="dashboard-panel">Tổng quan</button>
         <button class="admin-tab" data-target="customers-panel">Khách hàng</button>
+        <button class="admin-tab" data-target="product-types-panel">Loại sản phẩm</button>
         <button class="admin-tab" data-target="products-panel">Sản phẩm</button>
+        <button class="admin-tab" data-target="purchase-panel">Phiếu nhập</button>
+        <button class="admin-tab" data-target="pricing-panel">Giá bán</button>
         <button class="admin-tab" data-target="orders-panel">Đơn hàng</button>
+        <button class="admin-tab" data-target="stock-panel">Tồn kho</button>
         <button class="admin-tab" data-target="feedback-panel">Phản hồi</button>
       </aside>
 
@@ -88,34 +92,327 @@
                 <th>Số điện thoại</th>
                 <th>Địa chỉ</th>
                 <th>Ngày tham gia</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
               </tr>
             </thead>
             <tbody id="customers-table">
-              <tr><td colspan="6" class="muted" style="text-align:center;">Chưa có khách hàng.</td></tr>
+              <tr><td colspan="8" class="muted" style="text-align:center;">Chưa có khách hàng.</td></tr>
             </tbody>
           </table>
+        </div>
+
+        <div class="admin-panel" id="product-types-panel">
+          <h2>Loại sản phẩm</h2>
+          <p class="muted">Thêm, cập nhật tỷ lệ lợi nhuận mặc định và mô tả cho từng loại sản phẩm.</p>
+          <div class="admin-split">
+            <div>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Mã loại</th>
+                    <th>Tên loại</th>
+                    <th>Lợi nhuận (%)</th>
+                    <th>Mô tả</th>
+                    <th>Hành động</th>
+                  </tr>
+                </thead>
+                <tbody id="product-types-table">
+                  <tr><td colspan="5" class="muted" style="text-align:center;">Chưa có dữ liệu.</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="form-card">
+              <h3 id="type-form-title">Thêm loại sản phẩm</h3>
+              <form id="product-type-form">
+                <input type="hidden" id="product-type-id">
+                <div class="form-group">
+                  <label for="product-type-name">Tên loại</label>
+                  <input type="text" id="product-type-name" class="input" required>
+                </div>
+                <div class="form-group">
+                  <label for="product-type-margin">Tỷ lệ lợi nhuận (%)</label>
+                  <input type="number" id="product-type-margin" class="input" min="0" max="100" required>
+                </div>
+                <div class="form-group">
+                  <label for="product-type-description">Mô tả</label>
+                  <textarea id="product-type-description" class="input" rows="3" placeholder="Ghi chú về loại sản phẩm"></textarea>
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="btn primary">Lưu loại sản phẩm</button>
+                  <button type="button" class="btn ghost" id="reset-type-form">Hủy</button>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
 
         <div class="admin-panel" id="products-panel">
           <h2>Sản phẩm</h2>
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Mã SP</th>
-                <th>Tên sản phẩm</th>
-                <th>Giá</th>
-                <th>Tồn kho</th>
-                <th>Đã bán</th>
-              </tr>
-            </thead>
-            <tbody id="products-table">
-              <tr><td colspan="5" class="muted" style="text-align:center;">Chưa có dữ liệu sản phẩm.</td></tr>
-            </tbody>
-          </table>
+          <div class="admin-split">
+            <div>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Mã SP</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Loại</th>
+                    <th>Giá bán</th>
+                    <th>Tồn kho</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                  </tr>
+                </thead>
+                <tbody id="products-table">
+                  <tr><td colspan="7" class="muted" style="text-align:center;">Chưa có dữ liệu sản phẩm.</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="form-card">
+              <h3 id="product-form-title">Thêm sản phẩm</h3>
+              <form id="product-form">
+                <input type="hidden" id="product-form-mode" value="create">
+                <div class="form-group">
+                  <label for="product-code">Mã sản phẩm</label>
+                  <input type="text" id="product-code" class="input" placeholder="SP013" required>
+                </div>
+                <div class="form-group">
+                  <label for="product-name">Tên sản phẩm</label>
+                  <input type="text" id="product-name" class="input" required>
+                </div>
+                <div class="double-columns">
+                  <div class="form-group">
+                    <label for="product-type-select">Loại sản phẩm</label>
+                    <select id="product-type-select" class="input" required></select>
+                  </div>
+                  <div class="form-group">
+                    <label for="product-category-select">Phân loại hiển thị</label>
+                    <select id="product-category-select" class="input" required>
+                      <option value="nam">Nam</option>
+                      <option value="nu">Nữ</option>
+                      <option value="phukien">Phụ kiện</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="double-columns">
+                  <div class="form-group">
+                    <label for="product-cost">Giá vốn (₫)</label>
+                    <input type="number" id="product-cost" class="input" min="0" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="product-price">Giá bán (₫)</label>
+                    <input type="number" id="product-price" class="input" min="0" required>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="product-image">Hình ảnh</label>
+                  <input type="url" id="product-image" class="input" placeholder="https://...">
+                </div>
+                <div class="form-group">
+                  <label for="product-description">Mô tả</label>
+                  <textarea id="product-description" class="input" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="product-status">Trạng thái</label>
+                  <select id="product-status" class="input">
+                    <option value="active">Hiển thị</option>
+                    <option value="hidden">Ẩn</option>
+                  </select>
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="btn primary">Lưu sản phẩm</button>
+                  <button type="button" class="btn ghost" id="reset-product-form">Làm mới</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-panel" id="purchase-panel">
+          <h2>Phiếu nhập hàng</h2>
+          <form id="purchase-filter-form" class="inline-form">
+            <div>
+              <label for="purchase-filter-from">Từ ngày</label>
+              <input type="date" id="purchase-filter-from" class="input">
+            </div>
+            <div>
+              <label for="purchase-filter-to">Đến ngày</label>
+              <input type="date" id="purchase-filter-to" class="input">
+            </div>
+            <div>
+              <label for="purchase-filter-status">Trạng thái</label>
+              <select id="purchase-filter-status" class="input">
+                <option value="">Tất cả</option>
+                <option value="draft">Đang xử lý</option>
+                <option value="completed">Đã hoàn thành</option>
+              </select>
+            </div>
+            <div class="form-actions">
+              <button type="submit" class="btn ghost">Lọc</button>
+              <button type="button" class="btn" id="reset-purchase-filter">Xóa lọc</button>
+            </div>
+          </form>
+          <div class="admin-split">
+            <div>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Mã phiếu</th>
+                    <th>Ngày nhập</th>
+                    <th>Số sản phẩm</th>
+                    <th>Tổng giá trị</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                  </tr>
+                </thead>
+                <tbody id="purchase-orders-table">
+                  <tr><td colspan="6" class="muted" style="text-align:center;">Chưa có phiếu nhập.</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="form-card">
+              <h3 id="purchase-form-title">Tạo phiếu nhập</h3>
+              <form id="purchase-order-form">
+                <input type="hidden" id="purchase-id">
+                <div class="form-group">
+                  <label for="purchase-date">Ngày nhập</label>
+                  <input type="date" id="purchase-date" class="input" required>
+                </div>
+                <div class="form-group">
+                  <label>Danh sách sản phẩm</label>
+                  <div class="purchase-item-form">
+                    <select id="purchase-item-product" class="input"></select>
+                    <input type="number" id="purchase-item-qty" class="input" min="1" placeholder="Số lượng">
+                    <input type="number" id="purchase-item-cost" class="input" min="0" placeholder="Giá nhập">
+                    <button type="button" class="btn" id="add-purchase-item-btn">Thêm</button>
+                  </div>
+                  <div id="purchase-items-preview" class="muted small" style="margin-top:10px;">Chưa có sản phẩm nào.</div>
+                </div>
+                <div class="form-group">
+                  <label for="purchase-note">Ghi chú</label>
+                  <textarea id="purchase-note" class="input" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                  <button type="submit" class="btn primary">Lưu phiếu nhập</button>
+                  <button type="button" class="btn ghost" id="reset-purchase-form">Làm mới</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="admin-panel" id="pricing-panel">
+          <h2>Quản lý giá bán</h2>
+          <div class="admin-split stacked">
+            <div>
+              <h3>Lợi nhuận theo loại</h3>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Loại</th>
+                    <th>Tỷ lệ %</th>
+                  </tr>
+                </thead>
+                <tbody id="pricing-type-table">
+                  <tr><td colspan="2" class="muted" style="text-align:center;">Chưa có dữ liệu.</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="form-card">
+              <h3>Cập nhật lợi nhuận theo loại</h3>
+              <form id="type-margin-form">
+                <div class="form-group">
+                  <label for="type-margin-select">Chọn loại</label>
+                  <select id="type-margin-select" class="input"></select>
+                </div>
+                <div class="form-group">
+                  <label for="type-margin-value">Tỷ lệ lợi nhuận (%)</label>
+                  <input type="number" id="type-margin-value" class="input" min="0" max="100">
+                </div>
+                <button type="submit" class="btn primary">Cập nhật</button>
+              </form>
+            </div>
+          </div>
+          <div class="admin-split stacked" style="margin-top:20px;">
+            <div>
+              <h3>Lợi nhuận theo sản phẩm</h3>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Sản phẩm</th>
+                    <th>Giá vốn</th>
+                    <th>Biên lợi nhuận</th>
+                    <th>Giá bán đề xuất</th>
+                    <th>Áp dụng</th>
+                  </tr>
+                </thead>
+                <tbody id="pricing-product-table">
+                  <tr><td colspan="5" class="muted" style="text-align:center;">Chưa có dữ liệu.</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="form-card">
+              <h3>Cập nhật lợi nhuận sản phẩm</h3>
+              <form id="product-margin-form">
+                <div class="form-group">
+                  <label for="product-margin-select">Chọn sản phẩm</label>
+                  <select id="product-margin-select" class="input"></select>
+                </div>
+                <div class="form-group">
+                  <label for="product-margin-value">Tỷ lệ lợi nhuận (%)</label>
+                  <input type="number" id="product-margin-value" class="input" min="0" max="200">
+                </div>
+                <div class="form-group">
+                  <label for="product-sale-price">Giá bán dự kiến (₫)</label>
+                  <input type="number" id="product-sale-price" class="input" min="0">
+                </div>
+                <button type="submit" class="btn primary">Lưu</button>
+              </form>
+            </div>
+          </div>
+          <div class="form-card" style="margin-top:20px;">
+            <h3>Tra cứu giá vốn - lợi nhuận</h3>
+            <form id="price-lookup-form">
+              <div class="double-columns">
+                <div class="form-group">
+                  <label for="price-lookup-product">Sản phẩm</label>
+                  <select id="price-lookup-product" class="input"></select>
+                </div>
+                <div class="form-group">
+                  <label for="price-lookup-type">Loại</label>
+                  <input type="text" id="price-lookup-type" class="input" readonly>
+                </div>
+              </div>
+              <button type="submit" class="btn">Tra cứu</button>
+            </form>
+            <div id="price-lookup-result" class="muted" style="margin-top:12px;">Chọn sản phẩm để xem chi tiết.</div>
+          </div>
         </div>
 
         <div class="admin-panel" id="orders-panel">
           <h2>Đơn hàng</h2>
+          <form id="order-filter-form" class="inline-form">
+            <div>
+              <label for="order-filter-from">Từ ngày</label>
+              <input type="date" id="order-filter-from" class="input">
+            </div>
+            <div>
+              <label for="order-filter-to">Đến ngày</label>
+              <input type="date" id="order-filter-to" class="input">
+            </div>
+            <div>
+              <label for="order-filter-status">Trạng thái</label>
+              <select id="order-filter-status" class="input">
+                <option value="">Tất cả</option>
+                <option value="cho-xac-nhan">Chờ xác nhận</option>
+                <option value="dang-giao">Đang giao</option>
+                <option value="da-giao">Đã giao</option>
+                <option value="cancelled">Đã hủy</option>
+              </select>
+            </div>
+            <button type="submit" class="btn ghost">Lọc đơn hàng</button>
+            <button type="button" class="btn" id="reset-order-filter">Xóa lọc</button>
+          </form>
           <table class="table">
             <thead>
               <tr>
@@ -132,6 +429,54 @@
               <tr><td colspan="6" class="muted" style="text-align:center;">Chưa có đơn hàng.</td></tr>
             </tbody>
           </table>
+        </div>
+
+        <div class="admin-panel" id="stock-panel">
+          <h2>Tồn kho & cảnh báo</h2>
+          <div class="alert warning" id="stock-warning-list">
+            <p class="muted">Đang tải dữ liệu tồn kho...</p>
+          </div>
+          <div class="admin-split">
+            <div class="form-card">
+              <h3>Tra cứu tồn kho theo sản phẩm</h3>
+              <form id="stock-query-form">
+                <div class="form-group">
+                  <label for="stock-query-product">Sản phẩm</label>
+                  <select id="stock-query-product" class="input"></select>
+                </div>
+                <button type="submit" class="btn">Xem tồn kho</button>
+              </form>
+              <div id="stock-query-result" style="margin-top:12px;" class="muted">Chọn sản phẩm để xem chi tiết số lượng nhập - xuất - tồn.</div>
+            </div>
+            <div>
+              <h3>Lịch sử nhập - xuất</h3>
+              <form id="stock-history-form" class="inline-form">
+                <div>
+                  <label for="stock-history-from">Từ ngày</label>
+                  <input type="date" id="stock-history-from" class="input">
+                </div>
+                <div>
+                  <label for="stock-history-to">Đến ngày</label>
+                  <input type="date" id="stock-history-to" class="input">
+                </div>
+                <button type="submit" class="btn ghost">Lọc</button>
+              </form>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Ngày</th>
+                    <th>Loại</th>
+                    <th>Sản phẩm</th>
+                    <th>Số lượng</th>
+                    <th>Tham chiếu</th>
+                  </tr>
+                </thead>
+                <tbody id="stock-history-table">
+                  <tr><td colspan="5" class="muted" style="text-align:center;">Chưa có dữ liệu.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
 
         <div class="admin-panel" id="feedback-panel">

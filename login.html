@@ -49,35 +49,78 @@
 
 <main>
   <div class="container">
-    <section class="section">
-      
-      <!-- FORM ĐĂNG NHẬP (Tài khoản khách hàng mặc định) -->
-      <div class="login-container" id="login-view">
-        <div class="login-form">
-          <h2>Đăng nhập</h2>
-          <p class="muted">Vui lòng đăng nhập với tài khoản khách hàng.</p>
-          <p class="small" style="background: #f0f7ff; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
-            <strong>Tài khoản mặc định:</strong><br>
-            Email: <code>khachhang@clothify.com</code><br>
-            Mật khẩu: <code>123456</code>
-          </p>
-          
-          <form style="margin-top: 20px;" id="login-form">
-            <div class="form-group">
-              <label for="email">Email</label>
-              <input type="email" id="email-login" class="input" placeholder="khachhang@clothify.com" required>
-            </div>
-            <div class="form-group">
-              <label for="password">Mật khẩu</label>
-              <input type="password" id="password-login" class="input" placeholder="••••••••" required>
-            </div>
-            <div id="login-error" class="form-error"></div>
-            
-            <button type="submit" class="btn primary" style="width: 100%; margin-top: 10px;">Đăng nhập</button>
-          </form>
+    <section class="section auth-section">
+      <div class="auth-tabs">
+        <button class="auth-tab active" data-target="#login-view">Đăng nhập</button>
+        <button class="auth-tab" data-target="#register-view">Đăng ký</button>
+      </div>
+      <div class="auth-panels">
+        <!-- FORM ĐĂNG NHẬP -->
+        <div class="login-container auth-panel active" id="login-view">
+          <div class="login-form">
+            <h2>Đăng nhập</h2>
+            <p class="muted">Vui lòng đăng nhập với tài khoản khách hàng.</p>
+            <p class="small" style="background: #f0f7ff; padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+              <strong>Tài khoản mặc định:</strong><br>
+              Email: <code>khachhang@clothify.com</code><br>
+              Mật khẩu: <code>123456</code>
+            </p>
+            <form style="margin-top: 20px;" id="login-form">
+              <div class="form-group">
+                <label for="email-login">Email</label>
+                <input type="email" id="email-login" class="input" placeholder="khachhang@clothify.com" required>
+              </div>
+              <div class="form-group">
+                <label for="password-login">Mật khẩu</label>
+                <input type="password" id="password-login" class="input" placeholder="••••••••" required>
+              </div>
+              <div id="login-error" class="form-error"></div>
+              <button type="submit" class="btn primary" style="width: 100%; margin-top: 10px;">Đăng nhập</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- FORM ĐĂNG KÝ -->
+        <div class="login-container auth-panel" id="register-view">
+          <div class="login-form">
+            <h2>Tạo tài khoản mới</h2>
+            <p class="muted">Đăng ký tài khoản để theo dõi đơn hàng và mua sắm nhanh chóng.</p>
+            <form id="register-form" style="margin-top: 20px;">
+              <div class="double-columns">
+                <div class="form-group">
+                  <label for="register-name">Họ tên</label>
+                  <input type="text" id="register-name" class="input" placeholder="Nguyễn Văn A" required>
+                </div>
+                <div class="form-group">
+                  <label for="register-phone">Số điện thoại</label>
+                  <input type="tel" id="register-phone" class="input" placeholder="0901234567" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="register-email">Email</label>
+                <input type="email" id="register-email" class="input" placeholder="example@email.com" required>
+              </div>
+              <div class="double-columns">
+                <div class="form-group">
+                  <label for="register-password">Mật khẩu</label>
+                  <input type="password" id="register-password" class="input" minlength="6" required>
+                </div>
+                <div class="form-group">
+                  <label for="register-confirm-password">Nhập lại mật khẩu</label>
+                  <input type="password" id="register-confirm-password" class="input" minlength="6" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="register-address">Địa chỉ</label>
+                <textarea id="register-address" rows="3" class="input" placeholder="Số nhà, đường, phường/xã, quận/huyện, tỉnh/thành" required></textarea>
+              </div>
+              <div id="register-error" class="form-error"></div>
+              <div id="register-success" class="form-success"></div>
+              <button type="submit" class="btn success" style="width:100%; margin-top:10px;">Đăng ký tài khoản</button>
+            </form>
+          </div>
         </div>
       </div>
-
     </section>
   </div>
 </main>

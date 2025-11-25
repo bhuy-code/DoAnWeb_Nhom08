@@ -60,6 +60,34 @@
     <span class="muted">Tôn trọng giá trị riêng của bạn</span>
   </div>
   
+  <form class="advanced-search" id="advanced-search-form">
+    <div class="advanced-field">
+      <label for="advanced-keyword">Từ khóa</label>
+      <input type="text" id="advanced-keyword" name="keyword" placeholder="Tên sản phẩm muốn tìm...">
+    </div>
+    <div class="advanced-field">
+      <label for="advanced-category">Phân loại</label>
+      <select id="advanced-category" name="category">
+        <option value="">-- Tất cả --</option>
+        <option value="nam">Nam</option>
+        <option value="nu">Nữ</option>
+        <option value="phukien">Phụ kiện</option>
+      </select>
+    </div>
+    <div class="advanced-field">
+      <label>Khoảng giá (₫)</label>
+      <div class="price-range">
+        <input type="number" name="priceMin" id="advanced-price-min" placeholder="Từ">
+        <span>—</span>
+        <input type="number" name="priceMax" id="advanced-price-max" placeholder="Đến">
+      </div>
+    </div>
+    <div class="advanced-actions">
+      <button type="submit" class="btn primary">Tìm kiếm nâng cao</button>
+      <button type="button" class="btn ghost" id="reset-advanced-search">Xóa điều kiện</button>
+    </div>
+  </form>
+  
   <div class="grid" id="product-list">
 
     <!-- 

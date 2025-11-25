@@ -38,7 +38,8 @@ const ORDER_STATUS_LABELS = {
 
 const PAYMENT_METHOD_LABELS = {
   cod: 'Thanh toán khi nhận hàng (COD)',
-  qr: 'Chuyển khoản qua QR'
+  qr: 'Chuyển khoản qua QR',
+  online: 'Thanh toán trực tuyến'
 };
 
 function getCurrentUser() {
@@ -103,18 +104,18 @@ function ensureUserIds() {
 function initializeProductCatalog() {
   if (!localStorage.getItem('productCatalog')) {
     const catalog = [
-      { id: 'SP001', name: 'Áo thun basic Form Nữ', price: 199000 },
-      { id: 'SP002', name: 'Áo thun Basic Nam mẫu Typo', price: 249000 },
-      { id: 'SP003', name: 'Áo Sweaeter nỉ', price: 299000 },
-      { id: 'SP004', name: 'Áo len nữ', price: 349000 },
-      { id: 'SP005', name: 'Áo sơ mi Nam vải Broadcloth', price: 399000 },
-      { id: 'SP006', name: 'Jeans Baggy', price: 449000 },
-      { id: 'SP007', name: 'Áo Sơ Mi Cổ Thường Tay Ngắn', price: 499000 },
-      { id: 'SP008', name: 'Jeans Baggy Short', price: 549000 },
-      { id: 'SP009', name: 'Áo khoác Bomber', price: 599000 },
-      { id: 'SP010', name: 'Áo khoác chần bông lai', price: 649000 },
-      { id: 'SP011', name: 'Quần thể thao nữ', price: 279000 },
-      { id: 'SP012', name: 'Quần thể thao nam dài', price: 299000 }
+      { id: 'SP001', name: 'Áo thun basic Form Nữ', price: 199000, costPrice: 150000, category: 'nu', typeId: 'PT001', status: 'active' },
+      { id: 'SP002', name: 'Áo thun Basic Nam mẫu Typo', price: 249000, costPrice: 180000, category: 'nam', typeId: 'PT001', status: 'active' },
+      { id: 'SP003', name: 'Áo Sweaeter nỉ', price: 299000, costPrice: 220000, category: 'nam', typeId: 'PT001', status: 'active' },
+      { id: 'SP004', name: 'Áo len nữ', price: 349000, costPrice: 260000, category: 'nu', typeId: 'PT001', status: 'active' },
+      { id: 'SP005', name: 'Áo sơ mi Nam vải Broadcloth', price: 399000, costPrice: 300000, category: 'nam', typeId: 'PT001', status: 'active' },
+      { id: 'SP006', name: 'Jeans Baggy', price: 449000, costPrice: 320000, category: 'nam', typeId: 'PT002', status: 'active' },
+      { id: 'SP007', name: 'Áo Sơ Mi Cổ Thường Tay Ngắn', price: 499000, costPrice: 360000, category: 'nam', typeId: 'PT001', status: 'active' },
+      { id: 'SP008', name: 'Jeans Baggy Short', price: 549000, costPrice: 400000, category: 'nam', typeId: 'PT002', status: 'active' },
+      { id: 'SP009', name: 'Áo khoác Bomber', price: 599000, costPrice: 450000, category: 'nam', typeId: 'PT003', status: 'active' },
+      { id: 'SP010', name: 'Áo khoác chần bông lai', price: 649000, costPrice: 500000, category: 'nam', typeId: 'PT003', status: 'active' },
+      { id: 'SP011', name: 'Quần thể thao nữ', price: 699000, costPrice: 510000, category: 'nu', typeId: 'PT002', status: 'active' },
+      { id: 'SP012', name: 'Quần thể thao nam dài', price: 749000, costPrice: 540000, category: 'nam', typeId: 'PT002', status: 'active' }
     ];
     localStorage.setItem('productCatalog', JSON.stringify(catalog));
   }
@@ -199,6 +200,20 @@ function formatCurrency(value) {
   return (value || 0).toLocaleString('vi-VN');
 }
 
+function recordInventoryMovement(entry) {
+  const ledger = JSON.parse(localStorage.getItem('inventoryLedger')) || [];
+  ledger.push({
+    id: entry.id || `IMV${Date.now()}${Math.floor(Math.random() * 1000)}`,
+    timestamp: entry.timestamp || new Date().toISOString(),
+    type: entry.type,
+    productId: entry.productId,
+    quantity: entry.quantity,
+    reference: entry.reference || '',
+    note: entry.note || ''
+  });
+  localStorage.setItem('inventoryLedger', JSON.stringify(ledger));
+}
+
 function deductInventoryForOrder(order) {
   if (!order || !Array.isArray(order.items) || order.items.length === 0) return;
 
@@ -210,6 +225,14 @@ function deductInventoryForOrder(order) {
     if (inventoryItem) {
       inventoryItem.stock = Math.max(0, (inventoryItem.stock || 0) - (item.quantity || 0));
       changed = true;
+      recordInventoryMovement({
+        type: 'export',
+        productId: item.productId,
+        quantity: item.quantity || 0,
+        reference: order.orderId || order.id,
+        note: 'Trừ kho khi xử lý đơn hàng',
+        timestamp: new Date().toISOString()
+      });
     }
   });
 
@@ -303,18 +326,18 @@ function initializeInventory() {
     
     // Dữ liệu tồn kho ban đầu
     const initialInventory = [
-      { id: 'SP001', name: 'Áo thun basic Form Nữ', stock: 120 },
-      { id: 'SP002', name: 'Áo thun Basic Nam mẫu Typo', stock: 80 },
-      { id: 'SP003', name: 'Áo Sweaeter nỉ', stock: 50 },
-      { id: 'SP004', name: 'Áo len nữ', stock: 75 },
-      { id: 'SP005', name: 'Áo sơ mi Nam vải Broadcloth', stock: 90 },
-      { id: 'SP006', name: 'Jeans Baggy', stock: 65 },
-      { id: 'SP007', name: 'Áo Sơ Mi Cổ Thường Tay Ngắn', stock: 40 },
-      { id: 'SP008', name: 'Jeans Baggy Short', stock: 110 },
-      { id: 'SP009', name: 'Áo khoác Bomber', stock: 30 },
-      { id: 'SP010', name: 'Áo khoác chần bông lai', stock: 45 },
-      { id: 'SP011', name: 'Quần thể thao nữ', stock: 85 },
-      { id: 'SP012', name: 'Quần thể thao nam dài', stock: 60 }
+      { id: 'SP001', name: 'Áo thun basic Form Nữ', stock: 120, warningLevel: 20 },
+      { id: 'SP002', name: 'Áo thun Basic Nam mẫu Typo', stock: 80, warningLevel: 20 },
+      { id: 'SP003', name: 'Áo Sweaeter nỉ', stock: 50, warningLevel: 15 },
+      { id: 'SP004', name: 'Áo len nữ', stock: 75, warningLevel: 15 },
+      { id: 'SP005', name: 'Áo sơ mi Nam vải Broadcloth', stock: 90, warningLevel: 20 },
+      { id: 'SP006', name: 'Jeans Baggy', stock: 65, warningLevel: 15 },
+      { id: 'SP007', name: 'Áo Sơ Mi Cổ Thường Tay Ngắn', stock: 40, warningLevel: 10 },
+      { id: 'SP008', name: 'Jeans Baggy Short', stock: 110, warningLevel: 20 },
+      { id: 'SP009', name: 'Áo khoác Bomber', stock: 30, warningLevel: 10 },
+      { id: 'SP010', name: 'Áo khoác chần bông lai', stock: 45, warningLevel: 10 },
+      { id: 'SP011', name: 'Quần thể thao nữ', stock: 85, warningLevel: 20 },
+      { id: 'SP012', name: 'Quần thể thao nam dài', stock: 60, warningLevel: 15 }
     ];
     
     // Lưu vào localStorage
@@ -338,7 +361,8 @@ function initializeSampleData() {
       password: '123456',
       phone: '0901234567',
       address: '123 Đường ABC, Phường 1, Quận 1, TP.HCM',
-      createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+      createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+      status: 'active'
     },
     {
       id: 'CUS003',
@@ -347,7 +371,8 @@ function initializeSampleData() {
       password: '123456',
       phone: '0987654321',
       address: '456 Đường XYZ, Phường 2, Quận 3, TP.HCM',
-      createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString()
+      createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+      status: 'active'
     }
   ];
   
@@ -367,7 +392,8 @@ function initializeSampleData() {
         id: sampleCustomer.id,
         name: sampleCustomer.name,
         email: sampleCustomer.email,
-        createdAt: sampleCustomer.createdAt
+        createdAt: sampleCustomer.createdAt,
+        status: sampleCustomer.status || 'active'
       });
     }
   });
@@ -503,6 +529,26 @@ document.addEventListener('DOMContentLoaded', () => {
   const allCards = document.querySelectorAll('.grid .card');
   const paginationContainer = document.getElementById('pagination');
   const filterButtons = document.querySelectorAll('.filterbar .badge');
+  const advancedCategorySelect = document.getElementById('advanced-category');
+  const advancedForm = document.getElementById('advanced-search-form');
+  const advancedResetBtn = document.getElementById('reset-advanced-search');
+
+  let currentFilter = 'tatca';
+  let currentPage = 1;
+  let advancedKeyword = '';
+  let advancedMinPrice = null;
+  let advancedMaxPrice = null;
+
+  function setActiveFilterBadge(value) {
+    const targetValue = value || 'tatca';
+    filterButtons.forEach(badge => {
+      const badgeValue = badge.getAttribute('data-filler');
+      badge.classList.toggle('active', badgeValue === targetValue);
+    });
+    if (advancedCategorySelect) {
+      advancedCategorySelect.value = targetValue === 'tatca' ? '' : targetValue;
+    }
+  }
 
   // Chỉ chạy nếu có sản phẩm và khung phân trang
   if (allCards.length > 0 && paginationContainer) {
@@ -514,9 +560,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Biến lưu trạng thái
-    let currentFilter = 'tatca'; 
-    let currentPage = 1;
-
     // --- HÀM XỬ LÝ CHÍNH ---
     function updateDisplay() {
       const visibleItems = []; 
@@ -524,8 +567,17 @@ document.addEventListener('DOMContentLoaded', () => {
       // B1: Lọc sản phẩm
       allCards.forEach(card => {
         const category = card.dataset.category; 
-        // Kiểm tra nút lọc
-        if (currentFilter === 'tatca' || currentFilter === 'all' || category === currentFilter) {
+        const title = card.querySelector('.product-name')?.innerText.toLowerCase() || '';
+        const desc = card.querySelector('.muted')?.innerText.toLowerCase() || '';
+        const priceEl = card.querySelector('.product-price');
+        const priceValue = parseInt(priceEl?.getAttribute('data-price-value') || priceEl?.dataset?.priceValue || '0', 10);
+
+        const matchesCategory = currentFilter === 'tatca' || currentFilter === 'all' || category === currentFilter;
+        const matchesKeyword = !advancedKeyword || title.includes(advancedKeyword) || desc.includes(advancedKeyword);
+        const matchesMin = advancedMinPrice === null || priceValue >= advancedMinPrice;
+        const matchesMax = advancedMaxPrice === null || priceValue <= advancedMaxPrice;
+
+        if (matchesCategory && matchesKeyword && matchesMin && matchesMax) {
           visibleItems.push(card);
         } else {
           card.style.display = 'none'; // Ẩn ngay nếu không đúng loại
@@ -582,16 +634,51 @@ document.addEventListener('DOMContentLoaded', () => {
     if (filterButtons.length > 0) {
       filterButtons.forEach(btn => {
         btn.addEventListener('click', () => {
-          // Đổi màu nút active
-          filterButtons.forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-
           // Lấy giá trị lọc và reset về trang 1
           currentFilter = btn.getAttribute('data-filler');
+          setActiveFilterBadge(currentFilter);
           currentPage = 1;
 
           updateDisplay();
         });
+      });
+    }
+
+    if (advancedForm) {
+      advancedForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const keywordInput = advancedForm.querySelector('input[name="keyword"]');
+        const priceMinInput = advancedForm.querySelector('input[name="priceMin"]');
+        const priceMaxInput = advancedForm.querySelector('input[name="priceMax"]');
+        const categoryInput = advancedForm.querySelector('select[name="category"]');
+
+        advancedKeyword = keywordInput ? keywordInput.value.trim().toLowerCase() : '';
+        const minValue = priceMinInput?.value ? parseInt(priceMinInput.value, 10) : null;
+        const maxValue = priceMaxInput?.value ? parseInt(priceMaxInput.value, 10) : null;
+
+        advancedMinPrice = Number.isFinite(minValue) ? minValue : null;
+        advancedMaxPrice = Number.isFinite(maxValue) ? maxValue : null;
+
+        if (categoryInput) {
+          currentFilter = categoryInput.value || 'tatca';
+        }
+
+        setActiveFilterBadge(currentFilter);
+        currentPage = 1;
+        updateDisplay();
+      });
+    }
+
+    if (advancedResetBtn) {
+      advancedResetBtn.addEventListener('click', () => {
+        if (advancedForm) advancedForm.reset();
+        advancedKeyword = '';
+        advancedMinPrice = null;
+        advancedMaxPrice = null;
+        currentFilter = 'tatca';
+        setActiveFilterBadge(currentFilter);
+        currentPage = 1;
+        updateDisplay();
       });
     }
 
@@ -675,6 +762,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function filterProductsOnPage() {
       const keyword = searchInput.value.trim().toLowerCase();
       searchDropdown.classList.remove('active');
+
+      if (allCards.length > 0 && paginationContainer) {
+        advancedKeyword = keyword;
+        currentFilter = 'tatca';
+        setActiveFilterBadge(currentFilter);
+        currentPage = 1;
+        updateDisplay();
+        return;
+      }
       
       let productCards = document.querySelectorAll('#product-list .card');
       if (productCards.length === 0) {
@@ -721,6 +817,20 @@ document.addEventListener('DOMContentLoaded', () => {
   // TÍNH NĂNG 6: Logic ĐĂNG NHẬP (Tài khoản khách hàng mặc định)
   // ==========================================================
   const loginForm = document.getElementById('login-form');
+  const authTabs = document.querySelectorAll('.auth-tab');
+  const authPanels = document.querySelectorAll('.auth-panel');
+  if (authTabs.length && authPanels.length) {
+    authTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const targetSelector = tab.dataset.target;
+        authTabs.forEach(t => t.classList.remove('active'));
+        authPanels.forEach(panel => panel.classList.remove('active'));
+        tab.classList.add('active');
+        const targetPanel = document.querySelector(targetSelector);
+        if (targetPanel) targetPanel.classList.add('active');
+      });
+    });
+  }
   if(loginForm) {
     // Khởi tạo tài khoản khách hàng mặc định nếu chưa có
     function initializeDefaultCustomer() {
@@ -735,6 +845,7 @@ document.addEventListener('DOMContentLoaded', () => {
           password: '123456',
           phone: '',
           address: '',
+          status: 'active',
           createdAt: new Date().toISOString()
         };
         users.push(newCustomer);
@@ -747,7 +858,8 @@ document.addEventListener('DOMContentLoaded', () => {
             id: newCustomer.id,
             name: newCustomer.name,
             email: newCustomer.email,
-            createdAt: newCustomer.createdAt
+            createdAt: newCustomer.createdAt,
+            status: 'active'
           });
           localStorage.setItem('customers', JSON.stringify(customers));
         }
@@ -783,6 +895,11 @@ document.addEventListener('DOMContentLoaded', () => {
           foundUser = users.find(user => user.email === email);
         }
         
+        if (foundUser && foundUser.status === 'locked') {
+          errorEl.textContent = 'Tài khoản này đang bị khóa. Vui lòng liên hệ quản trị viên.';
+          return;
+        }
+
         if (foundUser) {
           errorEl.textContent = "";
           const { password: removedPassword, ...publicUser } = foundUser;
@@ -798,6 +915,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const foundUser = users.find(user => user.email === email && user.password === pass);
       
       if(foundUser) {
+        if (foundUser.status === 'locked') {
+          errorEl.textContent = 'Tài khoản này đang bị khóa. Vui lòng liên hệ quản trị viên.';
+          return;
+        }
         errorEl.textContent = "";
         const { password: removedPassword, ...publicUser } = foundUser;
         localStorage.setItem('currentUser', JSON.stringify(publicUser));
@@ -806,6 +927,93 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         errorEl.textContent = 'Email hoặc mật khẩu không chính xác.';
       }
+    });
+  }
+
+  // ==========================================================
+  // TÍNH NĂNG 6.1: Đăng ký tài khoản người dùng mới
+  // ==========================================================
+  const registerForm = document.getElementById('register-form');
+  if (registerForm) {
+    registerForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const nameInput = document.getElementById('register-name');
+      const phoneInput = document.getElementById('register-phone');
+      const emailInput = document.getElementById('register-email');
+      const pwInput = document.getElementById('register-password');
+      const confirmInput = document.getElementById('register-confirm-password');
+      const addressInput = document.getElementById('register-address');
+      const errorEl = document.getElementById('register-error');
+      const successEl = document.getElementById('register-success');
+
+      if (!nameInput || !phoneInput || !emailInput || !pwInput || !confirmInput || !addressInput) return;
+
+      const name = nameInput.value.trim();
+      const phone = phoneInput.value.trim();
+      const email = emailInput.value.trim().toLowerCase();
+      const password = pwInput.value.trim();
+      const confirmPassword = confirmInput.value.trim();
+      const address = addressInput.value.trim();
+
+      if (errorEl) errorEl.textContent = '';
+      if (successEl) successEl.textContent = '';
+
+      if (password.length < 6) {
+        if (errorEl) errorEl.textContent = 'Mật khẩu phải có tối thiểu 6 ký tự.';
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        if (errorEl) errorEl.textContent = 'Mật khẩu nhập lại không khớp.';
+        return;
+      }
+
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+      if (users.some(user => user.email?.toLowerCase() === email)) {
+        if (errorEl) errorEl.textContent = 'Email này đã tồn tại. Vui lòng chọn email khác.';
+        return;
+      }
+
+      const newUser = {
+        id: `CUS${Date.now()}`,
+        name,
+        phone,
+        email,
+        password,
+        address,
+        status: 'active',
+        role: 'customer',
+        createdAt: new Date().toISOString()
+      };
+
+      users.push(newUser);
+      localStorage.setItem('users', JSON.stringify(users));
+
+      // cập nhật bảng customers phục vụ admin
+      const customers = JSON.parse(localStorage.getItem('customers')) || [];
+      customers.push({
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        createdAt: newUser.createdAt,
+        phone: newUser.phone,
+        address: newUser.address,
+        status: 'active'
+      });
+      localStorage.setItem('customers', JSON.stringify(customers));
+
+      const { password: removedPw, ...publicUser } = newUser;
+      localStorage.setItem('currentUser', JSON.stringify(publicUser));
+
+      if (successEl) {
+        successEl.textContent = 'Đăng ký thành công! Đang chuyển đến trang chủ.';
+        successEl.classList.add('show');
+      }
+
+      registerForm.reset();
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1200);
     });
   }
 

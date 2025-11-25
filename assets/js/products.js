@@ -143,7 +143,31 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ===== NÚT "XÁC NHẬN THÊM" TRONG MODAL (Đơn giản hóa) =====
+  function addItemToCart(product, size, quantity) {
+    if (!product || !size) return;
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const existingIndex = cart.findIndex(item => item.id === product.id && item.size === size);
+
+    if (existingIndex > -1) {
+      cart[existingIndex].quantity += quantity;
+    } else {
+      cart.push({
+        id: product.id,
+        name: product.name,
+        size,
+        price: product.price,
+        image: product.image,
+        quantity
+      });
+    }
+
+    localStorage.setItem('cart', JSON.stringify(cart));
+
+    if (typeof updateCartCounter === 'function') updateCartCounter();
+    if (typeof syncCartToActiveOrder === 'function') syncCartToActiveOrder(cart);
+  }
+
+  // ===== NÚT "XÁC NHẬN THÊM" TRONG MODAL =====
   modalConfirmBtn.addEventListener("click", () => {
     if (!selectedSize) {
       alert("Vui lòng chọn size sản phẩm!");
@@ -166,8 +190,8 @@ document.addEventListener("DOMContentLoaded", () => {
       if (selectedQuantity > 10) selectedQuantity = 10;
     }
 
-    // Đơn giản hóa: Chỉ hiển thị thông báo thành công, không lưu vào localStorage
-    alert(`✅ Đã thêm "${currentProductData.name}" (Size: ${selectedSize}, Số lượng: ${selectedQuantity}) vào giỏ hàng thành công!`);
+    addItemToCart(currentProductData, selectedSize, selectedQuantity);
+    alert(`✅ Đã thêm "${currentProductData.name}" (Size: ${selectedSize}, Số lượng: ${selectedQuantity}) vào giỏ hàng!`);
     closeModal();
   });
 
