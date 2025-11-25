@@ -158,7 +158,7 @@ function renderOrderDetail(order) {
       const shipInfo = order.shippingInfo || {};
       paymentSection.innerHTML = `
         <div class="alert success" style="background:#d1fae5; color:#065f46; padding:20px; border-radius:8px; margin-top:20px; border: 1px solid #a7f3d0;">
-            <h4 style="margin-top:0; margin-bottom:10px;">✓ Đơn hàng đã được xác nhận</h4>
+            <h4 style="margin-top:0; margin-bottom:10px;">✓ Đã đặt hàng thành công!</h4>
             <p style="margin-bottom:5px;"><strong>Phương thức:</strong> ${pmLabels[order.paymentMethod] || order.paymentMethod}</p>
             <hr style="border-top:1px solid #a7f3d0; margin:10px 0;">
             <p style="margin-bottom:5px;"><strong>Thông tin giao hàng:</strong></p>
@@ -177,12 +177,42 @@ function renderOrderDetail(order) {
   }
 }
 
-// [QUAN TRỌNG] Hàm xử lý submit form thanh toán (ĐÃ SỬA ĐỂ DEBUG)
+// Hàm xử lý submit form thanh toán
 function setupPaymentHandling(paymentForm, order) {
   if (!paymentForm) return;
 
+  const currentUser = typeof getCurrentUser === 'function' ? getCurrentUser() : JSON.parse(localStorage.getItem('currentUser'));
+  if (!currentUser) return;
+
   const paymentErrorEl = document.getElementById('payment-error');
   const qrPreview = document.getElementById('qr-preview');
+  const accountAddressPreview = document.getElementById('account-address-preview');
+  const customAddressFields = document.getElementById('custom-address-fields');
+  const addressFromAccount = document.getElementById('address-from-account');
+  const addressCustom = document.getElementById('address-custom');
+
+  // Hiển thị địa chỉ từ tài khoản
+  if (accountAddressPreview && currentUser) {
+    document.getElementById('preview-email').textContent = currentUser.email || '--';
+    document.getElementById('preview-phone').textContent = currentUser.phone || '--';
+    document.getElementById('preview-address').textContent = currentUser.address || '--';
+  }
+
+  // Chuyển đổi giữa địa chỉ tài khoản và địa chỉ mới
+  if (addressFromAccount && addressCustom && customAddressFields && accountAddressPreview) {
+    addressFromAccount.addEventListener('change', () => {
+      if (addressFromAccount.checked) {
+        customAddressFields.style.display = 'none';
+        accountAddressPreview.style.display = 'block';
+      }
+    });
+    addressCustom.addEventListener('change', () => {
+      if (addressCustom.checked) {
+        customAddressFields.style.display = 'block';
+        accountAddressPreview.style.display = 'none';
+      }
+    });
+  }
 
   const toggleQrPreview = (method) => {
     if (!qrPreview) return;
@@ -201,29 +231,34 @@ function setupPaymentHandling(paymentForm, order) {
 
     const formData = new FormData(paymentForm);
     const method = formData.get('payment-method');
+    const addressSource = formData.get('address-source') || 'account';
 
-    // 1. Lấy dữ liệu từ ô Input
-    const emailInput = document.getElementById('customer-email');
-    const phoneInput = document.getElementById('customer-phone');
-    const addressInput = document.getElementById('customer-address');
-    const noteInput = document.getElementById('customer-note');
+    let emailVal, phoneVal, addrVal;
 
-    // Lấy giá trị từ các input
-    const emailVal = emailInput ? emailInput.value.trim() : '';
-    const phoneVal = phoneInput ? phoneInput.value.trim() : '';
-    const addrVal = addressInput ? addressInput.value.trim() : '';
-    
-    // Kiểm tra các trường bắt buộc
-    if (!emailInput || !phoneInput || !addressInput) {
-        alert("LỖI: Không tìm thấy các ô nhập thông tin trong HTML. Hãy kiểm tra lại file order-detail.html");
+    if (addressSource === 'account') {
+      // Dùng địa chỉ từ tài khoản
+      emailVal = currentUser.email || '';
+      phoneVal = currentUser.phone || '';
+      addrVal = currentUser.address || '';
+      
+      if (!emailVal || !addrVal) {
+        if (paymentErrorEl) paymentErrorEl.textContent = 'Vui lòng cập nhật địa chỉ trong tài khoản hoặc chọn "Nhập địa chỉ mới".';
         return;
-    }
-
-    // Nếu dữ liệu trống -> Chưa nhập
-    if (!emailVal || !phoneVal || !addrVal) {
+      }
+    } else {
+      // Nhập địa chỉ mới
+      const emailInput = document.getElementById('customer-email');
+      const phoneInput = document.getElementById('customer-phone');
+      const addressInput = document.getElementById('customer-address');
+      
+      emailVal = emailInput ? emailInput.value.trim() : '';
+      phoneVal = phoneInput ? phoneInput.value.trim() : '';
+      addrVal = addressInput ? addressInput.value.trim() : '';
+      
+      if (!emailVal || !phoneVal || !addrVal) {
         if (paymentErrorEl) paymentErrorEl.textContent = 'Vui lòng nhập đầy đủ Email, Số điện thoại và Địa chỉ nhận hàng.';
-        alert("Vui lòng nhập đầy đủ Email, SĐT và Địa chỉ!");
         return;
+      }
     }
 
     if (!method) {
@@ -231,54 +266,51 @@ function setupPaymentHandling(paymentForm, order) {
       return;
     }
 
-    // 2. Lưu dữ liệu vào LocalStorage
+    const noteInput = document.getElementById('customer-note');
+    const noteVal = noteInput ? noteInput.value.trim() : '';
+
+    // Lưu đơn hàng
     const orders = (typeof getOrders === 'function' ? getOrders() : JSON.parse(localStorage.getItem('orders')) || []);
     const index = orders.findIndex(o => (o.orderId === order.orderId || o.id === order.id));
     
     if (index === -1) {
-        alert("Lỗi: Không tìm thấy đơn hàng gốc.");
+        alert("Lỗi: Không tìm thấy đơn hàng.");
         return;
     }
 
     const paidAt = new Date().toISOString();
     
-    // Cập nhật đơn hàng
     orders[index] = {
       ...orders[index],
       paymentMethod: method,
       paymentStatus: pStatusPaid,
       paidAt: paidAt,
       updatedAt: paidAt,
-      status: 'Chờ xác nhận',
-      // LƯU THÔNG TIN GIAO HÀNG
+      status: typeof ORDER_STATUS !== 'undefined' ? ORDER_STATUS.PENDING : 'cho-xac-nhan',
       shippingInfo: {
           email: emailVal,
           phone: phoneVal,
           address: addrVal,
-          note: noteInput ? noteInput.value.trim() : ''
-      },
-      history: [
-        ...(orders[index].history || []),
-        { status: 'payment', timestamp: paidAt, note: `Thanh toán bằng ${method}` }
-      ],
-      inventoryDeducted: orders[index].inventoryDeducted || false
+          note: noteVal
+      }
     };
 
     // Trừ tồn kho
-    if (!orders[index].inventoryDeducted && typeof deductInventoryForOrder === 'function') {
+    if (typeof deductInventoryForOrder === 'function') {
       deductInventoryForOrder(orders[index]);
-      orders[index].inventoryDeducted = true;
     }
 
     if(typeof saveOrders === 'function') saveOrders(orders);
     else localStorage.setItem('orders', JSON.stringify(orders));
 
+    // Xóa giỏ hàng
     localStorage.setItem('cart', JSON.stringify([]));
     if (typeof updateCartCounter === 'function') updateCartCounter();
 
-    // Thông báo thành công (Có hiển thị lại địa chỉ để kiểm chứng)
-    alert(`Thanh toán THÀNH CÔNG!\nĐã lưu địa chỉ giao hàng: ${addrVal}`);
+    // Thông báo thành công
+    alert('✓ Đã đặt hàng thành công!');
     
+    // Hiển thị lại đơn hàng
     renderOrderDetail(orders[index]);
   });
 }
@@ -299,8 +331,13 @@ document.addEventListener('DOMContentLoaded', () => {
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   if (view === 'active') {
-      // Nếu không có đơn hàng, hiển thị thông báo thân thiện
-      if (orders.length === 0) {
+      // Đơn hàng hiện tại (chưa giao)
+      const activeOrders = orders.filter(o => {
+        const pPaid = (typeof PAYMENT_STATUS !== 'undefined') ? PAYMENT_STATUS.PAID : 'paid';
+        return o.paymentStatus === pPaid && o.status !== (typeof ORDER_STATUS !== 'undefined' ? ORDER_STATUS.DELIVERED : 'da-giao');
+      });
+      
+      if (activeOrders.length === 0) {
         const ordersList = document.getElementById('orders-list');
         if (ordersList) {
           ordersList.innerHTML = `
@@ -313,8 +350,11 @@ document.addEventListener('DOMContentLoaded', () => {
           `;
         }
       } else {
-        renderOrdersList(orders, document.getElementById('orders-list'), 'Bạn chưa có đơn hàng nào.');
+        renderOrdersList(activeOrders, document.getElementById('orders-list'), 'Bạn chưa có đơn hàng nào.');
       }
+  } else if (view === 'history') {
+      // Lịch sử đơn hàng (tất cả)
+      renderOrdersList(orders, document.getElementById('orders-list'), 'Bạn chưa có đơn hàng nào.');
   } else if (view === 'detail') {
     const targetId = getQueryParam('id') || getQueryParam('orderId');
     if (!targetId) return;

@@ -75,6 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('cart', JSON.stringify(cart));
     if (typeof updateCartCounter === 'function') updateCartCounter();
     renderCart();
+    alert('✓ Đã cập nhật số lượng thành công!');
   };
 
   window.removeItem = function(productId, size) {
@@ -82,6 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('cart', JSON.stringify(cart));
     if (typeof updateCartCounter === 'function') updateCartCounter();
     renderCart();
+    alert('✓ Đã xóa sản phẩm thành công!');
   };
 
   if (checkoutBtn) {
@@ -97,7 +99,45 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Giỏ hàng đang trống.');
         return;
       }
-      window.location.href = 'order-detail.html';
+      
+      // Tạo đơn hàng mới từ giỏ hàng
+      const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const now = new Date().toISOString();
+      const orderId = typeof generateOrderId === 'function' ? generateOrderId() : `DH${Date.now()}`;
+      
+      const newOrder = {
+        orderId: orderId,
+        userEmail: currentUser.email,
+        customerName: currentUser.name || 'Khách hàng',
+        items: cart.map(item => ({
+          productId: item.id,
+          name: item.name,
+          size: item.size,
+          price: item.price,
+          quantity: item.quantity,
+          image: item.image,
+          subtotal: item.price * item.quantity
+        })),
+        total: totalAmount,
+        status: typeof ORDER_STATUS !== 'undefined' ? ORDER_STATUS.PENDING : 'cho-xac-nhan',
+        paymentStatus: typeof PAYMENT_STATUS !== 'undefined' ? PAYMENT_STATUS.UNPAID : 'unpaid',
+        paymentMethod: 'cod',
+        createdAt: now,
+        updatedAt: now,
+        shippingInfo: {
+          email: currentUser.email || '',
+          phone: currentUser.phone || '',
+          address: currentUser.address || '',
+          note: ''
+        }
+      };
+      
+      let orders = JSON.parse(localStorage.getItem('orders')) || [];
+      orders.push(newOrder);
+      localStorage.setItem('orders', JSON.stringify(orders));
+      
+      // Chuyển đến trang chi tiết đơn hàng
+      window.location.href = `order-detail.html?id=${orderId}`;
     });
   }
 

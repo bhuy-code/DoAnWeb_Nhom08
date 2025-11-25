@@ -189,7 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     addItemToCart(currentProductData, selectedSize, selectedQuantity);
-    alert(`✅ Đã thêm "${currentProductData.name}" (Size: ${selectedSize}, Số lượng: ${selectedQuantity}) vào giỏ hàng!`);
+    alert(`✓ Đã thêm sản phẩm vào giỏ hàng thành công!`);
     closeModal();
   });
 

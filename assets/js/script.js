@@ -316,6 +316,7 @@ function setupAuth() {
       // Admin
       if (email === 'admin@clothify.com' && pass === 'admin123') {
         localStorage.setItem('currentUser', JSON.stringify({ name: 'Admin', email: 'admin@clothify.com' }));
+        alert('✓ Đăng nhập thành công!');
         window.location.href = 'admin.html';
         return;
       }
@@ -330,6 +331,7 @@ function setupAuth() {
         }
         const { password, ...publicUser } = user;
         localStorage.setItem('currentUser', JSON.stringify(publicUser));
+        alert('✓ Đăng nhập thành công!');
         window.location.href = 'index.html';
       } else {
         errorEl.textContent = 'Email hoặc mật khẩu không đúng.';
@@ -337,54 +339,60 @@ function setupAuth() {
     });
   }
 
-  // Đăng ký
+  // Đăng ký - VÔ HIỆU HÓA (chỉ để nền, không hoạt động)
   const registerForm = document.getElementById('register-form');
   if (registerForm) {
     registerForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      const name = document.getElementById('register-name').value.trim();
-      const email = document.getElementById('register-email').value.trim().toLowerCase();
-      const password = document.getElementById('register-password').value.trim();
-      const confirmPassword = document.getElementById('register-confirm-password').value.trim();
-      const phone = document.getElementById('register-phone').value.trim();
-      const address = document.getElementById('register-address').value.trim();
-      const errorEl = document.getElementById('register-error');
-      const successEl = document.getElementById('register-success');
-
-      if (password.length < 6) {
-        errorEl.textContent = 'Mật khẩu phải có ít nhất 6 ký tự.';
-        return;
-      }
-      if (password !== confirmPassword) {
-        errorEl.textContent = 'Mật khẩu nhập lại không khớp.';
-        return;
-      }
-
-      const users = JSON.parse(localStorage.getItem('users')) || [];
-      if (users.some(u => u.email === email)) {
-        errorEl.textContent = 'Email đã tồn tại.';
-        return;
-      }
-
-      const newUser = {
-        id: `CUS${Date.now()}`,
-        name,
-        email,
-        password,
-        phone,
-        address,
-        status: 'active',
-        createdAt: new Date().toISOString()
-      };
-
-      users.push(newUser);
-      localStorage.setItem('users', JSON.stringify(users));
-
-      const { password: _, ...publicUser } = newUser;
-      localStorage.setItem('currentUser', JSON.stringify(publicUser));
-      successEl.textContent = 'Đăng ký thành công! Đang chuyển hướng...';
-      setTimeout(() => window.location.href = 'index.html', 1000);
+      alert('Chức năng đăng ký tạm thời không khả dụng. Vui lòng sử dụng tài khoản mặc định để đăng nhập.');
     });
+  }
+}
+
+// ==========================================================
+// KHỞI TẠO DỮ LIỆU MẶC ĐỊNH
+// ==========================================================
+function initializeDefaultData() {
+  // Khởi tạo tài khoản khách hàng mặc định
+  let users = JSON.parse(localStorage.getItem('users')) || [];
+  const defaultCustomer = users.find(u => u.email === 'khachhang@clothify.com');
+  
+  if (!defaultCustomer) {
+    const newCustomer = {
+      id: 'CUS000',
+      name: 'Khách hàng',
+      email: 'khachhang@clothify.com',
+      password: '123456',
+      phone: '0901234567',
+      address: '123 Đường ABC, Phường 1, Quận 1, TP.HCM',
+      status: 'active',
+      createdAt: new Date().toISOString()
+    };
+    users.push(newCustomer);
+    localStorage.setItem('users', JSON.stringify(users));
+  }
+
+  // Khởi tạo admin user
+  const adminUser = users.find(u => u.email === 'admin@clothify.com');
+  if (!adminUser) {
+    users.push({
+      id: 'ADM001',
+      name: 'Admin',
+      email: 'admin@clothify.com',
+      password: 'admin123',
+      role: 'admin',
+      status: 'active',
+      createdAt: new Date().toISOString()
+    });
+    localStorage.setItem('users', JSON.stringify(users));
+  }
+
+  initializeInventory();
+  initializeProductCatalog();
+  
+  // Khởi tạo dữ liệu mẫu cho admin (nếu chưa có)
+  if (typeof initializeAdminSampleData === 'function') {
+    initializeAdminSampleData();
   }
 }
 
@@ -392,8 +400,7 @@ function setupAuth() {
 // KHỞI TẠO
 // ==========================================================
 document.addEventListener('DOMContentLoaded', () => {
-  initializeInventory();
-  initializeProductCatalog();
+  initializeDefaultData();
   updateCartCounter();
   
   const currentUser = getCurrentUser();

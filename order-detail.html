@@ -96,21 +96,39 @@
           <form id="payment-form">
             <div class="shipping-info" style="margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px solid #eee;">
             <div style="margin-bottom: 15px;">
-              <label for="customer-email" style="display:block; font-weight:600; margin-bottom:5px;">Email người nhận <span style="color:red">*</span></label>
-              <input type="email" id="customer-email" class="input" placeholder="Ví dụ: example@email.com" required 
-                     style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
-            </div>
-
-            <div style="margin-bottom: 15px;">
-              <label for="customer-phone" style="display:block; font-weight:600; margin-bottom:5px;">Số điện thoại người nhận <span style="color:red">*</span></label>
-              <input type="tel" id="customer-phone" class="input" placeholder="Ví dụ: 0901234567" required 
-                     style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
-            </div>
-
-            <div style="margin-bottom: 15px;">
-              <label for="customer-address" style="display:block; font-weight:600; margin-bottom:5px;">Địa chỉ nhận hàng <span style="color:red">*</span></label>
-              <input type="text" id="customer-address" class="input" placeholder="Số nhà, tên đường, phường/xã, quận/huyện..." required 
-                     style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
+              <label style="display:block; font-weight:600; margin-bottom:10px;">Chọn địa chỉ giao hàng</label>
+              <div style="display:flex; gap:10px; margin-bottom:10px;">
+                <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+                  <input type="radio" name="address-source" value="account" id="address-from-account" checked>
+                  <span>Dùng địa chỉ từ tài khoản</span>
+                </label>
+                <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+                  <input type="radio" name="address-source" value="custom" id="address-custom">
+                  <span>Nhập địa chỉ mới</span>
+                </label>
+              </div>
+              <div id="account-address-preview" style="background:#f0f7ff; padding:12px; border-radius:8px; border:1px solid #d6e2ff; margin-bottom:10px;">
+                <p style="margin:5px 0;"><strong>Email:</strong> <span id="preview-email">--</span></p>
+                <p style="margin:5px 0;"><strong>SĐT:</strong> <span id="preview-phone">--</span></p>
+                <p style="margin:5px 0;"><strong>Địa chỉ:</strong> <span id="preview-address">--</span></p>
+              </div>
+              <div id="custom-address-fields" style="display:none;">
+                <div style="margin-bottom: 15px;">
+                  <label for="customer-email" style="display:block; font-weight:600; margin-bottom:5px;">Email người nhận <span style="color:red">*</span></label>
+                  <input type="email" id="customer-email" class="input" placeholder="Ví dụ: example@email.com" 
+                         style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                  <label for="customer-phone" style="display:block; font-weight:600; margin-bottom:5px;">Số điện thoại người nhận <span style="color:red">*</span></label>
+                  <input type="tel" id="customer-phone" class="input" placeholder="Ví dụ: 0901234567" 
+                         style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
+                </div>
+                <div style="margin-bottom: 15px;">
+                  <label for="customer-address" style="display:block; font-weight:600; margin-bottom:5px;">Địa chỉ nhận hàng <span style="color:red">*</span></label>
+                  <input type="text" id="customer-address" class="input" placeholder="Số nhà, tên đường, phường/xã, quận/huyện..." 
+                         style="width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;">
+                </div>
+              </div>
             </div>
 
             <div style="margin-bottom: 15px;">
@@ -121,7 +139,7 @@
           </div>
             <div class="payment-options">
               <label class="payment-option">
-                <input type="radio" name="payment-method" value="cod">
+                <input type="radio" name="payment-method" value="cod" checked>
                 <span>
                   <strong>Thanh toán khi nhận hàng (COD)</strong>
                   <small>Thanh toán trực tiếp cho nhân viên giao hàng.</small>
@@ -132,6 +150,13 @@
                 <span>
                   <strong>Chuyển khoản bằng QR</strong>
                   <small>Quét mã QR để thanh toán online nhanh chóng.</small>
+                </span>
+              </label>
+              <label class="payment-option">
+                <input type="radio" name="payment-method" value="online">
+                <span>
+                  <strong>Thanh toán trực tuyến</strong>
+                  <small>Thanh toán qua cổng thanh toán online.</small>
                 </span>
               </label>
             </div>

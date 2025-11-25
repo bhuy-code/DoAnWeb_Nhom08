@@ -89,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (addressEl) addressEl.textContent = newAddress || 'Chưa cập nhật';
         
         // Hiển thị thông báo thành công
+        alert('✓ Đã cập nhật thông tin thành công!');
         if (updateSuccess) {
           updateSuccess.style.display = 'block';
           setTimeout(() => {
