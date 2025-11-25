@@ -82,9 +82,9 @@ function initializeAdminSampleData() {
   // 2. LOẠI SẢN PHẨM
   if (!localStorage.getItem('productTypes')) {
     const productTypes = [
-      { id: 'PT001', name: 'Áo', description: 'Các loại áo thun, áo sơ mi, áo len', profitMargin: 25 },
-      { id: 'PT002', name: 'Quần', description: 'Các loại quần jean, quần thể thao', profitMargin: 30 },
-      { id: 'PT003', name: 'Áo khoác', description: 'Các loại áo khoác, jacket', profitMargin: 35 }
+      { id: 'PT001', name: 'Áo', description: 'Các loại áo thun, áo sơ mi, áo len, áo polo, áo hoodie', profitMargin: 25 },
+      { id: 'PT002', name: 'Quần', description: 'Các loại quần jean, quần thể thao, quần kaki, quần tây', profitMargin: 30 },
+      { id: 'PT003', name: 'Áo khoác & Phụ kiện', description: 'Các loại áo khoác, jacket, túi xách, ví, thắt lưng', profitMargin: 35 }
     ];
     localStorage.setItem('productTypes', JSON.stringify(productTypes));
   }
@@ -235,7 +235,19 @@ function initializeAdminSampleData() {
         image: 'https://assets.adidas.com/images/w_383,h_383,f_auto,q_auto,fl_lossy,c_fill,g_auto/2a7478515757479d9f10cfb79b24c367_9366/quan-track-pant-dang-rong-cutline.jpg',
         description: 'Năng động và cá tính, trẻ trung và hợp thời đại',
         availableSizes: ['S', 'M', 'L']
-      }
+      },
+      { id: 'SP013', name: 'Áo thun nữ cổ tròn tay ngắn', price: 179000, costPrice: 130000, category: 'nu', typeId: 'PT001', status: 'active', image: 'https://image.uniqlo.com/UQ/ST3/vn/imagesgoods/481408/item/vngoods_69_481408_3x4.jpg?width=369', description: 'Chất liệu cotton mềm mại, thoáng mát, phù hợp mùa hè', availableSizes: ['S', 'M', 'L', 'XL'] },
+      { id: 'SP014', name: 'Áo Polo Nam cổ bẻ', price: 279000, costPrice: 200000, category: 'nam', typeId: 'PT001', status: 'active', image: 'https://product.hstatic.net/1000184601/product/men_vang-sundress__5__a2dca065fd0547209ea90ecf86ff9782_2048x2048.jpg', description: 'Thiết kế thanh lịch, chất liệu pique cao cấp, không nhăn', availableSizes: ['M', 'L', 'XL'] },
+      { id: 'SP015', name: 'Váy liền nữ dáng A', price: 399000, costPrice: 300000, category: 'nu', typeId: 'PT001', status: 'active', image: 'https://product.hstatic.net/1000184601/product/women_nau-nhat__2__47206564af004145addea15a2b71c162_2048x2048.jpg', description: 'Thiết kế nữ tính, dáng A che khuyết điểm, chất vải mềm mại', availableSizes: ['S', 'M', 'L'] },
+      { id: 'SP016', name: 'Quần Kaki Nam ống thẳng', price: 459000, costPrice: 330000, category: 'nam', typeId: 'PT002', status: 'active', image: 'https://api.muji.com.vn/media/catalog/product/cache/4da93324a1c25b12e9566f761e24b9c9/4/5/4547315862849_org.jpg', description: 'Chất liệu kaki bền đẹp, form ống thẳng thanh lịch, dễ phối đồ', availableSizes: ['28', '29', '30', '31', '32'] },
+      { id: 'SP017', name: 'Áo sơ mi nữ cổ đức', price: 379000, costPrice: 280000, category: 'nu', typeId: 'PT001', status: 'active', image: 'https://image.uniqlo.com/UQ/ST3/vn/imagesgoods/481408/item/vngoods_69_481408_3x4.jpg?width=369', description: 'Thiết kế công sở, chất liệu cotton lụa mềm mại, không nhăn', availableSizes: ['S', 'M', 'L'] },
+      { id: 'SP018', name: 'Quần Jogger Nam co giãn', price: 329000, costPrice: 240000, category: 'nam', typeId: 'PT002', status: 'active', image: 'https://content.pancake.vn/1/s2288x2860/88/d3/98/05/f32daa82a82f8cf47c9256f5303cc907852f6f2ad97b0d84cc1e7464-w:2400-h:3000-l:875966-t:image/jpeg.jpeg', description: 'Chất liệu co giãn 4 chiều, form rộng thoải mái, phong cách streetwear', availableSizes: ['M', 'L', 'XL'] },
+      { id: 'SP019', name: 'Quần Legging Nữ thể thao', price: 259000, costPrice: 190000, category: 'nu', typeId: 'PT002', status: 'active', image: 'https://assets.adidas.com/images/w_383,h_383,f_auto,q_auto,fl_lossy,c_fill,g_auto/d798d656cac14a67a1153cd486f26ce1_9366/quan-short-2-trong-1-climacool-own-the-run.jpg', description: 'Chất liệu spandex co giãn, thấm hút mồ hôi, phù hợp tập luyện', availableSizes: ['S', 'M', 'L', 'XL'] },
+      { id: 'SP020', name: 'Áo Hoodie Nam có mũ', price: 429000, costPrice: 320000, category: 'nam', typeId: 'PT001', status: 'active', image: 'https://dosi-in.com/file/detailed/369/dosiin-mlb-mlb-ao-khoac-bomber-waffen-premium-padded-369992369992.jpg?w=320&h=320&fit=fill&fm=webp', description: 'Chất liệu nỉ mềm mại, có mũ trùm đầu, túi kangaroo tiện lợi', availableSizes: ['M', 'L', 'XL'] },
+      { id: 'SP021', name: 'Áo Cardigan Nữ dài tay', price: 449000, costPrice: 330000, category: 'nu', typeId: 'PT001', status: 'active', image: 'https://product.hstatic.net/1000184601/product/women_nau-nhat__2__47206564af004145addea15a2b71c162_2048x2048.jpg', description: 'Thiết kế dáng dài, chất liệu len mềm, phù hợp mùa thu đông', availableSizes: ['S', 'M', 'L'] },
+      { id: 'SP022', name: 'Quần Short Nam thể thao', price: 199000, costPrice: 150000, category: 'nam', typeId: 'PT002', status: 'active', image: 'https://api.muji.com.vn/media/catalog/product/cache/4da93324a1c25b12e9566f761e24b9c9/4/5/4547315946945_org_1.jpg', description: 'Chất liệu thấm hút mồ hôi, form rộng thoải mái, phù hợp vận động', availableSizes: ['M', 'L', 'XL'] },
+      { id: 'SP023', name: 'Chân váy nữ xếp ly', price: 329000, costPrice: 240000, category: 'nu', typeId: 'PT002', status: 'active', image: 'https://image.uniqlo.com/UQ/ST3/vn/imagesgoods/481408/item/vngoods_69_481408_3x4.jpg?width=369', description: 'Thiết kế xếp ly thanh lịch, dài đến gối, dễ phối với áo sơ mi', availableSizes: ['S', 'M', 'L'] },
+      { id: 'SP024', name: 'Áo khoác gió Nam chống nước', price: 549000, costPrice: 400000, category: 'nam', typeId: 'PT003', status: 'active', image: 'https://assets.adidas.com/images/w_383,h_383,f_auto,q_auto,fl_lossy,c_fill,g_auto/2a2e875733534a7390db0ee2815f4e2f_9366/ao-khoac-chan-bong-lai-cong-nghe-cold.rdy-danh-cho-nam.jpg', description: 'Chất liệu chống nước, nhẹ, gọn, phù hợp đi du lịch, dã ngoại', availableSizes: ['M', 'L', 'XL'] }
     ];
     localStorage.setItem('productCatalog', JSON.stringify(catalog));
   }
@@ -254,7 +266,19 @@ function initializeAdminSampleData() {
       { id: 'SP009', name: 'Áo khoác Bomber', stock: 30, warningLevel: 10 },
       { id: 'SP010', name: 'Áo khoác chần bông lai', stock: 45, warningLevel: 10 },
       { id: 'SP011', name: 'Quần thể thao nữ', stock: 85, warningLevel: 20 },
-      { id: 'SP012', name: 'Quần thể thao nam dài', stock: 60, warningLevel: 15 }
+      { id: 'SP012', name: 'Quần thể thao nam dài', stock: 60, warningLevel: 15 },
+      { id: 'SP013', name: 'Áo thun nữ cổ tròn tay ngắn', stock: 95, warningLevel: 20 },
+      { id: 'SP014', name: 'Áo Polo Nam cổ bẻ', stock: 70, warningLevel: 20 },
+      { id: 'SP015', name: 'Váy liền nữ dáng A', stock: 55, warningLevel: 15 },
+      { id: 'SP016', name: 'Quần Kaki Nam ống thẳng', stock: 80, warningLevel: 20 },
+      { id: 'SP017', name: 'Áo sơ mi nữ cổ đức', stock: 65, warningLevel: 15 },
+      { id: 'SP018', name: 'Quần Jogger Nam co giãn', stock: 75, warningLevel: 20 },
+      { id: 'SP019', name: 'Quần Legging Nữ thể thao', stock: 90, warningLevel: 20 },
+      { id: 'SP020', name: 'Áo Hoodie Nam có mũ', stock: 50, warningLevel: 15 },
+      { id: 'SP021', name: 'Áo Cardigan Nữ dài tay', stock: 60, warningLevel: 15 },
+      { id: 'SP022', name: 'Quần Short Nam thể thao', stock: 100, warningLevel: 20 },
+      { id: 'SP023', name: 'Chân váy nữ xếp ly', stock: 45, warningLevel: 10 },
+      { id: 'SP024', name: 'Áo khoác gió Nam chống nước', stock: 40, warningLevel: 10 }
     ];
     localStorage.setItem('masterInventory', JSON.stringify(inventory));
   }
@@ -551,7 +575,19 @@ function initializeAdminSampleData() {
       { id: 'PR009', productId: 'SP009', profitPercent: 35 },
       { id: 'PR010', productId: 'SP010', profitPercent: 35 },
       { id: 'PR011', productId: 'SP011', profitPercent: 30 },
-      { id: 'PR012', productId: 'SP012', profitPercent: 30 }
+      { id: 'PR012', productId: 'SP012', profitPercent: 30 },
+      { id: 'PR013', productId: 'SP013', profitPercent: 25 },
+      { id: 'PR014', productId: 'SP014', profitPercent: 25 },
+      { id: 'PR015', productId: 'SP015', profitPercent: 25 },
+      { id: 'PR016', productId: 'SP016', profitPercent: 30 },
+      { id: 'PR017', productId: 'SP017', profitPercent: 25 },
+      { id: 'PR018', productId: 'SP018', profitPercent: 30 },
+      { id: 'PR019', productId: 'SP019', profitPercent: 30 },
+      { id: 'PR020', productId: 'SP020', profitPercent: 25 },
+      { id: 'PR021', productId: 'SP021', profitPercent: 25 },
+      { id: 'PR022', productId: 'SP022', profitPercent: 30 },
+      { id: 'PR023', productId: 'SP023', profitPercent: 30 },
+      { id: 'PR024', productId: 'SP024', profitPercent: 35 }
     ];
     localStorage.setItem('priceRules', JSON.stringify(priceRules));
   }

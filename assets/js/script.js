@@ -194,7 +194,7 @@ function setupAdvancedSearch() {
 }
 
 // ==========================================================
-// PHÂN TRANG ĐƠN GIẢN
+// PHÂN TRANG - SỬA LẠI ĐỂ HOẠT ĐỘNG ĐÚNG
 // ==========================================================
 function setupPagination() {
   const allCards = document.querySelectorAll('.grid .card');
@@ -202,63 +202,79 @@ function setupPagination() {
   if (!allCards.length || !paginationContainer) return;
 
   let currentPage = 1;
+  let currentCategory = 'tatca';
   const itemsPerPage = window.location.pathname.includes('products.html') ? 8 : 4;
 
+  // Lưu tất cả cards ban đầu
+  const cardsArray = Array.from(allCards);
+
+  function getVisibleCards() {
+    return cardsArray.filter(card => {
+      const cardCategory = card.getAttribute('data-category') || '';
+      if (currentCategory === 'tatca') {
+        return true;
+      }
+      return cardCategory === currentCategory;
+    });
+  }
+
   function updateDisplay() {
-    const visibleCards = Array.from(allCards).filter(card => card.style.display !== 'none');
+    const visibleCards = getVisibleCards();
     const totalPages = Math.ceil(visibleCards.length / itemsPerPage);
     
+    // Ẩn tất cả cards trước
+    cardsArray.forEach(card => card.style.display = 'none');
+    
     if (totalPages <= 1) {
+      // Nếu chỉ có 1 trang hoặc không có trang, hiện tất cả
+      visibleCards.forEach(card => card.style.display = 'flex');
       paginationContainer.innerHTML = '';
       return;
     }
 
+    // Tính toán vị trí bắt đầu và kết thúc
     const start = (currentPage - 1) * itemsPerPage;
     const end = start + itemsPerPage;
 
+    // Hiển thị cards của trang hiện tại
     visibleCards.forEach((card, index) => {
       if (index >= start && index < end) {
         card.style.display = 'flex';
-      } else {
-        card.style.display = 'none';
       }
     });
 
+    // Render nút phân trang
     paginationContainer.innerHTML = '';
     for (let i = 1; i <= totalPages; i++) {
       const btn = document.createElement('button');
       btn.className = 'page-btn' + (i === currentPage ? ' active' : '');
       btn.textContent = i;
-      btn.onclick = () => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
         currentPage = i;
         updateDisplay();
-      };
+        // Scroll lên đầu danh sách
+        const grid = document.querySelector('.grid');
+        if (grid) {
+          grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
       paginationContainer.appendChild(btn);
     }
   }
 
-  // Lọc theo category - SỬA LẠI ĐỂ HOẠT ĐỘNG ĐÚNG
+  // Lọc theo category
   const filterBadges = document.querySelectorAll('.filterbar .badge');
   if (filterBadges.length > 0) {
     filterBadges.forEach(badge => {
       badge.style.cursor = 'pointer';
       badge.addEventListener('click', (e) => {
         e.preventDefault();
-        const category = badge.getAttribute('data-filler') || 'tatca';
+        currentCategory = badge.getAttribute('data-filler') || 'tatca';
         
         // Cập nhật active state
         filterBadges.forEach(b => b.classList.remove('active'));
         badge.classList.add('active');
-
-        // Lọc sản phẩm
-        allCards.forEach(card => {
-          const cardCategory = card.getAttribute('data-category') || '';
-          if (category === 'tatca' || cardCategory === category) {
-            card.style.display = 'flex';
-          } else {
-            card.style.display = 'none';
-          }
-        });
 
         // Reset về trang 1 và cập nhật phân trang
         currentPage = 1;
@@ -267,6 +283,7 @@ function setupPagination() {
     });
   }
 
+  // Khởi tạo hiển thị
   updateDisplay();
 }
 
