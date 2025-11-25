@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let selectedQuantity = 1;
 
   // ===== HÀM MỞ MODAL (Được gọi khi click vào nút Thêm) =====
-  function openSizeModal(button) {
+  window.openSizeModal = function openSizeModal(button) {
       // 🔒 KIỂM TRA ĐĂNG NHẬP
       const currentUser = JSON.parse(localStorage.getItem("currentUser"));
       if (!currentUser) {
@@ -85,35 +85,49 @@ document.addEventListener("DOMContentLoaded", () => {
 
       modalOverlay.classList.add("active");
       
-      // Xử lý nút tăng/giảm số lượng
+      // Xử lý nút tăng/giảm số lượng - SỬA LẠI ĐỂ TRÁNH TRÙNG EVENT LISTENER
       const quantityInput = document.getElementById("modal-quantity-input");
-      if (quantityInput) quantityInput.value = 1;
       const quantityDecrease = document.getElementById("modal-quantity-decrease");
       const quantityIncrease = document.getElementById("modal-quantity-increase");
       
-      if (quantityInput && quantityDecrease && quantityIncrease) {
-        quantityInput.addEventListener("change", () => {
-          let val = parseInt(quantityInput.value) || 1;
+      if (quantityInput) {
+        quantityInput.value = 1;
+        // Xóa event listener cũ nếu có
+        const newInput = quantityInput.cloneNode(true);
+        quantityInput.parentNode.replaceChild(newInput, quantityInput);
+        
+        newInput.addEventListener("change", () => {
+          let val = parseInt(newInput.value) || 1;
           if (val < 1) val = 1;
           if (val > 10) val = 10;
-          quantityInput.value = val;
+          newInput.value = val;
           selectedQuantity = val;
         });
-        
-        quantityDecrease.addEventListener("click", () => {
-          let val = parseInt(quantityInput.value) || 1;
+      }
+      
+      if (quantityDecrease) {
+        const newDecrease = quantityDecrease.cloneNode(true);
+        quantityDecrease.parentNode.replaceChild(newDecrease, quantityDecrease);
+        newDecrease.addEventListener("click", () => {
+          const input = document.getElementById("modal-quantity-input");
+          let val = parseInt(input.value) || 1;
           if (val > 1) {
             val--;
-            quantityInput.value = val;
+            input.value = val;
             selectedQuantity = val;
           }
         });
-        
-        quantityIncrease.addEventListener("click", () => {
-          let val = parseInt(quantityInput.value) || 1;
+      }
+      
+      if (quantityIncrease) {
+        const newIncrease = quantityIncrease.cloneNode(true);
+        quantityIncrease.parentNode.replaceChild(newIncrease, quantityIncrease);
+        newIncrease.addEventListener("click", () => {
+          const input = document.getElementById("modal-quantity-input");
+          let val = parseInt(input.value) || 1;
           if (val < 10) {
             val++;
-            quantityInput.value = val;
+            input.value = val;
             selectedQuantity = val;
           }
         });

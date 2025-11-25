@@ -237,26 +237,35 @@ function setupPagination() {
     }
   }
 
-  // Lọc theo category
-  document.querySelectorAll('.filterbar .badge').forEach(badge => {
-    badge.addEventListener('click', () => {
-      const category = badge.dataset.filler || 'tatca';
-      document.querySelectorAll('.filterbar .badge').forEach(b => b.classList.remove('active'));
-      badge.classList.add('active');
+  // Lọc theo category - SỬA LẠI ĐỂ HOẠT ĐỘNG ĐÚNG
+  const filterBadges = document.querySelectorAll('.filterbar .badge');
+  if (filterBadges.length > 0) {
+    filterBadges.forEach(badge => {
+      badge.style.cursor = 'pointer';
+      badge.addEventListener('click', (e) => {
+        e.preventDefault();
+        const category = badge.getAttribute('data-filler') || 'tatca';
+        
+        // Cập nhật active state
+        filterBadges.forEach(b => b.classList.remove('active'));
+        badge.classList.add('active');
 
-      allCards.forEach(card => {
-        const cardCategory = card.dataset.category || '';
-        if (category === 'tatca' || cardCategory === category) {
-          card.style.display = 'flex';
-        } else {
-          card.style.display = 'none';
-        }
+        // Lọc sản phẩm
+        allCards.forEach(card => {
+          const cardCategory = card.getAttribute('data-category') || '';
+          if (category === 'tatca' || cardCategory === category) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        // Reset về trang 1 và cập nhật phân trang
+        currentPage = 1;
+        updateDisplay();
       });
-
-      currentPage = 1;
-      updateDisplay();
     });
-  });
+  }
 
   updateDisplay();
 }
@@ -270,22 +279,22 @@ function setupBasicSearch() {
   if (!searchInput || !searchBtn) return;
 
   function doSearch() {
-    const keyword = searchInput.value.trim().toLowerCase();
-    const cards = document.querySelectorAll('.grid .card');
-    cards.forEach(card => {
-      const title = card.querySelector('.product-name')?.innerText.toLowerCase() || '';
-      const desc = card.querySelector('.muted')?.innerText.toLowerCase() || '';
-      if (!keyword || title.includes(keyword) || desc.includes(keyword)) {
-        card.style.display = 'flex';
-      } else {
-        card.style.display = 'none';
-      }
-    });
+    const keyword = searchInput.value.trim();
+    if (keyword) {
+      // Chuyển đến trang kết quả tìm kiếm
+      window.location.href = `search-results.html?q=${encodeURIComponent(keyword)}`;
+    } else {
+      // Nếu không có từ khóa, chuyển đến trang sản phẩm
+      window.location.href = 'products.html';
+    }
   }
 
   searchBtn.addEventListener('click', doSearch);
   searchInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') doSearch();
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      doSearch();
+    }
   });
 }
 
@@ -293,14 +302,35 @@ function setupBasicSearch() {
 // ĐĂNG NHẬP / ĐĂNG KÝ
 // ==========================================================
 function setupAuth() {
-  // Tab chuyển đổi
+  // Tab chuyển đổi - SỬA LẠI ĐỂ HOẠT ĐỘNG ĐÚNG
   document.querySelectorAll('.auth-tab').forEach(tab => {
     tab.addEventListener('click', () => {
-      const target = tab.dataset.target;
-      document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.auth-panel').forEach(p => p.classList.remove('active'));
+      const target = tab.getAttribute('data-target');
+      if (!target) return;
+      
+      // Cập nhật tab
+      document.querySelectorAll('.auth-tab').forEach(t => {
+        t.classList.remove('active');
+        t.style.background = '#fff';
+        t.style.borderBottom = '3px solid transparent';
+        t.style.color = '';
+      });
       tab.classList.add('active');
-      document.querySelector(target)?.classList.add('active');
+      if (target === '#register-view') {
+        tab.style.background = '#f0f7ff';
+        tab.style.borderBottom = '3px solid #007bff';
+        tab.style.color = '#007bff';
+      } else {
+        tab.style.background = '#fff';
+        tab.style.borderBottom = '3px solid #007bff';
+      }
+      
+      // Cập nhật panel
+      document.querySelectorAll('.auth-panel').forEach(p => p.classList.remove('active'));
+      const targetPanel = document.querySelector(target);
+      if (targetPanel) {
+        targetPanel.classList.add('active');
+      }
     });
   });
 

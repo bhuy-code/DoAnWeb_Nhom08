@@ -29,14 +29,31 @@
 
 <header class="header">
   <div class="container">
-    <nav class="nav">
-      <a href="index.html" class="brand">Clothify</a>
+    <nav class="nav" aria-label="Primary">
+      <a href="index.html" class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <span>Clothify</span>
+      </a>
       <div>
         <a href="index.html">Trang chủ</a>
         <a href="products.html">Sản phẩm</a>
-        <a href="cart.html" style="position:relative">Giỏ hàng <span id="cart-counter" class="cart-badge"></span></a>
+        <a href="cart.html" style="position: relative;">
+          Giỏ hàng
+          <span id="cart-counter" class="cart-badge"></span>
+        </a>
+        <a href="about.html">Giới thiệu</a>
+        <a href="contact.html">Liên hệ</a>
+      </div>
+      <div class="cta">
+        <a class="btn ghost" href="login.html" aria-label="Đăng nhập">Đăng nhập</a>
+        <a class="btn primary" href="products.html" aria-label="Mua ngay">Mua ngay</a>
       </div>
     </nav>
+  </div>
+  <!-- Thanh tìm kiếm -->
+  <div class="search-bar">
+    <input type="text" id="search-input" placeholder="Tìm kiếm sản phẩm..." />
+    <button id="search-btn">Tìm</button>
   </div>
 </header>
 
@@ -73,8 +90,8 @@
     <button class="modal-confirm-btn" id="modal-confirm-add-btn">Xác nhận thêm</button>
   </div>
 </div>
-<script src="assets/js/database.js"></script>
 <script src="assets/js/script.js"></script>
+<script src="assets/js/products.js"></script>
 
 <script>
   document.addEventListener("DOMContentLoaded", () => {
@@ -82,81 +99,124 @@
     const params = new URLSearchParams(window.location.search);
     const productId = params.get("id");
 
-    // ===========================================================
-    // SỬA LỖI TẠI ĐÂY: Đảm bảo tên biến khớp với database.js
-    // ===========================================================
-    
-    // Cách 1: Thử tìm trong biến 'products' (nếu database.js dùng tên này)
-    let product = (typeof products !== 'undefined') ? products.find(p => p.id === productId) : null;
-
-    // Cách 2: Nếu không thấy, thử tìm trong biến 'allProducts' (phòng hờ database.js dùng tên này)
-    if (!product && typeof allProducts !== 'undefined') {
-      product = allProducts.find(p => p.id === productId);
-    }
+    // Lấy sản phẩm từ localStorage
+    const catalog = JSON.parse(localStorage.getItem('productCatalog')) || [];
+    let product = catalog.find(p => p.id === productId);
 
     const container = document.getElementById("product-detail");
 
     if (product) {
       // Nếu tìm thấy -> Hiển thị
+      const sizes = product.availableSizes || ['S', 'M', 'L', 'XL'];
       container.innerHTML = `
         <div>
-          <img src="${product.image}" alt="${product.name}" class="detail-img">
+          <img src="${product.image || ''}" alt="${product.name}" class="detail-img">
         </div>
         <div class="detail-info">
           <h1>${product.name}</h1>
-          <div class="detail-price">${product.price.toLocaleString()}₫</div>
-          <p class="detail-desc">${product.desc || product.description || "Chưa có mô tả"}</p>
+          <div class="detail-price">${(product.price || 0).toLocaleString('vi-VN')}₫</div>
+          <p class="detail-desc">${product.description || "Chưa có mô tả"}</p>
           
-          <button class="btn primary" id="open-size-modal-btn">
+          <button class="btn primary" 
+                  id="open-size-modal-btn"
+                  data-product-id="${product.id}"
+                  data-available-sizes="${sizes.join(',')}">
             Thêm vào giỏ
           </button>
           <a href="products.html" class="btn ghost">Quay lại</a>
         </div>
       `;
 
-      // --- LOGIC MỞ MODAL (Copy từ products.js sang để chạy độc lập) ---
+      // Gán sự kiện cho nút thêm vào giỏ
       const openBtn = document.getElementById("open-size-modal-btn");
-      if(openBtn) {
-        openBtn.addEventListener("click", () => {
-           // Gọi hàm mở modal bên file products.js (nếu đã load)
-           // Hoặc tự xử lý mở modal tại đây
-           const modal = document.getElementById("size-modal");
-           const modalImg = document.getElementById("modal-product-image");
-           const modalName = document.getElementById("modal-product-name");
-           const modalPrice = document.getElementById("modal-product-price");
-           const sizeContainer = document.getElementById("modal-size-options");
-           const modalConfirmBtn = document.getElementById("modal-confirm-add-btn");
-
-           if(modal) {
-             modalImg.src = product.image;
-             modalName.innerText = product.name;
-             modalPrice.innerText = product.price.toLocaleString() + '₫';
-             
-             // Xử lý size
-             sizeContainer.innerHTML = "";
-             const sizes = product.availableSizes || ["S", "M", "L", "XL"];
-             
-             // Biến toàn cục tạm để products.js xử lý thêm giỏ
-             // (Cần đảm bảo products.js có biến currentProductData ở scope ngoài hoặc gán vào window)
-             // Cách đơn giản nhất: Gán sự kiện click chọn size ngay tại đây
-             
-             // ... (Phần logic Modal giữ nguyên hoặc import từ products.js)
-             
-             // Để đơn giản, ta kích hoạt class active cho modal để nó hiện lên
-             // Logic xử lý click size/thêm giỏ sẽ do products.js đảm nhiệm nếu nó được load
-             modal.classList.add("active");
-             
-             // Cập nhật lại data cho nút xác nhận (để products.js đọc được)
-             // Tuy nhiên, cách tốt nhất là trang chi tiết tự xử lý thêm giỏ
-           }
+      if (openBtn) {
+        openBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          
+          // Kiểm tra đăng nhập
+          const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+          if (!currentUser) {
+            alert("⚠️ Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng!");
+            window.location.href = "login.html";
+            return;
+          }
+          
+          // Mở modal
+          const modal = document.getElementById("size-modal");
+          const modalImg = document.getElementById("modal-product-image");
+          const modalName = document.getElementById("modal-product-name");
+          const modalPrice = document.getElementById("modal-product-price");
+          const sizeContainer = document.getElementById("modal-size-options");
+          const modalConfirmBtn = document.getElementById("modal-confirm-add-btn");
+          
+          if (modal && modalImg && modalName && modalPrice && sizeContainer) {
+            modalImg.src = product.image || '';
+            modalName.innerText = product.name;
+            modalPrice.innerText = (product.price || 0).toLocaleString('vi-VN') + '₫';
+            
+            // Tạo nút size
+            sizeContainer.innerHTML = "";
+            let selectedSize = null;
+            sizes.forEach(size => {
+              const sizeBtn = document.createElement("button");
+              sizeBtn.classList.add("size-option");
+              sizeBtn.innerText = size.trim();
+              sizeBtn.setAttribute("data-size", size.trim());
+              sizeBtn.addEventListener("click", () => {
+                sizeContainer.querySelectorAll(".size-option").forEach(btn => btn.classList.remove("active"));
+                sizeBtn.classList.add("active");
+                selectedSize = size.trim();
+                if (modalConfirmBtn) modalConfirmBtn.disabled = false;
+              });
+              sizeContainer.appendChild(sizeBtn);
+            });
+            
+            if (modalConfirmBtn) {
+              modalConfirmBtn.disabled = true;
+              // Xóa event listener cũ
+              const newBtn = modalConfirmBtn.cloneNode(true);
+              modalConfirmBtn.parentNode.replaceChild(newBtn, modalConfirmBtn);
+              
+              newBtn.addEventListener("click", () => {
+                if (!selectedSize) {
+                  alert("Vui lòng chọn size!");
+                  return;
+                }
+                
+                const quantityInput = document.getElementById("modal-quantity-input");
+                const quantity = parseInt(quantityInput?.value) || 1;
+                
+                // Thêm vào giỏ
+                const cart = JSON.parse(localStorage.getItem('cart')) || [];
+                const existingIndex = cart.findIndex(item => item.id === product.id && item.size === selectedSize);
+                
+                if (existingIndex > -1) {
+                  cart[existingIndex].quantity += quantity;
+                } else {
+                  cart.push({
+                    id: product.id,
+                    name: product.name,
+                    size: selectedSize,
+                    price: product.price,
+                    image: product.image,
+                    quantity: quantity
+                  });
+                }
+                
+                localStorage.setItem('cart', JSON.stringify(cart));
+                if (typeof updateCartCounter === 'function') updateCartCounter();
+                
+                alert('✓ Đã thêm sản phẩm vào giỏ hàng thành công!');
+                modal.classList.remove("active");
+              });
+            }
+            
+            modal.classList.add("active");
+          }
         });
       }
 
     } else {
-      // Nếu vẫn không tìm thấy -> Báo lỗi
-      console.error("Không tìm thấy ID:", productId);
-      console.log("Danh sách products hiện có:", typeof products !== 'undefined' ? products : "Không có biến products");
-      
       container.innerHTML = `
         <div style="text-align:center; padding:40px;">
           <h2>Không tìm thấy sản phẩm!</h2>

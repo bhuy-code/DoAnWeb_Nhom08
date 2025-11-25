@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kết quả tìm kiếm · Clothify</title>
+  <meta name="description" content="Kết quả tìm kiếm sản phẩm tại Clothify">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<header class="header">
+  <div class="container">
+    <nav class="nav" aria-label="Primary">
+      <a href="index.html" class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <span>Clothify</span>
+      </a>
+      <div>
+        <a href="index.html">Trang chủ</a>
+        <a href="products.html">Sản phẩm</a>
+        <a href="cart.html" style="position: relative;">
+          Giỏ hàng
+          <span id="cart-counter" class="cart-badge"></span>
+        </a>
+        <a href="about.html">Giới thiệu</a>
+        <a href="contact.html">Liên hệ</a>
+      </div>
+      <div class="cta">
+        <a class="btn ghost" href="login.html" aria-label="Đăng nhập">Đăng nhập</a>
+        <a class="btn primary" href="products.html" aria-label="Mua ngay">Mua ngay</a>
+      </div>
+    </nav>
+  </div>
+  <!-- Thanh tìm kiếm -->
+  <div class="search-bar">
+    <input type="text" id="search-input" placeholder="Tìm kiếm sản phẩm..." />
+    <button id="search-btn">Tìm</button>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <section class="section">
+      <h2>Kết quả tìm kiếm</h2>
+      <p class="muted" id="search-query-display">Đang tìm kiếm...</p>
+      
+      <div class="filterbar" role="toolbar" aria-label="Bộ lọc sản phẩm">
+        <span class="badge active" data-filler="tatca">Tất cả</span>
+        <span class="badge" data-filler="nam">Nam</span>
+        <span class="badge" data-filler="nu">Nữ</span>
+        <span class="badge" data-filler="phukien">Phụ kiện</span>
+      </div>
+      
+      <div class="grid" id="search-results">
+        <!-- Kết quả tìm kiếm sẽ được hiển thị ở đây -->
+      </div>
+      
+      <div class="pagination" id="pagination"></div>
+    </section>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="grid">
+      <div style="grid-column:span 6;">
+        <a href="index.html" class="brand"><span class="logo"></span><span>Clothify</span></a>
+        <p class="small">Cửa hàng thời trang hiện đại – phong cách, bền vững và hợp túi tiền.</p>
+      </div>
+      <div style="grid-column:span 6;text-align:right;">
+        <div class="small">© 2025 Clothify. All rights reserved.</div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Modal -->
+<div id="size-modal" class="modal-overlay">
+  <div class="modal-content">
+    <button class="modal-close" id="modal-close-btn">&times;</button>
+    <div class="modal-product-info">
+      <img src="" alt="Sản phẩm" id="modal-product-image">
+      <div>
+        <h3 id="modal-product-name">Tên sản phẩm</h3>
+        <span id="modal-product-price">Giá</span>
+      </div>
+    </div>
+    <div class="modal-options">
+      <h4>Chọn size:</h4>
+      <div id="modal-size-options" class="size-options"></div>
+    </div>
+    <div class="modal-options" style="margin-top: 15px;">
+      <h4>Số lượng:</h4>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <button id="modal-quantity-decrease" class="btn" style="width: 40px; height: 40px; padding: 0; font-size: 20px;">-</button>
+        <input type="number" id="modal-quantity-input" value="1" min="1" max="10" style="width: 80px; text-align: center; padding: 8px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px;">
+        <button id="modal-quantity-increase" class="btn" style="width: 40px; height: 40px; padding: 0; font-size: 20px;">+</button>
+      </div>
+    </div>
+    <button class="btn primary modal-confirm-btn" id="modal-confirm-add-btn" disabled>Thêm vào giỏ</button>
+  </div>
+</div>
+
+<script src="assets/js/script.js"></script>
+<script src="assets/js/products.js"></script>
+<script>
+  // Xử lý kết quả tìm kiếm
+  document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const keyword = params.get('q') || '';
+    const category = params.get('category') || 'tatca';
+    
+    const queryDisplay = document.getElementById('search-query-display');
+    if (queryDisplay) {
+      queryDisplay.textContent = keyword ? `Kết quả tìm kiếm cho: "${keyword}"` : 'Tất cả sản phẩm';
+    }
+    
+    // Lấy danh sách sản phẩm từ localStorage hoặc render từ HTML
+    const catalog = JSON.parse(localStorage.getItem('productCatalog')) || [];
+    const resultsContainer = document.getElementById('search-results');
+    
+    if (!resultsContainer) return;
+    
+    // Lọc sản phẩm
+    let filteredProducts = catalog;
+    
+    if (keyword) {
+      const keywordLower = keyword.toLowerCase();
+      filteredProducts = catalog.filter(p => 
+        p.name.toLowerCase().includes(keywordLower)
+      );
+    }
+    
+    if (category && category !== 'tatca') {
+      filteredProducts = filteredProducts.filter(p => p.category === category);
+    }
+    
+    // Render kết quả
+    if (filteredProducts.length === 0) {
+      resultsContainer.innerHTML = `
+        <div style="text-align: center; padding: 60px 20px;">
+          <h3>Không tìm thấy sản phẩm nào</h3>
+          <p class="muted">Vui lòng thử lại với từ khóa khác.</p>
+          <a href="products.html" class="btn primary">Xem tất cả sản phẩm</a>
+        </div>
+      `;
+    } else {
+      // Render sản phẩm từ catalog (cần có dữ liệu đầy đủ)
+      resultsContainer.innerHTML = filteredProducts.map(product => {
+        const sizes = product.availableSizes || ['S', 'M', 'L', 'XL'];
+        return `
+          <article class="card" data-category="${product.category || ''}">
+            <a href="product-detail.html?id=${product.id}">
+              <img class="thumb product-image" src="${product.image || ''}" alt="${product.name}">
+            </a>
+            <div class="body">
+              <a href="product-detail.html?id=${product.id}" style="text-decoration: none; color: inherit;">
+                <div class="title product-name">${product.name}</div>
+              </a>
+              <div class="muted">${product.description || ''}</div>
+              <div class="price product-price" data-price-value="${product.price}">${(product.price || 0).toLocaleString('vi-VN')}₫</div>
+              <div>
+                <button class="btn add-to-cart-btn" 
+                        data-product-id="${product.id}" 
+                        data-available-sizes="${sizes.join(',')}">
+                  Thêm vào giỏ
+                </button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+    
+    // Cập nhật filter badge
+    document.querySelectorAll('.filterbar .badge').forEach(badge => {
+      badge.classList.toggle('active', badge.dataset.filler === category);
+    });
+    
+    // Setup pagination sau khi render
+    setTimeout(() => {
+      if (typeof setupPagination === 'function') {
+        setupPagination();
+      }
+    }, 100);
+  });
+</script>
+
+</body>
+</html>
+

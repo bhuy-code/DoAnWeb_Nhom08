@@ -50,9 +50,9 @@
 <main>
   <div class="container">
     <section class="section auth-section">
-      <div class="auth-tabs">
-        <button class="auth-tab active" data-target="#login-view">Đăng nhập</button>
-        <button class="auth-tab" data-target="#register-view">Đăng ký</button>
+      <div class="auth-tabs" style="display: flex; gap: 10px; margin-bottom: 30px; border-bottom: 2px solid #e5e7eb;">
+        <button class="auth-tab active" data-target="#login-view" style="flex: 1; padding: 15px; font-size: 16px; font-weight: 600; background: #fff; border: none; border-bottom: 3px solid transparent; cursor: pointer; transition: all 0.3s;">Đăng nhập</button>
+        <button class="auth-tab" data-target="#register-view" style="flex: 1; padding: 15px; font-size: 16px; font-weight: 600; background: #f0f7ff; border: none; border-bottom: 3px solid #007bff; cursor: pointer; transition: all 0.3s; color: #007bff;">✨ Đăng ký ngay</button>
       </div>
       <div class="auth-panels">
         <!-- FORM ĐĂNG NHẬP -->
@@ -81,10 +81,10 @@
         </div>
 
         <!-- FORM ĐĂNG KÝ -->
-        <div class="login-container auth-panel" id="register-view">
+        <div class="login-container auth-panel" id="register-view" style="border: 2px solid #007bff; border-radius: 12px; padding: 20px; background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%);">
           <div class="login-form">
-            <h2>Tạo tài khoản mới</h2>
-            <p class="muted">Đăng ký tài khoản để theo dõi đơn hàng và mua sắm nhanh chóng.</p>
+            <h2 style="color: #007bff; margin-bottom: 10px;">✨ Tạo tài khoản mới</h2>
+            <p class="muted" style="font-size: 14px; margin-bottom: 20px;">Đăng ký tài khoản để theo dõi đơn hàng và mua sắm nhanh chóng.</p>
             <form id="register-form" style="margin-top: 20px;">
               <div class="double-columns">
                 <div class="form-group">
