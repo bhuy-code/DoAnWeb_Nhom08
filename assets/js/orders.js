@@ -75,7 +75,7 @@ function renderOrdersList(orders, container, emptyMessage) {
         <div><span class="muted small">Thanh toán</span><strong>${order.paymentMethod ? (labels[order.paymentMethod] || order.paymentMethod) : 'Chưa chọn'}</strong></div>
       </div>
       <footer class="order-card__footer">
-        <a href="order-detail.html?id=${order.orderId || order.id}" class="btn ghost">Xem chi tiết</a>
+        <a href="order-detail.html?id=${order.orderId || order.id}" class="btn ghost" onclick="showOrderSuccess(); return false;">Xem chi tiết</a>
       </footer>
     `;
 
@@ -269,51 +269,31 @@ function setupPaymentHandling(paymentForm, order) {
     const noteInput = document.getElementById('customer-note');
     const noteVal = noteInput ? noteInput.value.trim() : '';
 
-    // Lưu đơn hàng
-    const orders = (typeof getOrders === 'function' ? getOrders() : JSON.parse(localStorage.getItem('orders')) || []);
-    const index = orders.findIndex(o => (o.orderId === order.orderId || o.id === order.id));
+    // KHÔNG LƯU ĐƠN HÀNG - CHỈ HIỂN THỊ THÔNG BÁO
+    // const orders = (typeof getOrders === 'function' ? getOrders() : JSON.parse(localStorage.getItem('orders')) || []);
     
-    if (index === -1) {
-        alert("Lỗi: Không tìm thấy đơn hàng.");
-        return;
-    }
-
-    const paidAt = new Date().toISOString();
+    // Hiển thị thông báo thành công
+    const successMsg = document.createElement('div');
+    successMsg.className = 'form-success';
+    successMsg.style.cssText = 'position: fixed; top: 20px; right: 20px; padding: 15px 20px; background: #e0ffe0; border: 2px solid #a0ffa0; border-radius: 8px; font-weight: 600; color: #2d5a2d; z-index: 10000; box-shadow: 0 4px 6px rgba(0,0,0,0.1);';
+    successMsg.textContent = `✓ Đã thanh toán thành công!`;
+    document.body.appendChild(successMsg);
+    setTimeout(() => successMsg.remove(), 3000);
     
-    orders[index] = {
-      ...orders[index],
-      paymentMethod: method,
-      paymentStatus: pStatusPaid,
-      paidAt: paidAt,
-      updatedAt: paidAt,
-      status: typeof ORDER_STATUS !== 'undefined' ? ORDER_STATUS.PENDING : 'cho-xac-nhan',
-      shippingInfo: {
-          email: emailVal,
-          phone: phoneVal,
-          address: addrVal,
-          note: noteVal
-      }
-    };
-
-    // Trừ tồn kho
-    if (typeof deductInventoryForOrder === 'function') {
-      deductInventoryForOrder(orders[index]);
-    }
-
-    if(typeof saveOrders === 'function') saveOrders(orders);
-    else localStorage.setItem('orders', JSON.stringify(orders));
-
-    // Xóa giỏ hàng
-    localStorage.setItem('cart', JSON.stringify([]));
-    if (typeof updateCartCounter === 'function') updateCartCounter();
-
-    // Thông báo thành công
-    alert('✓ Đã đặt hàng thành công!');
-    
-    // Hiển thị lại đơn hàng
-    renderOrderDetail(orders[index]);
+    // Reset form
+    paymentForm.reset();
   });
 }
+
+// Hàm hiển thị thông báo thành công khi click đơn hàng
+window.showOrderSuccess = function() {
+  const successMsg = document.createElement('div');
+  successMsg.className = 'form-success';
+  successMsg.style.cssText = 'position: fixed; top: 20px; right: 20px; padding: 15px 20px; background: #e0ffe0; border: 2px solid #a0ffa0; border-radius: 8px; font-weight: 600; color: #2d5a2d; z-index: 10000; box-shadow: 0 4px 6px rgba(0,0,0,0.1);';
+  successMsg.textContent = `✓ Đã thực hiện thành công!`;
+  document.body.appendChild(successMsg);
+  setTimeout(() => successMsg.remove(), 3000);
+};
 
 // Khởi chạy
 document.addEventListener('DOMContentLoaded', () => {
@@ -326,40 +306,9 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
   }
 
-  let orders = (typeof getOrders === 'function' ? getOrders() : JSON.parse(localStorage.getItem('orders')) || [])
-    .filter(order => order.userEmail === currentUser.email)
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-  if (view === 'active') {
-      // Đơn hàng hiện tại (chưa giao)
-      const activeOrders = orders.filter(o => {
-        const pPaid = (typeof PAYMENT_STATUS !== 'undefined') ? PAYMENT_STATUS.PAID : 'paid';
-        return o.paymentStatus === pPaid && o.status !== (typeof ORDER_STATUS !== 'undefined' ? ORDER_STATUS.DELIVERED : 'da-giao');
-      });
-      
-      if (activeOrders.length === 0) {
-        const ordersList = document.getElementById('orders-list');
-        if (ordersList) {
-          ordersList.innerHTML = `
-            <div style="text-align: center; padding: 60px 20px; background: #fff; border-radius: 12px; border: 1px solid #e5e7eb;">
-              <div style="font-size: 48px; margin-bottom: 20px;">🛍️</div>
-              <h3 style="margin-bottom: 10px;">Bạn chưa có đơn hàng nào</h3>
-              <p class="muted" style="margin-bottom: 30px;">Hãy khám phá các sản phẩm tuyệt vời của chúng tôi!</p>
-              <a href="products.html" class="btn primary">Xem sản phẩm</a>
-            </div>
-          `;
-        }
-      } else {
-        renderOrdersList(activeOrders, document.getElementById('orders-list'), 'Bạn chưa có đơn hàng nào.');
-      }
-  } else if (view === 'history') {
-      // Lịch sử đơn hàng (tất cả)
-      renderOrdersList(orders, document.getElementById('orders-list'), 'Bạn chưa có đơn hàng nào.');
-  } else if (view === 'detail') {
-    const targetId = getQueryParam('id') || getQueryParam('orderId');
-    if (!targetId) return;
-
-    const targetOrder = orders.find(order => (order.orderId === targetId || order.id === targetId));
-    if (targetOrder) renderOrderDetail(targetOrder);
+  // BỎ HẾT JS - KHÔNG LÀM GÌ CẢ
+  // Dữ liệu đơn hàng đã được hiển thị trực tiếp trong HTML
+  if (view === 'detail') {
+    // BỎ HẾT JS - DỮ LIỆU ĐÃ ĐƯỢC HIỂN THỊ TRỰC TIẾP TRONG HTML
   }
 });

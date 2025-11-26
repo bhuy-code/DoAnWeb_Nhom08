@@ -194,97 +194,11 @@ function setupAdvancedSearch() {
 }
 
 // ==========================================================
-// PHÂN TRANG - SỬA LẠI ĐỂ HOẠT ĐỘNG ĐÚNG
+// PHÂN TRANG - BỎ HẾT JS, CHỈ HIỂN THỊ HTML TĨNH
 // ==========================================================
 function setupPagination() {
-  const allCards = document.querySelectorAll('.grid .card');
-  const paginationContainer = document.getElementById('pagination');
-  if (!allCards.length || !paginationContainer) return;
-
-  let currentPage = 1;
-  let currentCategory = 'tatca';
-  const itemsPerPage = window.location.pathname.includes('products.html') ? 8 : 4;
-
-  // Lưu tất cả cards ban đầu
-  const cardsArray = Array.from(allCards);
-
-  function getVisibleCards() {
-    return cardsArray.filter(card => {
-      const cardCategory = card.getAttribute('data-category') || '';
-      if (currentCategory === 'tatca') {
-        return true;
-      }
-      return cardCategory === currentCategory;
-    });
-  }
-
-  function updateDisplay() {
-    const visibleCards = getVisibleCards();
-    const totalPages = Math.ceil(visibleCards.length / itemsPerPage);
-    
-    // Ẩn tất cả cards trước
-    cardsArray.forEach(card => card.style.display = 'none');
-    
-    if (totalPages <= 1) {
-      // Nếu chỉ có 1 trang hoặc không có trang, hiện tất cả
-      visibleCards.forEach(card => card.style.display = 'flex');
-      paginationContainer.innerHTML = '';
-      return;
-    }
-
-    // Tính toán vị trí bắt đầu và kết thúc
-    const start = (currentPage - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-
-    // Hiển thị cards của trang hiện tại
-    visibleCards.forEach((card, index) => {
-      if (index >= start && index < end) {
-        card.style.display = 'flex';
-      }
-    });
-
-    // Render nút phân trang
-    paginationContainer.innerHTML = '';
-    for (let i = 1; i <= totalPages; i++) {
-      const btn = document.createElement('button');
-      btn.className = 'page-btn' + (i === currentPage ? ' active' : '');
-      btn.textContent = i;
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        currentPage = i;
-        updateDisplay();
-        // Scroll lên đầu danh sách
-        const grid = document.querySelector('.grid');
-        if (grid) {
-          grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
-      paginationContainer.appendChild(btn);
-    }
-  }
-
-  // Lọc theo category
-  const filterBadges = document.querySelectorAll('.filterbar .badge');
-  if (filterBadges.length > 0) {
-    filterBadges.forEach(badge => {
-      badge.style.cursor = 'pointer';
-      badge.addEventListener('click', (e) => {
-        e.preventDefault();
-        currentCategory = badge.getAttribute('data-filler') || 'tatca';
-        
-        // Cập nhật active state
-        filterBadges.forEach(b => b.classList.remove('active'));
-        badge.classList.add('active');
-
-        // Reset về trang 1 và cập nhật phân trang
-        currentPage = 1;
-        updateDisplay();
-      });
-    });
-  }
-
-  // Khởi tạo hiển thị
-  updateDisplay();
+  // BỎ HẾT JS - KHÔNG LÀM GÌ CẢ
+  // Phân trang sẽ được hiển thị trực tiếp trong HTML
 }
 
 // ==========================================================
@@ -446,6 +360,45 @@ function initializeDefaultData() {
 // ==========================================================
 // KHỞI TẠO
 // ==========================================================
+// ==========================================================
+// XỬ LÝ FORM LIÊN HỆ - CHỈ HIỂN THỊ THÔNG BÁO
+// ==========================================================
+function setupContactForm() {
+  const contactForm = document.getElementById('contact-form');
+  if (!contactForm) return;
+  
+  contactForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    
+    const name = document.getElementById('contact-name')?.value.trim();
+    const email = document.getElementById('contact-email')?.value.trim();
+    const title = document.getElementById('contact-title')?.value.trim();
+    const message = document.getElementById('contact-message')?.value.trim();
+    
+    if (!name || !email || !title || !message) {
+      alert('Vui lòng nhập đầy đủ thông tin!');
+      return;
+    }
+    
+    // CHỈ HIỂN THỊ THÔNG BÁO - KHÔNG LƯU DỮ LIỆU
+    const successMsg = document.getElementById('contact-success-msg');
+    if (successMsg) {
+      successMsg.textContent = '✓ Đã gửi liên hệ thành công! Chúng tôi sẽ phản hồi sớm nhất có thể.';
+      successMsg.style.cssText = 'grid-column:span 12; color: #22a06b; font-weight: 700; padding: 12px; background: #e0ffe0; border: 1px solid #a0ffa0; border-radius: 8px; margin-top: 10px;';
+      setTimeout(() => {
+        successMsg.textContent = '';
+        successMsg.style.cssText = '';
+      }, 5000);
+    }
+    
+    // Reset form
+    contactForm.reset();
+  });
+}
+
+// ==========================================================
+// KHỞI TẠO
+// ==========================================================
 document.addEventListener('DOMContentLoaded', () => {
   initializeDefaultData();
   updateCartCounter();
@@ -456,4 +409,5 @@ document.addEventListener('DOMContentLoaded', () => {
   setupAdvancedSearch();
   setupPagination();
   setupAuth();
+  setupContactForm();
 });

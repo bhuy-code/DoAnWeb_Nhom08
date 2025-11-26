@@ -45,12 +45,12 @@
       <div class="order-detail-card" id="order-detail">
         <div class="order-detail-header">
           <div>
-            <h3 id="order-id">Đơn hàng</h3>
-            <p class="muted" id="order-created">--</p>
+            <h3 id="order-id">Đơn hàng #DH1704067200001</h3>
+            <p class="muted" id="order-created">Tạo lúc 15/01/2025, 10:30:00</p>
           </div>
           <div class="order-badges">
-            <span class="badge" id="order-status">--</span>
-            <span class="badge payment-badge" id="order-payment-status">--</span>
+            <span class="badge badge-warning" id="order-status">Chờ xác nhận</span>
+            <span class="badge badge-warning payment-badge" id="order-payment-status">Chưa thanh toán</span>
           </div>
         </div>
 
@@ -61,11 +61,11 @@
           </div>
           <div>
             <span class="muted small">Trạng thái giao hàng</span>
-            <p id="order-shipping-status">--</p>
+            <p id="order-shipping-status">Chờ xác nhận</p>
           </div>
           <div>
             <span class="muted small">Thời gian thanh toán</span>
-            <p id="order-paid-at">--</p>
+            <p id="order-paid-at">Chưa thanh toán</p>
           </div>
         </div>
 
@@ -81,14 +81,38 @@
               </tr>
             </thead>
             <tbody id="order-items">
-              <!-- JS render -->
+              <!-- DỮ LIỆU MẪU HTML TĨNH -->
+              <tr>
+                <td class="order-item-name">
+                  <div class="order-item">
+                    <img src="https://product.hstatic.net/1000184601/product/women_nau-nhat__2__47206564af004145addea15a2b71c162_2048x2048.jpg" alt="Áo thun basic Form Nữ" class="order-item__thumb" onerror="this.src='https://via.placeholder.com/60x60?text=SP';">
+                    <span>Áo thun basic Form Nữ màu cổ điển</span>
+                  </div>
+                </td>
+                <td><span class="badge">M</span></td>
+                <td>2</td>
+                <td>199.000₫</td>
+                <td>398.000₫</td>
+              </tr>
+              <tr>
+                <td class="order-item-name">
+                  <div class="order-item">
+                    <img src="https://product.hstatic.net/1000184601/product/men_vang-sundress__5__a2dca065fd0547209ea90ecf86ff9782_2048x2048.jpg" alt="Áo thun Basic Nam" class="order-item__thumb" onerror="this.src='https://via.placeholder.com/60x60?text=SP';">
+                    <span>Áo thun Basic Nam mẫu Typo</span>
+                  </div>
+                </td>
+                <td><span class="badge">L</span></td>
+                <td>1</td>
+                <td>249.000₫</td>
+                <td>249.000₫</td>
+              </tr>
             </tbody>
           </table>
         </div>
 
         <div class="order-total-row">
           <span>Tổng cộng</span>
-          <strong id="order-total">0₫</strong>
+          <strong id="order-total">647.000₫</strong>
         </div>
 
         <div class="payment-section" id="payment-section">
@@ -108,9 +132,9 @@
                 </label>
               </div>
               <div id="account-address-preview" style="background:#f0f7ff; padding:12px; border-radius:8px; border:1px solid #d6e2ff; margin-bottom:10px;">
-                <p style="margin:5px 0;"><strong>Email:</strong> <span id="preview-email">--</span></p>
-                <p style="margin:5px 0;"><strong>SĐT:</strong> <span id="preview-phone">--</span></p>
-                <p style="margin:5px 0;"><strong>Địa chỉ:</strong> <span id="preview-address">--</span></p>
+                <p style="margin:5px 0;"><strong>Email:</strong> <span id="preview-email">example@email.com</span></p>
+                <p style="margin:5px 0;"><strong>SĐT:</strong> <span id="preview-phone">0901234567</span></p>
+                <p style="margin:5px 0;"><strong>Địa chỉ:</strong> <span id="preview-address">123 Đường ABC, Phường 1, Quận 1, TP.HCM</span></p>
               </div>
               <div id="custom-address-fields" style="display:none;">
                 <div style="margin-bottom: 15px;">
@@ -191,7 +215,60 @@
 </footer>
 
 <script src="assets/js/script.js"></script>
-<script src="assets/js/orders.js"></script>
+<script>
+// BỎ HẾT JS - CHỈ HIỂN THỊ THÔNG BÁO
+document.addEventListener('DOMContentLoaded', () => {
+  const paymentForm = document.getElementById('payment-form');
+  if (paymentForm) {
+    paymentForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      // CHỈ HIỂN THỊ THÔNG BÁO - KHÔNG LƯU ĐƠN HÀNG
+      const successMsg = document.createElement('div');
+      successMsg.className = 'form-success';
+      successMsg.style.cssText = 'position: fixed; top: 20px; right: 20px; padding: 15px 20px; background: #e0ffe0; border: 2px solid #a0ffa0; border-radius: 8px; font-weight: 600; color: #2d5a2d; z-index: 10000; box-shadow: 0 4px 6px rgba(0,0,0,0.1);';
+      successMsg.textContent = `✓ Đã thanh toán thành công!`;
+      document.body.appendChild(successMsg);
+      setTimeout(() => successMsg.remove(), 3000);
+      
+      // Reset form
+      paymentForm.reset();
+    });
+  }
+  
+  // Xử lý chuyển đổi địa chỉ
+  const addressFromAccount = document.getElementById('address-from-account');
+  const addressCustom = document.getElementById('address-custom');
+  const customAddressFields = document.getElementById('custom-address-fields');
+  const accountAddressPreview = document.getElementById('account-address-preview');
+  
+  if (addressFromAccount && addressCustom && customAddressFields && accountAddressPreview) {
+    addressFromAccount.addEventListener('change', () => {
+      if (addressFromAccount.checked) {
+        customAddressFields.style.display = 'none';
+        accountAddressPreview.style.display = 'block';
+      }
+    });
+    addressCustom.addEventListener('change', () => {
+      if (addressCustom.checked) {
+        customAddressFields.style.display = 'block';
+        accountAddressPreview.style.display = 'none';
+      }
+    });
+  }
+  
+  // Xử lý QR preview
+  const qrPreview = document.getElementById('qr-preview');
+  const paymentMethods = document.querySelectorAll('input[name="payment-method"]');
+  paymentMethods.forEach(radio => {
+    radio.addEventListener('change', () => {
+      if (qrPreview) {
+        qrPreview.hidden = (radio.value !== 'qr');
+      }
+    });
+  });
+});
+</script>
 </body>
 </html>
 

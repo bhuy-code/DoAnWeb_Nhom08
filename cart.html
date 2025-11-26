@@ -50,16 +50,64 @@
           </tr>
         </thead>
         <tbody id="cart-items">
-          <!-- JS sẽ render giỏ hàng vào đây -->
+          <!-- 2 SẢN PHẨM MẪU -->
+          <tr>
+            <td>
+              <div style="display:flex; gap:10px; align-items:center;">
+                <img src="https://product.hstatic.net/1000184601/product/women_nau-nhat__2__47206564af004145addea15a2b71c162_2048x2048.jpg" alt="Áo thun basic Form Nữ" style="width:60px; height:60px; object-fit:cover; border-radius:4px;">
+                <div>
+                  <div style="font-weight:600;">Áo thun basic Form Nữ màu cổ điển</div>
+                  <div class="muted small">Mã: SP001</div>
+                </div>
+              </div>
+            </td>
+            <td>199.000₫</td>
+            <td><span class="badge">M</span></td>
+            <td>
+              <div style="display:flex; gap:5px; align-items:center;">
+                <button class="btn" style="width:30px; height:30px; padding:0;">-</button>
+                <input type="number" value="2" min="1" max="10" style="width:50px; text-align:center; padding:5px; border:1px solid #ddd; border-radius:4px;" readonly>
+                <button class="btn" style="width:30px; height:30px; padding:0;">+</button>
+              </div>
+            </td>
+            <td>398.000₫</td>
+            <td>
+              <button class="btn ghost small">Xóa</button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div style="display:flex; gap:10px; align-items:center;">
+                <img src="https://product.hstatic.net/1000184601/product/men_vang-sundress__5__a2dca065fd0547209ea90ecf86ff9782_2048x2048.jpg" alt="Áo thun Basic Nam" style="width:60px; height:60px; object-fit:cover; border-radius:4px;">
+                <div>
+                  <div style="font-weight:600;">Áo thun Basic Nam mẫu Typo</div>
+                  <div class="muted small">Mã: SP002</div>
+                </div>
+              </div>
+            </td>
+            <td>249.000₫</td>
+            <td><span class="badge">L</span></td>
+            <td>
+              <div style="display:flex; gap:5px; align-items:center;">
+                <button class="btn" style="width:30px; height:30px; padding:0;">-</button>
+                <input type="number" value="1" min="1" max="10" style="width:50px; text-align:center; padding:5px; border:1px solid #ddd; border-radius:4px;" readonly>
+                <button class="btn" style="width:30px; height:30px; padding:0;">+</button>
+              </div>
+            </td>
+            <td>249.000₫</td>
+            <td>
+              <button class="btn ghost small">Xóa</button>
+            </td>
+          </tr>
         </tbody>
       </table>
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:20px">
         <a class="btn" href="products.html">Tiếp tục mua sắm</a>
         <div style="text-align:right;">
           <div style="margin-bottom:10px;">
-            <strong>Tổng cộng: <span id="cart-total">0₫</span></strong>
+            <strong>Tổng cộng: <span id="cart-total">647.000₫</span></strong>
           </div>
-          <a class="btn success" href="#" id="checkout-btn">Thanh toán</a>
+          <a class="btn success" href="order-detail.html" id="checkout-btn">Thanh toán</a>
         </div>
       </div>
     </section>
@@ -80,8 +128,7 @@
   </div>
 </footer>
 
-<script src="assets/js/script.js"></script>
-<script src="assets/js/cart.js"></script>
+<!-- BỎ HẾT JS - CHỈ GIỮ HTML TĨNH -->
 
 </body>
 </html>
