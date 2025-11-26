@@ -285,6 +285,126 @@ function viewOrderDetail(orderId) {
   showSuccessMessage('Đã xem chi tiết đơn hàng thành công!');
 }
 
+// Hàm mở modal chỉnh sửa
+function openEditModal(type, id) {
+  const modal = document.getElementById('edit-modal');
+  const modalTitle = document.getElementById('edit-modal-title');
+  const modalFields = document.getElementById('edit-modal-fields');
+  const modalForm = document.getElementById('edit-modal-form');
+  
+  if (!modal || !modalTitle || !modalFields || !modalForm) return;
+  
+  // Lấy dữ liệu hiện tại
+  let currentData = null;
+  let formHTML = '';
+  
+  if (type === 'edit-type') {
+    const types = getData('productTypes');
+    currentData = types.find(t => t.id === id);
+    modalTitle.textContent = 'Chỉnh sửa loại sản phẩm';
+    formHTML = `
+      <div class="form-group">
+        <label for="edit-type-id">Mã loại</label>
+        <input type="text" id="edit-type-id" class="input" value="${currentData?.id || ''}" required readonly>
+      </div>
+      <div class="form-group">
+        <label for="edit-type-name">Tên loại sản phẩm</label>
+        <input type="text" id="edit-type-name" class="input" value="${currentData?.name || ''}" required>
+      </div>
+      <div class="form-group">
+        <label for="edit-type-margin">Tỷ lệ lợi nhuận (%)</label>
+        <input type="number" id="edit-type-margin" class="input" value="${currentData?.profitMargin || 0}" min="0" required>
+      </div>
+      <div class="form-group">
+        <label for="edit-type-description">Mô tả</label>
+        <textarea id="edit-type-description" class="input" rows="3">${currentData?.description || ''}</textarea>
+      </div>
+    `;
+  } else if (type === 'edit-product') {
+    const products = getData('productCatalog');
+    currentData = products.find(p => p.id === id);
+    modalTitle.textContent = 'Chỉnh sửa sản phẩm';
+    formHTML = `
+      <div class="form-group">
+        <label for="edit-product-id">Mã sản phẩm</label>
+        <input type="text" id="edit-product-id" class="input" value="${currentData?.id || ''}" required readonly>
+      </div>
+      <div class="form-group">
+        <label for="edit-product-name">Tên sản phẩm</label>
+        <input type="text" id="edit-product-name" class="input" value="${currentData?.name || ''}" required>
+      </div>
+      <div class="form-group">
+        <label for="edit-product-type">Loại sản phẩm</label>
+        <input type="text" id="edit-product-type" class="input" value="${currentData?.typeId || ''}" required>
+      </div>
+      <div class="form-group">
+        <label for="edit-product-price">Giá bán (₫)</label>
+        <input type="number" id="edit-product-price" class="input" value="${currentData?.price || 0}" min="0" required>
+      </div>
+      <div class="form-group">
+        <label for="edit-product-cost">Giá vốn (₫)</label>
+        <input type="number" id="edit-product-cost" class="input" value="${currentData?.costPrice || 0}" min="0" required>
+      </div>
+      <div class="form-group">
+        <label for="edit-product-image">Hình ảnh (URL)</label>
+        <input type="url" id="edit-product-image" class="input" value="${currentData?.image || ''}">
+      </div>
+      <div class="form-group">
+        <label for="edit-product-description">Mô tả</label>
+        <textarea id="edit-product-description" class="input" rows="3">${currentData?.description || ''}</textarea>
+      </div>
+    `;
+  } else if (type === 'edit-purchase') {
+    const orders = getData('purchaseOrders');
+    currentData = orders.find(o => o.id === id);
+    modalTitle.textContent = 'Chỉnh sửa phiếu nhập';
+    formHTML = `
+      <div class="form-group">
+        <label for="edit-purchase-id">Mã phiếu nhập</label>
+        <input type="text" id="edit-purchase-id" class="input" value="${currentData?.id || ''}" required readonly>
+      </div>
+      <div class="form-group">
+        <label for="edit-purchase-date">Ngày nhập</label>
+        <input type="date" id="edit-purchase-date" class="input" value="${currentData?.date ? new Date(currentData.date).toISOString().split('T')[0] : ''}" required>
+      </div>
+      <div class="form-group">
+        <label for="edit-purchase-supplier">Nhà cung cấp</label>
+        <input type="text" id="edit-purchase-supplier" class="input" value="${currentData?.supplier || ''}">
+      </div>
+      <div class="form-group">
+        <label for="edit-purchase-total">Tổng chi phí (₫)</label>
+        <input type="number" id="edit-purchase-total" class="input" value="${currentData?.totalCost || 0}" min="0" required>
+      </div>
+      <div class="form-group">
+        <label for="edit-purchase-status">Trạng thái</label>
+        <select id="edit-purchase-status" class="input">
+          <option value="draft" ${currentData?.status === 'draft' ? 'selected' : ''}>Đang xử lý</option>
+          <option value="completed" ${currentData?.status === 'completed' ? 'selected' : ''}>Đã hoàn thành</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="edit-purchase-notes">Ghi chú</label>
+        <textarea id="edit-purchase-notes" class="input" rows="3">${currentData?.notes || ''}</textarea>
+      </div>
+    `;
+  }
+  
+  modalFields.innerHTML = formHTML;
+  modal.style.display = 'flex';
+  
+  // Lưu thông tin loại và ID vào form để dùng khi submit
+  modalForm.dataset.editType = type;
+  modalForm.dataset.editId = id;
+}
+
+// Hàm đóng modal chỉnh sửa
+function closeEditModal() {
+  const modal = document.getElementById('edit-modal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
 // Event Listeners - CHỈ HIỂN THỊ THÔNG BÁO
 document.addEventListener('DOMContentLoaded', () => {
   const adminUser = requireAdmin();
@@ -368,7 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   
-  // ===== LOẠI SẢN PHẨM - CHỈ HIỂN THỊ THÔNG BÁO =====
+  // ===== LOẠI SẢN PHẨM - MỞ MODAL KHI SỬA =====
   const typesTable = document.getElementById('product-types-table');
   if (typesTable) {
     typesTable.addEventListener('click', (e) => {
@@ -377,7 +497,8 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const action = btn.dataset.action;
       if (action === 'edit-type') {
-        showSuccessMessage('Đã mở form chỉnh sửa loại sản phẩm!');
+        const id = btn.dataset.id;
+        openEditModal('edit-type', id);
       } else if (action === 'delete-type') {
         showSuccessMessage('Đã thực hiện xóa loại sản phẩm thành công!');
       }
@@ -392,7 +513,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   
-  // ===== SẢN PHẨM - CHỈ HIỂN THỊ THÔNG BÁO =====
+  // ===== SẢN PHẨM - MỞ MODAL KHI SỬA =====
   const productsTable = document.getElementById('products-table');
   if (productsTable) {
     productsTable.addEventListener('click', (e) => {
@@ -401,7 +522,8 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const action = btn.dataset.action;
       if (action === 'edit-product') {
-        showSuccessMessage('Đã mở form chỉnh sửa sản phẩm!');
+        const id = btn.dataset.id;
+        openEditModal('edit-product', id);
       } else if (action === 'toggle-product') {
         showSuccessMessage('Đã thực hiện thay đổi trạng thái sản phẩm thành công!');
       }
@@ -416,7 +538,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   
-  // ===== PHIẾU NHẬP - CHỈ HIỂN THỊ THÔNG BÁO =====
+  // ===== PHIẾU NHẬP - MỞ MODAL KHI SỬA =====
   const purchaseTable = document.getElementById('purchase-orders-table');
   if (purchaseTable) {
     purchaseTable.addEventListener('click', (e) => {
@@ -425,7 +547,8 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const action = btn.dataset.action;
       if (action === 'edit-purchase') {
-        showSuccessMessage('Đã mở form chỉnh sửa phiếu nhập!');
+        const id = btn.dataset.id;
+        openEditModal('edit-purchase', id);
       } else if (action === 'complete-purchase') {
         showSuccessMessage('Đã thực hiện hoàn thành phiếu nhập thành công!');
       } else if (action === 'delete-purchase') {
@@ -521,6 +644,37 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // ===== PHẢN HỒI - KHÔNG CÓ JS =====
   // Không có event listeners cho phản hồi
+  
+  // ===== MODAL CHỈNH SỬA - XỬ LÝ FORM SUBMIT =====
+  const editModalForm = document.getElementById('edit-modal-form');
+  if (editModalForm) {
+    editModalForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      // KHÔNG LƯU DỮ LIỆU, CHỈ HIỂN THỊ THÔNG BÁO
+      showSuccessMessage('Đã thực hiện sửa thành công!');
+      closeEditModal();
+    });
+  }
+  
+  // Đóng modal khi click nút đóng hoặc nút hủy
+  const editModalClose = document.getElementById('edit-modal-close');
+  const editModalCancel = document.getElementById('edit-modal-cancel');
+  if (editModalClose) {
+    editModalClose.addEventListener('click', closeEditModal);
+  }
+  if (editModalCancel) {
+    editModalCancel.addEventListener('click', closeEditModal);
+  }
+  
+  // Đóng modal khi click ra ngoài
+  const editModal = document.getElementById('edit-modal');
+  if (editModal) {
+    editModal.addEventListener('click', (e) => {
+      if (e.target === editModal) {
+        closeEditModal();
+      }
+    });
+  }
   
   // Đóng modal
   const modal = document.getElementById('order-detail-modal');
