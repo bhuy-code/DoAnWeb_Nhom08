@@ -33,10 +33,12 @@
       </div>
     </nav>
   </div>
-  <!-- Thanh tìm kiếm (đã có trong file gốc) -->
-  <div class="search-bar">
-    <input type="text" id="search-input" placeholder="Tìm kiếm sản phẩm..." />
-    <button id="search-btn">Tìm</button>
+  <!-- Thanh tìm kiếm -->
+  <div class="search-bar" style="background: #f8f8f8; padding: 15px 0; border-bottom: 1px solid #e0e0e0;">
+    <div class="container" style="display: flex; gap: 10px; max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+      <input type="text" id="search-input" placeholder="Tìm kiếm sản phẩm..." style="flex: 1; padding: 12px 16px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; outline: none; transition: border-color 0.2s;" />
+      <button id="search-btn" style="padding: 12px 24px; background: #333; color: #fff; border: none; border-radius: 4px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s;">Tìm</button>
+    </div>
   </div>
 </header>
 
@@ -265,8 +267,20 @@
       </div>
     </article>
 
-  </div><div class="pagination" id="pagination">
- </div>
+  </div>
+  <div class="pagination" id="pagination">
+    <!-- PHÂN TRANG HTML TĨNH 1-10 -->
+    <button class="page-btn active">1</button>
+    <button class="page-btn">2</button>
+    <button class="page-btn">3</button>
+    <button class="page-btn">4</button>
+    <button class="page-btn">5</button>
+    <button class="page-btn">6</button>
+    <button class="page-btn">7</button>
+    <button class="page-btn">8</button>
+    <button class="page-btn">9</button>
+    <button class="page-btn">10</button>
+  </div>
 </section>
 
   </div>

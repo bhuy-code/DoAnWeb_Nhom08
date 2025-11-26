@@ -205,15 +205,21 @@ document.addEventListener("DOMContentLoaded", () => {
     // KHÔNG THÊM VÀO CART - CHỈ HIỂN THỊ THÔNG BÁO
     // addItemToCart(currentProductData, selectedSize, selectedQuantity);
     
-    // Hiển thị thông báo thành công
-    const successMsg = document.createElement('div');
-    successMsg.className = 'form-success';
-    successMsg.style.cssText = 'position: fixed; top: 20px; right: 20px; padding: 15px 20px; background: #e0ffe0; border: 2px solid #a0ffa0; border-radius: 8px; font-weight: 600; color: #2d5a2d; z-index: 10000; box-shadow: 0 4px 6px rgba(0,0,0,0.1);';
-    successMsg.textContent = `✓ Đã thêm sản phẩm vào giỏ hàng thành công!`;
-    document.body.appendChild(successMsg);
-    setTimeout(() => successMsg.remove(), 3000);
-    
+    // Đóng modal trước
     closeModal();
+    
+    // Hiển thị thông báo thành công BẰNG ALERT để đảm bảo người dùng thấy
+    setTimeout(() => {
+      alert('✓ Đã thêm sản phẩm vào giỏ hàng thành công!');
+      
+      // Ngoài ra cũng hiển thị thông báo trên màn hình
+      const successMsg = document.createElement('div');
+      successMsg.className = 'form-success';
+      successMsg.style.cssText = 'position: fixed; top: 20px; right: 20px; padding: 15px 20px; background: #e0ffe0; border: 2px solid #a0ffa0; border-radius: 8px; font-weight: 600; color: #2d5a2d; z-index: 10000; box-shadow: 0 4px 6px rgba(0,0,0,0.1);';
+      successMsg.textContent = `✓ Đã thêm sản phẩm vào giỏ hàng thành công!`;
+      document.body.appendChild(successMsg);
+      setTimeout(() => successMsg.remove(), 3000);
+    }, 300);
   });
 
   function closeModal() {

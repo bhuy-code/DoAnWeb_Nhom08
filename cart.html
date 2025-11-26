@@ -72,7 +72,7 @@
             </td>
             <td>398.000₫</td>
             <td>
-              <button class="btn ghost small">Xóa</button>
+              <button class="btn ghost small" onclick="alert('✓ Đã xóa sản phẩm thành công!'); return false;">Xóa</button>
             </td>
           </tr>
           <tr>
@@ -96,7 +96,79 @@
             </td>
             <td>249.000₫</td>
             <td>
-              <button class="btn ghost small">Xóa</button>
+              <button class="btn ghost small" onclick="alert('✓ Đã xóa sản phẩm thành công!'); return false;">Xóa</button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div style="display:flex; gap:10px; align-items:center;">
+                <img src="https://im.uniqlo.com/global-cms/spa/res9d7c31ab934101f35172e2a6d1ae6c3dfr.jpg" alt="Áo Sweaeter nỉ" style="width:60px; height:60px; object-fit:cover; border-radius:4px;" onerror="this.src='https://via.placeholder.com/60x60?text=SP';">
+                <div>
+                  <div style="font-weight:600;">Áo Sweaeter nỉ</div>
+                  <div class="muted small">Mã: SP003</div>
+                </div>
+              </div>
+            </td>
+            <td>299.000₫</td>
+            <td><span class="badge">M</span></td>
+            <td>
+              <div style="display:flex; gap:5px; align-items:center;">
+                <button class="btn" style="width:30px; height:30px; padding:0;">-</button>
+                <input type="number" value="1" min="1" max="10" style="width:50px; text-align:center; padding:5px; border:1px solid #ddd; border-radius:4px;" readonly>
+                <button class="btn" style="width:30px; height:30px; padding:0;">+</button>
+              </div>
+            </td>
+            <td>299.000₫</td>
+            <td>
+              <button class="btn ghost small" onclick="alert('✓ Đã xóa sản phẩm thành công!'); return false;">Xóa</button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div style="display:flex; gap:10px; align-items:center;">
+                <img src="https://image.uniqlo.com/UQ/ST3/vn/imagesgoods/481408/item/vngoods_69_481408_3x4.jpg?width=369" alt="Áo len nữ" style="width:60px; height:60px; object-fit:cover; border-radius:4px;" onerror="this.src='https://via.placeholder.com/60x60?text=SP';">
+                <div>
+                  <div style="font-weight:600;">Áo len nữ</div>
+                  <div class="muted small">Mã: SP004</div>
+                </div>
+              </div>
+            </td>
+            <td>349.000₫</td>
+            <td><span class="badge">S</span></td>
+            <td>
+              <div style="display:flex; gap:5px; align-items:center;">
+                <button class="btn" style="width:30px; height:30px; padding:0;">-</button>
+                <input type="number" value="1" min="1" max="10" style="width:50px; text-align:center; padding:5px; border:1px solid #ddd; border-radius:4px;" readonly>
+                <button class="btn" style="width:30px; height:30px; padding:0;">+</button>
+              </div>
+            </td>
+            <td>349.000₫</td>
+            <td>
+              <button class="btn ghost small" onclick="alert('✓ Đã xóa sản phẩm thành công!'); return false;">Xóa</button>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div style="display:flex; gap:10px; align-items:center;">
+                <img src="https://api.muji.com.vn/media/catalog/product/cache/4da93324a1c25b12e9566f761e24b9c9/4/5/4547315862849_org.jpg" alt="Áo sơ mi Nam" style="width:60px; height:60px; object-fit:cover; border-radius:4px;" onerror="this.src='https://via.placeholder.com/60x60?text=SP';">
+                <div>
+                  <div style="font-weight:600;">Áo sơ mi Nam vải Broadcloth</div>
+                  <div class="muted small">Mã: SP005</div>
+                </div>
+              </div>
+            </td>
+            <td>399.000₫</td>
+            <td><span class="badge">L</span></td>
+            <td>
+              <div style="display:flex; gap:5px; align-items:center;">
+                <button class="btn" style="width:30px; height:30px; padding:0;">-</button>
+                <input type="number" value="1" min="1" max="10" style="width:50px; text-align:center; padding:5px; border:1px solid #ddd; border-radius:4px;" readonly>
+                <button class="btn" style="width:30px; height:30px; padding:0;">+</button>
+              </div>
+            </td>
+            <td>399.000₫</td>
+            <td>
+              <button class="btn ghost small" onclick="alert('✓ Đã xóa sản phẩm thành công!'); return false;">Xóa</button>
             </td>
           </tr>
         </tbody>
@@ -105,9 +177,9 @@
         <a class="btn" href="products.html">Tiếp tục mua sắm</a>
         <div style="text-align:right;">
           <div style="margin-bottom:10px;">
-            <strong>Tổng cộng: <span id="cart-total">647.000₫</span></strong>
+            <strong>Tổng cộng: <span id="cart-total">1.295.000₫</span></strong>
           </div>
-          <a class="btn success" href="order-detail.html" id="checkout-btn">Thanh toán</a>
+          <a class="btn success" href="order-detail.html" id="checkout-btn" onclick="alert('✓ Đã chuyển đến trang thanh toán thành công!'); return true;">Thanh toán</a>
         </div>
       </div>
     </section>
@@ -128,7 +200,8 @@
   </div>
 </footer>
 
-<!-- BỎ HẾT JS - CHỈ GIỮ HTML TĨNH -->
+<!-- Script để hiển thị thông tin người dùng và cập nhật giỏ hàng -->
+<script src="assets/js/script.js"></script>
 
 </body>
 </html>

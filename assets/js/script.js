@@ -143,7 +143,7 @@ function setupAccountDropdown(currentUser) {
 }
 
 // ==========================================================
-// TÌM KIẾM NÂNG CAO
+// TÌM KIẾM NÂNG CAO - BỎ HẾT JS, CHỈ LINK ĐẾN TRANG KẾT QUẢ
 // ==========================================================
 function setupAdvancedSearch() {
   const form = document.getElementById('advanced-search-form');
@@ -151,44 +151,28 @@ function setupAdvancedSearch() {
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    const keyword = form.querySelector('input[name="keyword"]')?.value.trim().toLowerCase() || '';
+    const keyword = form.querySelector('input[name="keyword"]')?.value.trim() || '';
     const category = form.querySelector('select[name="category"]')?.value || 'tatca';
-    const minPrice = parseInt(form.querySelector('input[name="priceMin"]')?.value) || 0;
-    const maxPrice = parseInt(form.querySelector('input[name="priceMax"]')?.value) || 999999999;
-
-    const cards = document.querySelectorAll('.grid .card');
-    cards.forEach(card => {
-      const cardCategory = card.dataset.category || '';
-      const title = card.querySelector('.product-name')?.innerText.toLowerCase() || '';
-      const priceValue = parseInt(card.querySelector('.product-price')?.getAttribute('data-price-value') || '0');
-
-      const matchKeyword = !keyword || title.includes(keyword);
-      const matchCategory = category === '' || category === 'tatca' || cardCategory === category;
-      const matchPrice = priceValue >= minPrice && priceValue <= maxPrice;
-
-      if (matchKeyword && matchCategory && matchPrice) {
-        card.style.display = 'flex';
-      } else {
-        card.style.display = 'none';
-      }
-    });
-
-    // Cập nhật filter badge
-    document.querySelectorAll('.filterbar .badge').forEach(badge => {
-      badge.classList.toggle('active', badge.dataset.filler === (category || 'tatca'));
-    });
+    const minPrice = form.querySelector('input[name="priceMin"]')?.value || '';
+    const maxPrice = form.querySelector('input[name="priceMax"]')?.value || '';
+    
+    // Tạo URL với query params và chuyển đến trang kết quả
+    let url = 'search-results.html?';
+    if (keyword) url += `q=${encodeURIComponent(keyword)}&`;
+    if (category && category !== '') url += `category=${encodeURIComponent(category)}&`;
+    if (minPrice) url += `priceMin=${encodeURIComponent(minPrice)}&`;
+    if (maxPrice) url += `priceMax=${encodeURIComponent(maxPrice)}&`;
+    
+    // Xóa dấu & cuối cùng nếu có
+    url = url.replace(/&$/, '');
+    window.location.href = url;
   });
 
-  // Nút reset
+  // Nút reset - chỉ reset form
   const resetBtn = document.getElementById('reset-advanced-search');
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
       form.reset();
-      const cards = document.querySelectorAll('.grid .card');
-      cards.forEach(card => card.style.display = 'flex');
-      document.querySelectorAll('.filterbar .badge').forEach(badge => {
-        badge.classList.toggle('active', badge.dataset.filler === 'tatca');
-      });
     });
   }
 }

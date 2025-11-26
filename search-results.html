@@ -6,6 +6,81 @@
   <title>Kết quả tìm kiếm · Clothify</title>
   <meta name="description" content="Kết quả tìm kiếm sản phẩm tại Clothify">
   <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    /* Style cho phân trang đẹp như Uniqlo */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 40px;
+      padding: 20px 0;
+    }
+    .page-btn {
+      min-width: 40px;
+      height: 40px;
+      padding: 0 12px;
+      border: 1px solid #ddd;
+      background: #fff;
+      color: #333;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .page-btn:hover {
+      border-color: #333;
+      background: #f5f5f5;
+    }
+    .page-btn.active {
+      background: #333;
+      color: #fff;
+      border-color: #333;
+      font-weight: 600;
+    }
+    /* Style cho thanh tìm kiếm đẹp hơn */
+    .search-bar {
+      background: #f8f8f8;
+      padding: 15px 0;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .search-bar .container {
+      display: flex;
+      gap: 10px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    .search-bar input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-bar input:focus {
+      border-color: #333;
+    }
+    .search-bar button {
+      padding: 12px 24px;
+      background: #333;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .search-bar button:hover {
+      background: #555;
+    }
+  </style>
 </head>
 <body>
 
@@ -34,8 +109,10 @@
   </div>
   <!-- Thanh tìm kiếm -->
   <div class="search-bar">
-    <input type="text" id="search-input" placeholder="Tìm kiếm sản phẩm..." />
-    <button id="search-btn">Tìm</button>
+    <div class="container">
+      <input type="text" id="search-input" placeholder="Tìm kiếm sản phẩm..." />
+      <button id="search-btn">Tìm</button>
+    </div>
   </div>
 </header>
 
@@ -43,20 +120,319 @@
   <div class="container">
     <section class="section">
       <h2>Kết quả tìm kiếm</h2>
-      <p class="muted" id="search-query-display">Đang tìm kiếm...</p>
+      <p class="muted">Kết quả tìm kiếm cho: "áo thun"</p>
       
       <div class="filterbar" role="toolbar" aria-label="Bộ lọc sản phẩm">
-        <span class="badge active" data-filler="tatca">Tất cả</span>
-        <span class="badge" data-filler="nam">Nam</span>
-        <span class="badge" data-filler="nu">Nữ</span>
-        <span class="badge" data-filler="phukien">Phụ kiện</span>
+        <a href="search-results.html?category=tatca" class="badge active" data-filler="tatca" style="text-decoration:none; color:inherit;">Tất cả</a>
+        <a href="search-results.html?category=nam" class="badge" data-filler="nam" style="text-decoration:none; color:inherit;">Nam</a>
+        <a href="search-results.html?category=nu" class="badge" data-filler="nu" style="text-decoration:none; color:inherit;">Nữ</a>
+        <a href="search-results.html?category=phukien" class="badge" data-filler="phukien" style="text-decoration:none; color:inherit;">Phụ kiện</a>
       </div>
       
       <div class="grid" id="search-results">
-        <!-- Kết quả tìm kiếm sẽ được hiển thị ở đây -->
+        <!-- TẤT CẢ 16 SẢN PHẨM -->
+        <article class="card" data-category="nu">
+          <a href="product-detail.html?id=SP001">
+            <img class="thumb product-image" src="https://product.hstatic.net/1000184601/product/women_nau-nhat__2__47206564af004145addea15a2b71c162_2048x2048.jpg" alt="Áo thun basic" onerror="this.src='https://via.placeholder.com/300x400?text=Áo+thun+nữ';">
+          </a>
+          <div class="body">
+            <a href="product-detail.html?id=SP001" style="text-decoration: none; color: inherit;">
+              <div class="title product-name">Áo thun basic Form Nữ màu cổ điển</div>
+            </a>
+            <div class="muted">100% làm từ vải cotton, nữ tính và nhẹ nhàng</div>
+            <div class="price product-price" data-price-value="199000">199.000₫</div>
+            <div>
+              <button class="btn add-to-cart-btn" data-product-id="SP001" data-available-sizes="S,M,L,XL">
+                Thêm vào giỏ
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" data-category="nam">
+          <a href="product-detail.html?id=SP002">
+            <img class="thumb product-image" src="https://product.hstatic.net/1000184601/product/men_vang-sundress__5__a2dca065fd0547209ea90ecf86ff9782_2048x2048.jpg" alt="Áo thun Basic Nam" onerror="this.src='https://via.placeholder.com/300x400?text=Áo+thun+nam';">
+          </a>
+          <div class="body">
+            <a href="product-detail.html?id=SP002" style="text-decoration: none; color: inherit;">
+              <div class="title product-name">Áo thun Basic Nam mẫu Typo</div>
+            </a>
+            <div class="muted">Áo làm từ vải cotton, mang lại cảm giác mềm mại và đầy năng động</div>
+            <div class="price product-price" data-price-value="249000">249.000₫</div>
+            <div>
+              <button class="btn add-to-cart-btn" data-product-id="SP002" data-available-sizes="M,L,XL">
+                Thêm vào giỏ
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" data-category="nam">
+          <a href="product-detail.html?id=SP003">
+            <img class="thumb product-image" src="https://im.uniqlo.com/global-cms/spa/res9d7c31ab934101f35172e2a6d1ae6c3dfr.jpg" alt="Áo Sweaeter nỉ" onerror="this.src='https://via.placeholder.com/300x400?text=Áo+sweater';">
+          </a>
+          <div class="body">
+            <a href="product-detail.html?id=SP003" style="text-decoration: none; color: inherit;">
+              <div class="title product-name">Áo Sweaeter nỉ</div>
+            </a>
+            <div class="muted">Chất vải cao cấp với kết cấu mịn hai mặt, mang lại cảm giác êm ái</div>
+            <div class="price product-price" data-price-value="299000">299.000₫</div>
+            <div>
+              <button class="btn add-to-cart-btn" data-product-id="SP003" data-available-sizes="S,M,L">
+                Thêm vào giỏ
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" data-category="nu">
+          <a href="product-detail.html?id=SP004">
+            <img class="thumb product-image" src="https://image.uniqlo.com/UQ/ST3/vn/imagesgoods/481408/item/vngoods_69_481408_3x4.jpg?width=369" alt="Áo len nữ" onerror="this.src='https://via.placeholder.com/300x400?text=Áo+len';">
+          </a>
+          <div class="body">
+            <a href="product-detail.html?id=SP004" style="text-decoration: none; color: inherit;">
+              <div class="title product-name">Áo len nữ</div>
+            </a>
+            <div class="muted">Cảm giác trơn mịn được làm hoàn toàn từ chất len Merino siêu mịn</div>
+            <div class="price product-price" data-price-value="349000">349.000₫</div>
+            <div>
+              <button class="btn add-to-cart-btn" data-product-id="SP004" data-available-sizes="S,M">
+                Thêm vào giỏ
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" data-category="nam">
+          <a href="product-detail.html?id=SP005">
+            <img class="thumb product-image" src="https://api.muji.com.vn/media/catalog/product/cache/4da93324a1c25b12e9566f761e24b9c9/4/5/4547315862849_org.jpg" alt="Áo sơ mi Nam" onerror="this.src='https://via.placeholder.com/300x400?text=Áo+sơ+mi';">
+          </a>
+          <div class="body">
+            <a href="product-detail.html?id=SP005" style="text-decoration: none; color: inherit;">
+              <div class="title product-name">Áo sơ mi Nam vải Broadcloth</div>
+            </a>
+            <div class="muted">Được giặt trước để tạo nên bề mặt mềm mại. Bông được nuôi trồng</div>
+            <div class="price product-price" data-price-value="399000">399.000₫</div>
+            <div>
+              <button class="btn add-to-cart-btn" data-product-id="SP005" data-available-sizes="S,M,L,XL">
+                Thêm vào giỏ
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" data-category="nam">
+          <a href="product-detail.html?id=SP006">
+            <img class="thumb product-image" src="https://content.pancake.vn/1/s2288x2860/88/d3/98/05/f32daa82a82f8cf47c9256f5303cc907852f6f2ad97b0d84cc1e7464-w:2400-h:3000-l:875966-t:image/jpeg.jpeg" alt="Jeans Baggy" onerror="this.src='https://via.placeholder.com/300x400?text=Jeans';">
+          </a>
+          <div class="body">
+            <a href="product-detail.html?id=SP006" style="text-decoration: none; color: inherit;">
+              <div class="title product-name">Jeans Baggy</div>
+            </a>
+            <div class="muted">Chất liệu Raw denim (100% cotton) cùng form baggy loose fit</div>
+            <div class="price product-price" data-price-value="449000">449.000₫</div>
+            <div>
+              <button class="btn add-to-cart-btn" data-product-id="SP006" data-available-sizes="28,29,30,31,32">
+                Thêm vào giỏ
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" data-category="nam">
+          <a href="product-detail.html?id=SP007">
+            <img class="thumb product-image" src="https://api.muji.com.vn/media/catalog/product/cache/4da93324a1c25b12e9566f761e24b9c9/4/5/4547315946945_org_1.jpg" alt="Áo Sơ Mi" onerror="this.src='https://via.placeholder.com/300x400?text=Áo+sơ+mi';">
+          </a>
+          <div class="body">
+            <a href="product-detail.html?id=SP007" style="text-decoration: none; color: inherit;">
+              <div class="title product-name">Áo Sơ Mi Cổ Thường Tay Ngắn Vải Cool Touch</div>
+            </a>
+            <div class="muted">Sản phẩm sử dụng chất liệu tạo cảm giác mát mẻ</div>
+            <div class="price product-price" data-price-value="499000">499.000₫</div>
+            <div>
+              <button class="btn add-to-cart-btn" data-product-id="SP007" data-available-sizes="M,L,XL">
+                Thêm vào giỏ
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" data-category="nam">
+          <a href="product-detail.html?id=SP008">
+            <img class="thumb product-image" src="https://content.pancake.vn/1/s700x875/23/77/e2/f4/5fa6d0958119c7d9a0e7243849ae0c54876ee93d5339d1d6ed0b491d-w:2400-h:3000-l:897588-t:image/jpeg.jpeg" alt="Jeans Baggy Short" onerror="this.src='https://via.placeholder.com/300x400?text=Jeans';">
+          </a>
+          <div class="body">
+            <a href="product-detail.html?id=SP008" style="text-decoration: none; color: inherit;">
+              <div class="title product-name">Jeans Baggy Short</div>
+            </a>
+            <div class="muted">Một thiết kế năng động dành cho các khách hàng trẻ trung và đầy cá tính</div>
+            <div class="price product-price" data-price-value="549000">549.000₫</div>
+            <div>
+              <button class="btn add-to-cart-btn" data-product-id="SP008" data-available-sizes="28,29,30,31">
+                Thêm vào giỏ
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" data-category="nam">
+          <a href="product-detail.html?id=SP009">
+            <img class="thumb product-image" src="https://dosi-in.com/file/detailed/369/dosiin-mlb-mlb-ao-khoac-bomber-waffen-premium-padded-369992369992.jpg?w=320&h=320&fit=fill&fm=webp" alt="Áo khoác Bomber" onerror="this.src='https://via.placeholder.com/300x400?text=Áo+khoác';">
+          </a>
+          <div class="body">
+            <a href="product-detail.html?id=SP009" style="text-decoration: none; color: inherit;">
+              <div class="title product-name">Áo khoác Bomber</div>
+            </a>
+            <div class="muted">Chất liệu Da Simili giả da cá sấu, mạnh mẽ và trẻ trung</div>
+            <div class="price product-price" data-price-value="599000">599.000₫</div>
+            <div>
+              <button class="btn add-to-cart-btn" data-product-id="SP009" data-available-sizes="M,L">
+                Thêm vào giỏ
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" data-category="nam">
+          <a href="product-detail.html?id=SP010">
+            <img class="thumb product-image" src="https://assets.adidas.com/images/w_383,h_383,f_auto,q_auto,fl_lossy,c_fill,g_auto/2a2e875733534a7390db0ee2815f4e2f_9366/ao-khoac-chan-bong-lai-cong-nghe-cold.rdy-danh-cho-nam.jpg" alt="Áo khoác chần bông" onerror="this.src='https://via.placeholder.com/300x400?text=Áo+khoác';">
+          </a>
+          <div class="body">
+            <a href="product-detail.html?id=SP010" style="text-decoration: none; color: inherit;">
+              <div class="title product-name">Áo khoác chần bông lai công nghệ Cold.Dry (Nam)</div>
+            </a>
+            <div class="muted">Áo khoác chất bông giúp giữ ấm, chống tia UV, thanh lịch và nam tính</div>
+            <div class="price product-price" data-price-value="649000">649.000₫</div>
+            <div>
+              <button class="btn add-to-cart-btn" data-product-id="SP010" data-available-sizes="M,L,XL">
+                Thêm vào giỏ
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" data-category="nu">
+          <a href="product-detail.html?id=SP011">
+            <img class="thumb product-image" src="https://assets.adidas.com/images/w_383,h_383,f_auto,q_auto,fl_lossy,c_fill,g_auto/d798d656cac14a67a1153cd486f26ce1_9366/quan-short-2-trong-1-climacool-own-the-run.jpg" alt="Quần thể thao nữ" onerror="this.src='https://via.placeholder.com/300x400?text=Quần';">
+          </a>
+          <div class="body">
+            <a href="product-detail.html?id=SP011" style="text-decoration: none; color: inherit;">
+              <div class="title product-name">Quần thể thao nữ</div>
+            </a>
+            <div class="muted">Quần short 2 trong 1 thông thoáng và thoải mái, rất thích hợp cho một buổi tập luyện</div>
+            <div class="price product-price" data-price-value="699000">699.000₫</div>
+            <div>
+              <button class="btn add-to-cart-btn" data-product-id="SP011" data-available-sizes="S,M,L,XL">
+                Thêm vào giỏ
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" data-category="nam">
+          <a href="product-detail.html?id=SP012">
+            <img class="thumb product-image" src="https://assets.adidas.com/images/w_383,h_383,f_auto,q_auto,fl_lossy,c_fill,g_auto/2a7478515757479d9f10cfb79b24c367_9366/quan-track-pant-dang-rong-cutline.jpg" alt="Quần thể thao nam" onerror="this.src='https://via.placeholder.com/300x400?text=Quần';">
+          </a>
+          <div class="body">
+            <a href="product-detail.html?id=SP012" style="text-decoration: none; color: inherit;">
+              <div class="title product-name">Quần thể thao nam dài</div>
+            </a>
+            <div class="muted">Năng động và cá tính, trẻ trung và hợp thời đại</div>
+            <div class="price product-price" data-price-value="749000">749.000₫</div>
+            <div>
+              <button class="btn add-to-cart-btn" data-product-id="SP012" data-available-sizes="S,M,L">
+                Thêm vào giỏ
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" data-category="nu">
+          <a href="product-detail.html?id=SP013">
+            <img class="thumb product-image" src="https://image.uniqlo.com/UQ/ST3/vn/imagesgoods/481408/item/vngoods_69_481408_3x4.jpg?width=369" alt="Áo thun nữ cổ tròn" onerror="this.src='https://via.placeholder.com/300x400?text=Áo+thun';">
+          </a>
+          <div class="body">
+            <a href="product-detail.html?id=SP013" style="text-decoration: none; color: inherit;">
+              <div class="title product-name">Áo thun nữ cổ tròn tay ngắn</div>
+            </a>
+            <div class="muted">Chất liệu cotton mềm mại, thoáng mát, phù hợp mùa hè</div>
+            <div class="price product-price" data-price-value="179000">179.000₫</div>
+            <div>
+              <button class="btn add-to-cart-btn" data-product-id="SP013" data-available-sizes="S,M,L,XL">
+                Thêm vào giỏ
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" data-category="nam">
+          <a href="product-detail.html?id=SP014">
+            <img class="thumb product-image" src="https://product.hstatic.net/1000184601/product/men_vang-sundress__5__a2dca065fd0547209ea90ecf86ff9782_2048x2048.jpg" alt="Áo polo nam" onerror="this.src='https://via.placeholder.com/300x400?text=Áo+polo';">
+          </a>
+          <div class="body">
+            <a href="product-detail.html?id=SP014" style="text-decoration: none; color: inherit;">
+              <div class="title product-name">Áo Polo Nam cổ bẻ</div>
+            </a>
+            <div class="muted">Thiết kế thanh lịch, chất liệu pique cao cấp, không nhăn</div>
+            <div class="price product-price" data-price-value="279000">279.000₫</div>
+            <div>
+              <button class="btn add-to-cart-btn" data-product-id="SP014" data-available-sizes="M,L,XL">
+                Thêm vào giỏ
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" data-category="nu">
+          <a href="product-detail.html?id=SP015">
+            <img class="thumb product-image" src="https://product.hstatic.net/1000184601/product/women_nau-nhat__2__47206564af004145addea15a2b71c162_2048x2048.jpg" alt="Váy liền nữ" onerror="this.src='https://via.placeholder.com/300x400?text=Váy';">
+          </a>
+          <div class="body">
+            <a href="product-detail.html?id=SP015" style="text-decoration: none; color: inherit;">
+              <div class="title product-name">Váy liền nữ dáng A</div>
+            </a>
+            <div class="muted">Thiết kế nữ tính, dáng A che khuyết điểm, chất vải mềm mại</div>
+            <div class="price product-price" data-price-value="399000">399.000₫</div>
+            <div>
+              <button class="btn add-to-cart-btn" data-product-id="SP015" data-available-sizes="S,M,L">
+                Thêm vào giỏ
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" data-category="nam">
+          <a href="product-detail.html?id=SP016">
+            <img class="thumb product-image" src="https://api.muji.com.vn/media/catalog/product/cache/4da93324a1c25b12e9566f761e24b9c9/4/5/4547315862849_org.jpg" alt="Quần Kaki nam" onerror="this.src='https://via.placeholder.com/300x400?text=Quần';">
+          </a>
+          <div class="body">
+            <a href="product-detail.html?id=SP016" style="text-decoration: none; color: inherit;">
+              <div class="title product-name">Quần Kaki Nam ống thẳng</div>
+            </a>
+            <div class="muted">Chất liệu kaki bền đẹp, form ống thẳng thanh lịch, dễ phối đồ</div>
+            <div class="price product-price" data-price-value="459000">459.000₫</div>
+            <div>
+              <button class="btn add-to-cart-btn" data-product-id="SP016" data-available-sizes="28,29,30,31,32">
+                Thêm vào giỏ
+              </button>
+            </div>
+          </div>
+        </article>
       </div>
       
-      <div class="pagination" id="pagination"></div>
+      <div class="pagination" id="pagination">
+        <!-- PHÂN TRANG HTML TĨNH 1-10 -->
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">4</button>
+        <button class="page-btn">5</button>
+        <button class="page-btn">6</button>
+        <button class="page-btn">7</button>
+        <button class="page-btn">8</button>
+        <button class="page-btn">9</button>
+        <button class="page-btn">10</button>
+      </div>
     </section>
   </div>
 </main>
@@ -104,89 +480,6 @@
 
 <script src="assets/js/script.js"></script>
 <script src="assets/js/products.js"></script>
-<script>
-  // Xử lý kết quả tìm kiếm
-  document.addEventListener('DOMContentLoaded', () => {
-    const params = new URLSearchParams(window.location.search);
-    const keyword = params.get('q') || '';
-    const category = params.get('category') || 'tatca';
-    
-    const queryDisplay = document.getElementById('search-query-display');
-    if (queryDisplay) {
-      queryDisplay.textContent = keyword ? `Kết quả tìm kiếm cho: "${keyword}"` : 'Tất cả sản phẩm';
-    }
-    
-    // Lấy danh sách sản phẩm từ localStorage hoặc render từ HTML
-    const catalog = JSON.parse(localStorage.getItem('productCatalog')) || [];
-    const resultsContainer = document.getElementById('search-results');
-    
-    if (!resultsContainer) return;
-    
-    // Lọc sản phẩm
-    let filteredProducts = catalog;
-    
-    if (keyword) {
-      const keywordLower = keyword.toLowerCase();
-      filteredProducts = catalog.filter(p => 
-        p.name.toLowerCase().includes(keywordLower)
-      );
-    }
-    
-    if (category && category !== 'tatca') {
-      filteredProducts = filteredProducts.filter(p => p.category === category);
-    }
-    
-    // Render kết quả
-    if (filteredProducts.length === 0) {
-      resultsContainer.innerHTML = `
-        <div style="text-align: center; padding: 60px 20px;">
-          <h3>Không tìm thấy sản phẩm nào</h3>
-          <p class="muted">Vui lòng thử lại với từ khóa khác.</p>
-          <a href="products.html" class="btn primary">Xem tất cả sản phẩm</a>
-        </div>
-      `;
-    } else {
-      // Render sản phẩm từ catalog (cần có dữ liệu đầy đủ)
-      resultsContainer.innerHTML = filteredProducts.map(product => {
-        const sizes = product.availableSizes || ['S', 'M', 'L', 'XL'];
-        return `
-          <article class="card" data-category="${product.category || ''}">
-            <a href="product-detail.html?id=${product.id}">
-              <img class="thumb product-image" src="${product.image || ''}" alt="${product.name}">
-            </a>
-            <div class="body">
-              <a href="product-detail.html?id=${product.id}" style="text-decoration: none; color: inherit;">
-                <div class="title product-name">${product.name}</div>
-              </a>
-              <div class="muted">${product.description || ''}</div>
-              <div class="price product-price" data-price-value="${product.price}">${(product.price || 0).toLocaleString('vi-VN')}₫</div>
-              <div>
-                <button class="btn add-to-cart-btn" 
-                        data-product-id="${product.id}" 
-                        data-available-sizes="${sizes.join(',')}">
-                  Thêm vào giỏ
-                </button>
-              </div>
-            </div>
-          </article>
-        `;
-      }).join('');
-    }
-    
-    // Cập nhật filter badge
-    document.querySelectorAll('.filterbar .badge').forEach(badge => {
-      badge.classList.toggle('active', badge.dataset.filler === category);
-    });
-    
-    // Setup pagination sau khi render
-    setTimeout(() => {
-      if (typeof setupPagination === 'function') {
-        setupPagination();
-      }
-    }, 100);
-  });
-</script>
 
 </body>
 </html>
-

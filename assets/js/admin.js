@@ -4,19 +4,16 @@
 
 // Hàm hiển thị thông báo thành công
 function showSuccessMessage(message) {
+  // LUÔN HIỂN THỊ THÔNG BÁO BẰNG ALERT ĐỂ ĐẢM BẢO NGƯỜI DÙNG THẤY
+  alert(`✓ ${message}`);
+  
+  // Ngoài ra, cũng tạo thông báo trên màn hình
   const msgEl = document.createElement('div');
   msgEl.className = 'form-success';
-  msgEl.style.cssText = 'margin-top: 15px; padding: 12px; background: #e0ffe0; border: 1px solid #a0ffa0; border-radius: 8px; text-align: center; font-weight: 600; color: #2d5a2d;';
+  msgEl.style.cssText = 'position: fixed; top: 20px; right: 20px; padding: 15px 20px; background: #e0ffe0; border: 2px solid #a0ffa0; border-radius: 8px; font-weight: 600; color: #2d5a2d; z-index: 10000; box-shadow: 0 4px 6px rgba(0,0,0,0.1);';
   msgEl.textContent = `✓ ${message}`;
-  
-  // Tìm form gần nhất để chèn thông báo
-  const form = document.querySelector('form');
-  if (form) {
-    form.appendChild(msgEl);
-    setTimeout(() => msgEl.remove(), 3000);
-  } else {
-    alert(`✓ ${message}`);
-  }
+  document.body.appendChild(msgEl);
+  setTimeout(() => msgEl.remove(), 3000);
 }
 
 // Kiểm tra quyền admin
@@ -284,54 +281,8 @@ function renderFeedback() {
 
 // Xem chi tiết đơn hàng (giữ nguyên)
 function viewOrderDetail(orderId) {
-  const orders = getData('orders');
-  const order = orders.find(o => (o.orderId === orderId || o.id === orderId));
-  if (!order) return;
-  
-  const modal = document.getElementById('order-detail-modal');
-  if (!modal) return;
-  
-  document.getElementById('modal-order-id').textContent = `#${order.orderId || order.id}`;
-  document.getElementById('modal-customer-name').textContent = order.customerName || order.userEmail || 'Khách';
-  const shipInfo = order.shippingInfo || {};
-  document.getElementById('modal-customer-email').textContent = shipInfo.email || order.userEmail || '---';
-  document.getElementById('modal-customer-phone').textContent = shipInfo.phone || '---';
-  document.getElementById('modal-customer-address').textContent = shipInfo.address || '---';
-  document.getElementById('modal-customer-note').textContent = shipInfo.note || 'Không có ghi chú';
-  
-  const modalPaymentStatus = document.getElementById('modal-payment-status');
-  if (modalPaymentStatus) {
-    if (order.paymentStatus === 'paid') {
-      modalPaymentStatus.textContent = 'Đã thanh toán';
-      modalPaymentStatus.className = 'badge badge-success';
-    } else {
-      modalPaymentStatus.textContent = 'Chưa thanh toán';
-      modalPaymentStatus.className = 'badge badge-warning';
-    }
-  }
-  
-  const modalItems = document.getElementById('modal-order-items');
-  if (!order.items || order.items.length === 0) {
-    modalItems.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;" class="muted">Không có sản phẩm trong đơn hàng này.</td></tr>';
-  } else {
-    modalItems.innerHTML = order.items.map(item => {
-      const price = (item.price || 0).toLocaleString('vi-VN');
-      const subtotal = ((item.price || 0) * (item.quantity || 0)).toLocaleString('vi-VN');
-      return `
-        <tr>
-          <td style="width: 50px;"><img src="${item.image || ''}" style="width:40px; height:40px; object-fit:cover; border-radius:4px;" onerror="this.style.display='none'"></td>
-          <td><div style="font-weight:600;">${item.name}</div>${item.size ? `<div class="small muted">Size: ${item.size}</div>` : ''}</td>
-          <td style="text-align:center;">x${item.quantity || 0}</td>
-          <td style="text-align:right;">${price}₫</td>
-          <td style="text-align:right; font-weight:700; color:#d32f2f;">${subtotal}₫</td>
-        </tr>
-      `;
-    }).join('');
-    const total = (order.total || 0).toLocaleString('vi-VN');
-    modalItems.innerHTML += `<tr style="border-top:2px solid #eee;"><td colspan="4" style="text-align:right; padding:12px; font-weight:700;">Tổng cộng:</td><td style="text-align:right; padding:12px; font-weight:700; color:#d32f2f; font-size:1.1em;">${total}₫</td></tr>`;
-  }
-  
-  modal.classList.add('active');
+  // CHỈ HIỂN THỊ THÔNG BÁO, KHÔNG MỞ MODAL
+  showSuccessMessage('Đã xem chi tiết đơn hàng thành công!');
 }
 
 // Event Listeners - CHỈ HIỂN THỊ THÔNG BÁO
@@ -353,7 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
   
-  // Tab switching
+  // Tab switching - KHÔNG HIỂN THỊ THÔNG BÁO (chỉ chuyển tab)
   const tabs = document.querySelectorAll('.admin-tab');
   const panels = document.querySelectorAll('.admin-panel');
   tabs.forEach(tab => {
@@ -362,6 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
       tabs.forEach(t => t.classList.remove('active'));
       panels.forEach(p => p.classList.toggle('active', p.id === target));
       tab.classList.add('active');
+      // BỎ THÔNG BÁO KHI CHUYỂN TAB
     });
   });
   
@@ -378,6 +330,28 @@ document.addEventListener('DOMContentLoaded', () => {
   renderFeedback();
   
   // ===== KHÁCH HÀNG - CHỈ HIỂN THỊ THÔNG BÁO =====
+  // Sử dụng event delegation trên document để bắt tất cả các nút
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-action]');
+    if (!btn) return;
+    
+    const action = btn.dataset.action;
+    const table = btn.closest('table');
+    if (!table) return;
+    
+    // Kiểm tra xem nút có thuộc bảng khách hàng không
+    if (table.id === 'customers-table' || table.querySelector('#customers-table')) {
+      if (action === 'reset-password') {
+        e.preventDefault();
+        showSuccessMessage('Đã thực hiện reset mật khẩu thành công!');
+      } else if (action === 'toggle-status') {
+        e.preventDefault();
+        showSuccessMessage('Đã thực hiện thay đổi trạng thái khách hàng thành công!');
+      }
+    }
+  });
+  
+  // Giữ lại event listener cũ để đảm bảo tương thích
   const customersTable = document.getElementById('customers-table');
   if (customersTable) {
     customersTable.addEventListener('click', (e) => {
@@ -385,8 +359,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!btn) return;
       const action = btn.dataset.action;
       if (action === 'reset-password') {
+        e.preventDefault();
         showSuccessMessage('Đã thực hiện reset mật khẩu thành công!');
       } else if (action === 'toggle-status') {
+        e.preventDefault();
         showSuccessMessage('Đã thực hiện thay đổi trạng thái khách hàng thành công!');
       }
     });
@@ -398,6 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
     typesTable.addEventListener('click', (e) => {
       const btn = e.target.closest('button[data-action]');
       if (!btn) return;
+      e.preventDefault();
       const action = btn.dataset.action;
       if (action === 'edit-type') {
         showSuccessMessage('Đã mở form chỉnh sửa loại sản phẩm!');
@@ -421,6 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
     productsTable.addEventListener('click', (e) => {
       const btn = e.target.closest('button[data-action]');
       if (!btn) return;
+      e.preventDefault();
       const action = btn.dataset.action;
       if (action === 'edit-product') {
         showSuccessMessage('Đã mở form chỉnh sửa sản phẩm!');
@@ -444,6 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
     purchaseTable.addEventListener('click', (e) => {
       const btn = e.target.closest('button[data-action]');
       if (!btn) return;
+      e.preventDefault();
       const action = btn.dataset.action;
       if (action === 'edit-purchase') {
         showSuccessMessage('Đã mở form chỉnh sửa phiếu nhập!');
@@ -506,8 +485,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     ordersTable.addEventListener('click', (e) => {
-      if (e.target.closest('button') && e.target.textContent === 'Xem') {
-        // viewOrderDetail sẽ được gọi từ onclick
+      const btn = e.target.closest('button');
+      if (btn && (btn.textContent === 'Xem' || btn.onclick)) {
+        e.preventDefault();
+        // viewOrderDetail sẽ được gọi từ onclick, nhưng chúng ta cũng hiển thị thông báo
         showSuccessMessage('Đã mở chi tiết đơn hàng!');
       }
     });
